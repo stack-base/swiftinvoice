@@ -1,0 +1,2837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SwiftInvoice | StackBase</title>
+    <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
+
+    <!-- JS Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Base styles --- */
+        /* REMOVED: --sidebar-width variable */
+
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+            color: #111827; /* text-gray-900 */
+            height: 100vh; /* h-screen */
+            overflow: hidden; /* overflow-hidden */
+            margin: 0;
+        }
+
+        /* ---
+           STYLES FOR THE INVOICE TEMPLATE ITSELF
+           These styles control the look of the #invoice div that gets
+           exported to PDF.
+        --- */
+
+        #invoice {
+            width:100%;
+            background:#fff;
+            padding: 40px 40px 24px 40px; /* Reduced bottom padding */
+            box-sizing:border-box;
+            color: #111827; /* gray-900 */
+            font-family: 'Inter', Arial, sans-serif;
+            min-height: 29.7cm; /* A4 Height */
+            
+            /* --- Flexbox styles --- */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- Logo styles --- */
+        .invoice-logo {
+            max-height: 80px;
+            width: 100%;
+            max-width: 160px;
+            object-fit: contain;
+            border-radius: 6px; 
+        }
+
+        .invoice-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #f3f4f6; /* gray-100 border */
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+        .header-left {
+            width: 58%; 
+        }
+        .header-right {
+            width: 40%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+        }
+
+        .party-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        /* --- Invoice Title --- */
+        h1.title {
+            font-size: 32px;
+            margin: 0 0 16px 0;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #111827;
+            text-transform: uppercase; /* Added for "INVOICE" */
+        }
+
+        .meta-table { font-size:12px; border-collapse:collapse; }
+        .meta-table td { padding: 4px 0; vertical-align:top; }
+        .meta-table td.label { 
+            width:120px; 
+            font-weight: 600;
+            color: #4b5563; /* gray-600 */
+        }
+        
+        .party { width:48%; }
+        .party h2 { 
+            font-size: 14px;
+            margin: 0 0 8px 0;
+            font-weight: 600; 
+            color: #111827; 
+        }
+        .address {
+            font-size: 12px;
+            white-space:pre-wrap;
+            line-height: 1.6;
+            min-height:72px;
+            padding:4px;
+            border:none;
+            color: #4b5563; /* gray-600 */
+        }
+
+        /* Items table */
+        .table-wrap { margin-top: 0; width:100%; overflow-x:auto; }
+        #items {
+            width:100%;
+            border-collapse:collapse;
+            font-size: 12px;
+        }
+        #items th, #items td {
+            padding: 12px 8px;
+            vertical-align:top;
+            font-family:'Inter', Arial, sans-serif;
+            border:none;
+            text-align: left;
+            vertical-align: middle; 
+        }
+        /* Column alignments */
+        #items td:nth-child(1), #items th:nth-child(1) { text-align: center; } /* Line Nr */
+        #items td:nth-child(2), #items th:nth-child(2) { text-align: left; } /* Product Code */
+        #items td:nth-child(3), #items th:nth-child(3) { text-align: left; } /* Description */
+        #items td:nth-child(4), #items th:nth-child(4) { text-align: center; } /* Qty */
+        #items td:nth-child(5), #items th:nth-child(5) { text-align: right; } /* Price excl */
+        /* UPDATED: Column 6 is now VAT Rate */
+        #items td:nth-child(6), #items th:nth-child(6) { text-align: right; } /* VAT rate */
+        /* UPDATED: Column 7 is now VAT Amount */
+        #items td:nth-child(7), #items th:nth-child(7) { text-align: right; } /* VAT amount */
+        /* UPDATED: Column 8 is now Price Incl */
+        #items td:nth-child(8), #items th:nth-child(8) { text-align: right; } /* Price incl */
+        #items th:last-child, #items td:last-child { text-align: center; } /* Actions */
+
+
+        #items thead th {
+            background: #f9fafb; /* gray-50 */
+            font-weight: 600;
+            font-size: 11px;
+            vertical-align:middle;
+            color: #4b5563; /* gray-600 */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 8px;
+        }
+
+        /* Column sizing */
+        #items th:nth-child(1) { width:40px; } /* Line Nr */
+        #items th:nth-child(2) { width:80px; } /* Product Code */
+        #items th:nth-child(3) { /* Description - auto width */ }
+        #items th:nth-child(4) { width:40px; } /* Qty */
+        #items th:nth-child(5) { width:90px; } /* Price excl */
+        /* REMOVED: th:nth-child(6) for Tax Category */
+        /* UPDATED: th:nth-child(6) is now VAT Rate */
+        #items th:nth-child(6) { width:60px; } /* VAT rate */
+        /* UPDATED: th:nth-child(7) is now VAT Amount */
+        #items th:nth-child(7) { width:80px; } /* VAT amount */
+        /* UPDATED: th:nth-child(8) is now Price Incl */
+        #items th:nth-child(8) { width:90px; } /* Price incl */
+        #items th:last-child { width: 40px; } /* Actions column */
+
+        #items tbody tr { border-bottom:1px solid #f3f4f6; } /* LIGHTER BORDER */
+        .desc { 
+            white-space:pre-wrap; 
+            line-height: 1.6;
+            font-size: 12px;
+            color: #111827;
+            width: 100%; /* Ensure it takes width for text-align to work */
+        }
+        
+        /* --- NEW: Styles for custom table dropdown --- */
+        /* This wrapper is now inside the Description cell */
+        .tax-category-wrapper {
+            position: relative;
+            margin-top: 8px;
+            max-width: 200px; /* Limit width */
+        }
+        
+        .table-dropdown-trigger {
+            width: 100%;
+            padding: 4px 2px;
+            font-size: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background-color: #f9fafb;
+            font-family: 'Inter', Arial, sans-serif;
+            text-align: left;
+            cursor: pointer;
+            
+            /* Ellipsis for long text */
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 20px; /* Space for arrow */
+            
+            /* SVG arrow */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.5'%3e%3cpath d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            background-size: 16px 16px;
+        }
+        .table-dropdown-trigger:hover {
+            background-color: #f3f4f6;
+        }
+        .table-dropdown-trigger:focus {
+            outline:1px dashed #9ca3af;
+            border-color: #9ca3af;
+            background-color: #fff;
+        }
+        
+        .table-dropdown-panel {
+            position: absolute;
+            z-index: 10;
+            /* UPDATED: Position to open upwards, relative to the wrapper */
+            bottom: 100%; 
+            margin-bottom: 4px;
+            width: 180px; /* Wider than the wrapper */
+            max-height: 15rem; /* 240px */
+            overflow: auto;
+            border-radius: 0.375rem; /* 6px */
+            background-color: #ffffff;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-dropdown-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            font-size: 12px;
+            line-height: 1.25;
+            color: #374151;
+            background: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .table-dropdown-option:hover {
+            background-color: #f0fdfa; /* teal-50 */
+            color: #0f766e; /* teal-700 */
+        }
+        /* --- End custom table dropdown --- */
+
+        
+        /* NEW: Style for the read-only rate cell */
+        .rate-display {
+            text-align: right !important;
+            color: #4b5563; /* gray-600 */
+            font-size: 12px;
+            padding-right: 8px;
+        }
+
+        /* Totals block */
+        .totals {
+            display:flex;
+            justify-content:flex-end;
+            margin-top: 32px;
+        }
+        .totals .box {
+            width: 380px;
+            font-size: 12px;
+        }
+        .totals .currency { 
+            text-align:right; 
+            padding-right:10px; 
+            margin-bottom:6px; 
+            color: #4b5563; /* gray-600 */
+            font-size: 12px;
+        }
+        .totals table { 
+            width:100%; 
+            border-collapse:collapse; 
+            font-size: 12px;
+        }
+        .totals td { padding: 8px; }
+        .totals td.label { 
+            text-align:left; 
+            width:100px; 
+            font-weight: 500;
+            color: #4b5563; /* gray-600 */
+        }
+        .totals td.value { 
+            text-align:right; 
+            font-weight: 700; 
+            width:140px; 
+            color: #111827; /* gray-900 */
+        }
+
+        /* Grand total highlight */
+        .totals table tr:last-child {
+            background-color: #f9fafb; /* gray-50 */
+            border-top: 2px solid #e5e7eb; /* gray-200 */
+            border-bottom: 2px solid #e5e7eb; /* gray-200 */
+        }
+        .totals table tr:last-child td {
+            font-size: 14px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        /* Delete button */
+        .delete-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+        }
+        .delete-btn svg {
+            color: #dc2626; /* text-red-600 */
+            width: 1rem; /* w-4 */
+            height: 1rem; /* h-4 */
+            stroke-width: 1.5;
+        }
+        .delete-btn:hover svg {
+            stroke: #b91c1c; /* hover:text-red-700 */
+        }
+
+        /* contenteditable focus styles */
+        [contenteditable="true"]:focus { 
+            outline:1px dashed #9ca3af; 
+            background:#f9fafb; 
+        }
+
+        /* --- New styles to replace Tailwind --- */
+
+        /* Utility classes */
+        .hidden {
+            display: none;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        /* Small screen text: hidden */
+        @media (min-width: 640px) {
+            .sm\:inline {
+                display: inline;
+            }
+        }
+        /* Large screen: hidden */
+        @media (min-width: 1024px) {
+            .lg\:hidden {
+                display: none !important;
+            }
+            .lg\:block {
+                display: block;
+            }
+            .lg\:relative {
+                position: relative;
+            }
+            /* REMOVED .lg\:w-96 */
+            /* REMOVED .lg\:pl-96 */
+            .lg\:translate-x-0 {
+                transform: translateX(0);
+            }
+        }
+
+
+        /* Layout */
+        .app-layout {
+            /* On mobile, block layout (default) */
+            /* On desktop, it's a flex-row */
+        }
+
+        @media (min-width: 1024px) {
+            .app-layout {
+                display: flex;
+            }
+        }
+
+        /* Sidebar (Column 1: History) */
+        .sidebar {
+            width: 100%;
+            max-width: 24rem; /* Max width on mobile, hardcoded from var */
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            flex-shrink: 0;
+            
+            /* --- Mobile styles --- */
+            position: fixed;
+            inset-y: 0;
+            left: 0;
+            z-index: 20;
+            transform: translateX(-100%);
+            transition-property: transform;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+
+            /* --- Positioning branding at bottom --- */
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+        }
+        .sidebar.mobile-sidebar-open {
+            transform: translateX(0);
+        }
+
+        /* Desktop sidebar styles (Column 1) */
+        @media (min-width: 1024px) {
+            .sidebar {
+                width: 20%; /* CHANGED from 25% */
+                max-width: none; /* ADDED */
+                position: fixed; /* Always fixed on left */
+                transform: translateX(0);
+            }
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            background-color: rgb(0 0 0 / 0.5);
+        }
+
+        .settings-panel {
+            padding: 1.5rem 1rem; /* UPDATED padding */
+            /* --- Grow to fill space --- */
+            flex-grow: 1;
+            overflow-y: auto; /* Allow settings to scroll */
+        }
+        @media (min-width: 768px) {
+            .settings-panel {
+                padding: 2.5rem 1.5rem; /* UPDATED padding */
+            }
+        }
+        .settings-panel > section:not([hidden]) ~ section:not([hidden]) {
+            margin-top: 2rem; /* 32px */
+        }
+        .settings-panel > .sidebar-header:not([hidden]) ~ *:not([hidden]) {
+            margin-top: 2rem; /* 32px */
+        }
+
+        /* --- NEW: Column 2 (Settings) Styles --- */
+        .settings-column-wrapper {
+            background-color: #f9fafb; /* Lighter bg for mobile */
+            border-bottom: 1px solid #e5e7eb;
+        }
+        /* On mobile, the settings-panel inside provides padding */
+        .settings-column-wrapper .settings-panel {
+             padding-bottom: 0; /* Remove bottom padding if header is present */
+        }
+        .settings-column-header {
+             /* Uses .settings-section-title styles */
+             padding-bottom: 1.5rem;
+             border-bottom: 1px solid #e5e7eb;
+        }
+        .settings-column-wrapper .settings-panel > .settings-column-header:not([hidden]) ~ *:not([hidden]) {
+            margin-top: 2rem; /* Add margin back */
+        }
+
+        @media (min-width: 1024px) {
+            .settings-column-wrapper {
+                width: 20%; /* CHANGED from 25% */
+                position: fixed;
+                left: 20%; /* CHANGED from 25% */
+                top: 0;
+                height: 100vh;
+                border-right: 1px solid #e5e7eb;
+                background: #ffffff;
+            }
+            /* Make the settings-panel div scrollable */
+            .settings-column-wrapper .settings-panel {
+                overflow-y: auto;
+                height: 100%;
+                padding: 2rem; /* ADDED desktop padding */
+            }
+            .settings-column-header.lg\:hidden {
+                display: none;
+            }
+        }
+        /* --- End Column 2 Styles --- */
+
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between; /* Added for close button */
+            align-items: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .sidebar-header-branding {
+            display: flex;
+            align-items: center;
+        }
+        .sidebar-header-branding > *:not([hidden]) ~ *:not([hidden]) {
+            margin-left: 0.75rem; /* 12px */
+        }
+        .sidebar-logo-bg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem; /* 40px */
+            height: 2.5rem; /* 40px */
+            background-color: #0d9488; /* Changed from indigo */
+            border-radius: 0.5rem; /* 8px */
+        }
+        .sidebar-logo-icon {
+            width: 1.5rem; /* 24px */
+            height: 1.5rem; /* 24px */
+            color: #ffffff;
+        }
+        .sidebar-title {
+            font-size: 1.5rem; /* 24px */
+            line-height: 2rem; /* 32px */
+            font-weight: 700;
+            color: #0d9488; /* Changed from indigo */
+        }
+
+        /* Settings Sections */
+        .settings-section-title {
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.75rem; /* 28px */
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem; /* 16px */
+            padding-bottom: 0.5rem; /* NEW */
+            border-bottom: 1px solid #e5e7eb; /* NEW */
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 1.5rem; /* 24px */
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-helper-text {
+            margin-top: 0.5rem; /* 8px */
+            font-size: 0.75rem; /* 12px */
+            line-height: 1rem; /* 16px */
+            color: #6b7280;
+        }
+
+        /* Custom Dropdown */
+        .dropdown-container {
+            position: relative;
+            margin-top: 0.25rem; /* 4px */
+        }
+        .dropdown-trigger {
+            position: relative;
+            width: 100%;
+            cursor: default;
+            border-radius: 0.375rem; /* 6px */
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0.75rem;
+            padding-right: 2.5rem;
+            text-align: left;
+            font-size: 1rem; /* 16px */
+            line-height: 1.5rem; /* 24px */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); /* NEW */
+        }
+        .dropdown-trigger:hover {
+            border-color: #d1d5db; /* gray-300 */ /* NEW */
+        }
+        .dropdown-trigger:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #99f6e4; /* Changed from indigo */
+            box-shadow: 0 0 0 2px #99f6e4; /* Changed from indigo */
+        }
+        @media (min-width: 640px) {
+            .dropdown-trigger {
+                font-size: 0.875rem; /* 14px */
+                line-height: 1.25rem; /* 20px */
+            }
+        }
+        .dropdown-label {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dropdown-icon-container {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            padding-right: 0.5rem;
+        }
+        .dropdown-icon {
+            width: 1.25rem; /* 20px */
+            height: 1.25rem; /* 20px */
+            color: #9ca3af;
+        }
+        .dropdown-options-panel {
+            position: absolute;
+            z-index: 10;
+            margin-top: 0.25rem;
+            width: 100%;
+            max-height: 15rem; /* 240px */
+            overflow: auto;
+            border-radius: 0.375rem; /* 6px */
+            background-color: #ffffff;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            font-size: 1rem; /* 16px */
+            line-height: 1.5rem; /* 24px */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border: 1px solid rgb(0 0 0 / 0.05);
+        }
+        .dropdown-options-panel:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+        @media (min-width: 640px) {
+            .dropdown-options-panel {
+                font-size: 0.875rem; /* 14px */
+                line-height: 1.25rem; /* 20px */
+            }
+        }
+        .dropdown-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            color: #374151;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .dropdown-option:hover {
+            background-color: #f0fdfa; /* Changed from indigo */
+            color: #0f766e; /* Changed from indigo */
+        }
+
+        /* Notification */
+        .notification-box {
+            padding: 0.75rem; /* 12px */
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            color: #92400e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification-dismiss-btn {
+            margin-left: 0.5rem;
+            margin-right: -0.25rem;
+            margin-top: -0.25rem;
+            margin-bottom: -0.25rem;
+            padding: 0.25rem;
+            border-radius: 0.375rem; /* 6px */
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .notification-dismiss-btn:hover {
+            background-color: #fef3c7;
+        }
+        .notification-dismiss-btn:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px #f59e0b;
+        }
+        .notification-dismiss-btn-icon {
+            width: 1rem; /* 16px */
+            height: 1rem; /* 16px */
+            stroke: currentColor;
+        }
+
+        /* File Input */
+        .form-file-input {
+            margin-top: 0.75rem; /* 12px */
+            width: 100%;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            color: #6b7280;
+        }
+        .form-file-input::file-selector-button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* 6px */
+            border-width: 0;
+            font-weight: 600;
+            background-color: #f0fdfa; /* Changed from indigo */
+            color: #0f766e; /* Changed from indigo */
+            cursor: pointer;
+        }
+        .form-file-input:hover::file-selector-button {
+            background-color: #ccfbf1; /* Changed from indigo */
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            font-weight: 500;
+            border-radius: 0.375rem; /* 6px */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .btn-full {
+            width: 100%;
+        }
+        .btn-primary {
+            color: #ffffff;
+            background-color: #0d9488; /* Changed from indigo */
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #0f766e; /* Changed from indigo */
+        }
+        .btn-primary:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #2dd4bf; /* Changed from indigo */
+            box-shadow: 0 0 0 2px #2dd4bf; /* Changed from indigo */
+        }
+        .btn-secondary {
+             color: #374151;
+            background-color: #ffffff;
+            border-color: #e5e7eb;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #f9fafb;
+        }
+        /* NEW: More distinct hover for toolbar */
+        .invoice-toolbar .btn-secondary:hover:not(:disabled) {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        .btn-secondary:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #2dd4bf; /* Changed from indigo */
+            box-shadow: 0 0 0 2px #2dd4bf; /* Changed from indigo */
+        }
+
+        .btn-danger {
+            color: #ffffff;
+            background-color: #dc2626;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem; /* 12px */
+            line-height: 1rem; /* 16px */
+            margin-top: 0.75rem; /* 12px */
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: #b91c1c;
+        }
+        .btn-danger:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px #ef4444;
+        }
+        .btn-icon {
+            width: 1.25rem; /* 20px */
+            height: 1.25rem; /* 20px */
+            margin-right: 0.5rem;
+            margin-left: -0.25rem;
+        }
+        /* Loading spinner animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+
+        /* Icon-only button (for mobile menu toggles) */
+        .btn-icon-only {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem; /* 40px */
+            height: 2.5rem; /* 40px */
+            padding: 0;
+            border-radius: 0.375rem;
+            border: 1px solid transparent;
+            color: #4b5563; /* gray-600 */
+        }
+        .btn-icon-only:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .btn-icon-only:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #2dd4bf; /* Changed from indigo */
+            box-shadow: 0 0 0 2px #2dd4bf; /* Changed from indigo */
+        }
+        .btn-icon-only svg {
+            width: 1.5rem; /* 24px */
+            height: 1.5rem; /* 24px */
+        }
+
+
+        /* Main Content Area (Column 3) */
+        .main-content {
+            flex: 1 1 0%;
+            height: 100%;
+            overflow-y: auto;
+            width: 100%;
+        }
+        @media (min-width: 1024px) {
+            .main-content {
+                /* REMOVED padding-left */
+                margin-left: 40%; /* ADDED (Col1 20% + Col2 20%) */
+                width: 60%; /* ADDED */
+            }
+        }
+
+        /* --- NEW: Main Header Bar --- */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background-color: rgba(243, 244, 246, 0.8); /* bg-gray-100/80 */
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 4rem; /* 64px */
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .main-header {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .main-header {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+
+        .main-content-container {
+            max-width: 56rem; /* 896px */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1.5rem 1rem; /* Reduced top padding */
+        }
+        @media (min-width: 640px) {
+            .main-content-container {
+                padding: 2.5rem 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .main-content-container {
+                padding: 2.5rem 2rem;
+            }
+        }
+
+        /* --- NEW: Invoice Toolbar --- */
+        .invoice-toolbar {
+            display: flex;
+            gap: 0.75rem; /* 12px */
+            flex-wrap: nowrap; /* Keep buttons in a row */
+        }
+        /* Make toolbar buttons shrink if needed, and adjust padding */
+        .invoice-toolbar .btn {
+            width: auto;
+            flex-shrink: 0;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        .invoice-toolbar .btn-icon {
+            margin-right: 0.25rem;
+        }
+        /* On small screens, hide text label */
+        .invoice-toolbar .btn-label {
+            display: none; /* Hidden by default */
+        }
+        @media (min-width: 640px) {
+            .invoice-toolbar .btn {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+             .invoice-toolbar .btn-label {
+                display: inline; /* Show on sm+ */
+            }
+            .invoice-toolbar .btn-icon {
+                margin-right: 0.5rem;
+            }
+        }
+        /* --- End New Styles --- */
+
+
+        /* App Container (Invoice Wrapper) */
+        .app-container {
+            background-color: #ffffff;
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+        @media (max-width: 640px) {
+            .app-container {
+                /* NEW: Smaller shadow on mobile */
+                box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            }
+        }
+
+        /* Branding Styles (Column 1) */
+        .sidebar-branding {
+            /* --- Moved from inline style --- */
+            font-family: 'Ubuntu', sans-serif;
+            text-align: center;
+            font-size: 0.875rem; /* 14px */
+            color: #6b7280; /* gray-500 */
+            font-weight: 500;
+            
+            /* --- New positioning styles --- */
+            flex-shrink: 0; /* Don't shrink */
+            padding: 1.5rem; /* 24px */
+            border-top: 1px solid #e5e7eb; /* gray-200 */
+        }
+        /* REMOVED: User ID Display */
+
+
+        .invoice-footer {
+            font-family: 'Ubuntu', sans-serif;
+            text-align: center;
+            margin-top: 3rem; /* 48px - Was 4rem */
+            padding-top: 1rem; /* 16px - Was 1.5rem */
+            border-top: 1px solid #e5e7eb; /* gray-200 */
+            font-size: 0.875rem; /* 14px */
+            color: #9ca3af; /* gray-400 */
+            font-weight: 400;
+        }
+
+        .invoice-footer-brand {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+        }
+        
+        /* --- NEW: Search Box Styles --- */
+        .search-wrapper {
+            position: relative;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem; /* Space between search and list */
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem; /* 8px 12px 8px 40px */
+            border-radius: 0.375rem; /* 6px */
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.25rem; /* 20px */
+            color: #1f2937;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box; /* <<< ADD THIS LINE */
+        }
+        .search-input:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #2dd4bf; /* teal-400 */
+            box-shadow: 0 0 0 2px #2dd4bf;
+        }
+        .search-input::placeholder {
+            color: #9ca3af; /* gray-400 */
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.75rem; /* 12px */
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            width: 1.25rem; /* 20px */
+            height: 1.25rem; /* 20px */
+            color: #9ca3af; /* gray-400 */
+            pointer-events: none; /* So it doesn't block focus */
+        }
+        
+        /* --- NEW: Saved Invoice List Styles --- */
+        #invoice-list-container {
+            margin-top: 0.5rem; /* Reduced from 1rem */
+            /* REMOVED max-height */
+            overflow-y: visible; /* Let parent panel scroll */
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+        #invoice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem; /* 4px gap between items */
+        }
+        #invoice-list li {
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: stretch; /* Make items full height */
+            gap: 0.25rem; /* 4px gap between load and delete */
+            border-radius: 0.375rem; /* 6px */
+            overflow: hidden; /* To contain the rounded corners */
+        }
+        
+        /* This is the main "Load" button */
+        #invoice-list .list-item-content {
+            flex-grow: 1;
+            padding: 0.75rem 1rem; /* 12px 16px */
+            border-radius: 0.375rem; /* 6px */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            background-color: #ffffff;
+            text-align: left;
+            cursor: pointer;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            display: block; /* Treat as block for text */
+            width: 100%;
+            color: #374151; /* gray-700 */
+        }
+        #invoice-list .list-item-content:hover {
+            background-color: #f9fafb; /* gray-50 */
+            border-color: #d1d5db; /* gray-300 */
+        }
+        #invoice-list .list-item-content:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #2dd4bf; /* teal-400 */
+            box-shadow: 0 0 0 2px #2dd4bf;
+        }
+        
+        /* NEW: Active state for loaded invoice */
+        #invoice-list .list-item-content.active {
+            border-color: #2dd4bf; /* teal-400 */
+            background-color: #f0fdfa; /* teal-50 */
+            box-shadow: 0 0 0 1px #2dd4bf;
+        }
+        #invoice-list .list-item-content.active:hover {
+             background-color: #ccfbf1; /* teal-100 */
+        }
+
+
+        #invoice-list .list-item-content strong {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937; /* gray-800 */
+            display: block;
+        }
+        #invoice-list .list-item-content span {
+            font-size: 0.75rem;
+            color: #6b7280; /* gray-500 */
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* This is the new icon button wrapper */
+        #invoice-list .list-item-actions {
+            display: flex;
+            gap: 0.25rem; /* 4px */
+            flex-shrink: 0;
+        }
+        
+        /* Remove base button styles from list-btn */
+        #invoice-list .list-btn {
+            padding: 0;
+            width: 2.5rem; /* 40px */
+            height: 100%;
+            min-height: 2.5rem; /* 40px */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem; /* 6px */
+            border: 1px solid transparent;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #invoice-list .list-btn svg {
+             width: 1rem; /* 16px */
+             height: 1rem; /* 16px */
+        }
+        
+        /* Specific button styles */
+        /* REMOVED .list-btn-load styles, it's now .list-item-content */
+
+        .list-btn-delete {
+            background-color: #fef2f2; /* red-50 */
+            color: #dc2626; /* red-600 */
+            border-color: #fee2e2; /* red-100 */
+        }
+        .list-btn-delete:hover {
+            background-color: #fee2e2; /* red-100 */
+            color: #b91c1c; /* red-700 */
+        }
+        .list-btn-delete:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #f87171; /* red-400 */
+            box-shadow: 0 0 0 2px #f87171;
+        }
+        
+        #invoice-list .list-placeholder {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-style: italic;
+            /* NEW: Center placeholder */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem; /* 12px */
+            min-height: 100px; /* Give it some space */
+            justify-content: center;
+        }
+        /* NEW: Icon styles for placeholder */
+        #invoice-list .list-placeholder-icon {
+            width: 2rem; /* 32px */
+            height: 2rem; /* 32px */
+            color: #d1d5db; /* gray-300 */
+        }
+
+
+        /* --- MOBILE RESPONSIVE STYLES --- */
+        @media (max-width: 1023px) { /* md breakpoint CHANGED to 1023px */
+            
+            body {
+                overflow: auto; /* Allow body to scroll on mobile */
+            }
+            
+            /* NEW: Mobile layout improvements */
+            .settings-column-wrapper {
+                background-color: transparent; /* Match body bg */
+                border-bottom: none; /* Remove border */
+            }
+            .settings-column-wrapper .settings-panel {
+                padding-top: 0; /* Mobile header has padding */
+            }
+            .settings-column-header {
+                 padding-bottom: 1rem;
+                 margin-bottom: 1.5rem;
+            }
+            /* END NEW */
+            
+            #invoice {
+                padding: 20px;
+                min-height: 0; /* Remove A4 height constraint */
+            }
+            .invoice-header-row {
+                flex-direction: column;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            .header-left, .header-right {
+                width: 100%;
+            }
+            .header-right {
+                align-items: flex-start;
+            }
+
+            .party-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .party {
+                width: 100%;
+            }
+
+            h1.title {
+                font-size: 28px;
+            }
+
+            /* --- Responsive Table --- */
+            .table-wrap {
+                overflow-x: hidden; /* Hide horizontal scroll */
+            }
+            #items {
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+            #items thead {
+                display: none; /* Hide table head */
+            }
+            #items tr.item {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.375rem;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                padding: 0;
+            }
+            #items td {
+                display: block;
+                width: 100% !important; /* Force full width */
+                box-sizing: border-box; /* Include padding in width */
+                text-align: right !important; /* Force right align */
+                padding: 0.75rem 1rem; /* 12px 16px */
+                padding-left: 9rem; /* 144px (make space for label) */
+                position: relative;
+                border: none;
+                border-bottom: 1px solid #f3f4f6;
+            }
+            #items tr.item td:last-child {
+                border-bottom: none;
+            }
+
+            #items td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 1rem; /* 16px */
+                top: 0.75rem; /* 12px */
+                padding-right: 0.5rem; /* 8px */
+                
+                font-weight: 600;
+                color: #4b5563;
+                text-align: left;
+                white-space: nowrap;
+            }
+            
+            /* Handle description field */
+            #items td[data-label="Description"] {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            .desc {
+                text-align: right; /* Align text inside contenteditable */
+                padding: 0;
+            }
+
+            /* Handle tax category dropdown */
+            /* REMOVED: td[data-label="Tax Category"] styles */
+            
+            /* UPDATED: Wrapper is now inside description cell */
+            .tax-category-wrapper {
+                max-width: none; /* Full width on mobile */
+            }
+            .table-dropdown-trigger {
+                padding-top: 8px;
+                padding-bottom: 8px;
+            }
+            /* Position mobile dropdown panel */
+            .table-dropdown-panel {
+                bottom: auto;
+                top: 100%;
+                margin-bottom: 0;
+                margin-top: 4px;
+                width: 100%;
+                left: 0;
+                width: 100%; /* Full width */
+            }
+            
+            /* Handle read-only rate */
+            .rate-display {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            /* Handle delete button */
+            #items td[data-label="Action"] {
+                padding: 0;
+                height: 3.5rem; /* 56px */
+            }
+            .delete-btn {
+                position: absolute;
+                top: 0.5rem; /* 8px */
+                right: 0.5rem; /* 8px */
+                padding: 0.5rem; /* 8px */
+                background-color: #fef2f2;
+            }
+            .delete-btn:hover {
+                background-color: #fee2e2;
+            }
+            .delete-btn svg {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+            
+            /* --- End Responsive Table --- */
+
+            .totals {
+                margin-top: 24px;
+            }
+            .totals .box {
+                width: 100%;
+            }
+        }
+
+
+        /* Print overrides */
+        @media print {
+            .hide-on-print { display:none; }
+            body { 
+                background:#fff; 
+                padding:0; 
+                margin: 0;
+                height: auto;
+                overflow: visible;
+            }
+            .app-layout {
+                display: block;
+            }
+            main.main-content {
+                display: block;
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                padding: 0;
+                margin: 0;
+                /* NEW: Reset desktop layout changes */
+                margin-left: 0;
+            }
+            main .main-content-container {
+                max-width: none;
+                padding: 0;
+                margin: 0;
+            }
+            .app-container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+            }
+            #invoice {
+                border: none;
+                border-radius: 0;
+                padding: 0; /* Use printer margins */
+            }
+            /* --- HIDE NEW TOOLBAR ON PRINT --- */
+            .main-header {
+                display: none;
+            }
+            
+            /* --- Print styles for table --- */
+            /* Ensure custom dropdowns are not shown */
+            .table-dropdown-trigger {
+                display: none;
+            }
+            .table-dropdown-panel {
+                display: none;
+            }
+            
+            /* UPDATED: Target the wrapper div */
+            .tax-category-wrapper::after {
+                content: attr(data-category-print); /* We will set this via JS */
+                font-size: 12px;
+                color: #111827;
+                white-space: nowrap;
+                /* NEW: Add a label for clarity in print */
+                padding-left: 8px;
+            }
+            /* NEW: Add a label before the printed category */
+            .tax-category-wrapper::before {
+                content: "Tax Category:";
+                font-size: 12px;
+                font-weight: 600;
+                color: #4b5563;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile sidebar overlay, hidden by default -->
+    <div id="sidebar-overlay" class="sidebar-overlay hidden lg:hidden"></div>
+
+    <!-- Main Structure: Full-height layout -->
+    <div class="app-layout">
+
+        <!-- --- COLUMN 1: Saved Items (becomes mobile sidebar) --- -->
+        <!-- Base classes: mobile-first, hidden by default -->
+        <!-- lg:* classes: apply on large screens -->
+        <aside id="history-sidebar" class="sidebar hide-on-print">
+            
+            <!-- Settings panel (scrollable, used for padding) -->
+            <div class="settings-panel">
+
+                <!-- Header with new branding -->
+                <div class="sidebar-header">
+                    <div class="sidebar-header-branding">
+                        <!-- Simple SVG Logo -->
+                        <span class="sidebar-logo-bg">
+                            <svg class="sidebar-logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h1 class="sidebar-title">SwiftInvoice</h1>
+                        </div>
+                    </div>
+                    <!-- Mobile Close Button -->
+                    <button type="button" id="sidebar-close-btn" class="btn-icon-only lg:hidden">
+                        <span class="sr-only">Close menu</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- --- NEW: Section 3: Saved Invoices --- -->
+                <section id="invoice-list-section">
+                    <h2 class="settings-section-title">Saved Invoices</h2>
+                    <!-- NEW: Search Box -->
+                    <div class="search-wrapper">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input type="text" id="invoice-search" class="search-input" placeholder="Search by name or number...">
+                    </div>
+                    
+                    <div id="invoice-list-container">
+                        <ul id="invoice-list">
+                            <!-- Placeholder, will be populated by JS -->
+                            <li class="list-placeholder">No saved invoices.</li>
+                        </ul>
+                    </div>
+                </section>
+
+            </div> <!-- end settings-panel -->
+
+            <!-- New Branding Section (Moved to bottom) -->
+            <div class="sidebar-branding hide-on-print">
+                Powered by <strong><a href="https://stack-base.github.io/home" style="text-decoration: none; color: #6b7280;">StackBase</a></strong>
+                <!-- REMOVED: User ID Display -->
+            </div>
+
+        </aside> <!-- end column 1 -->
+
+
+        <!-- --- COLUMN 2: Settings Panel --- -->
+        <!-- This is new. It's a block on mobile, a column on desktop -->
+        <aside id="settings-column" class="settings-column-wrapper hide-on-print">
+            <!-- This div provides padding and scrolling on desktop -->
+            <div class="settings-panel"> 
+                 <!-- Mobile-only Header -->
+                <div class="settings-column-header lg:hidden">
+                    <h2 class="settings-section-title">Invoice Settings</h2>
+                </div>
+            
+                <!-- Section 1: Invoice Settings -->
+                <section>
+                    <h2 class="settings-section-title">Invoice Settings</h2>
+                    <div class="settings-grid">
+                        <!-- Region Settings -->
+                        <div>
+                            <label for="region-select-trigger" class="form-label">
+                                Currency & Tax
+                            </label>
+                            
+                            <!-- *** NEW CUSTOM DROPDOWN (Region) *** -->
+                            <div class="dropdown-container" id="region-dropdown-container">
+                                <!-- 1. Trigger Button -->
+                                <button type="button" id="region-select-trigger" class="dropdown-trigger">
+                                    <span class="dropdown-label" id="region-select-label">Select Region</span>
+                                    <span class="dropdown-icon-container">
+                                        <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                        </svg>
+                                    </span>
+                                </button>
+                                
+                                <!-- 2. Options Panel (hidden by default) -->
+                                <div id="region-select-options" class="dropdown-options-panel hidden">
+                                    <!-- Options will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <!-- *** END CUSTOM DROPDOWN *** -->
+
+                            <p class="form-helper-text">Sets the default currency and tax categories for all items.</p>
+                        </div>
+
+                        <!-- Region change notification -->
+                        <div id="region-note" class="notification-box hidden">
+                            <p>Region changed. Please review item tax categories.</p>
+                            <button id="dismiss-note-btn" type="button" class="notification-dismiss-btn">
+                                <svg class="notification-dismiss-btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Logo Settings -->
+                <section>
+                    <h2 class="settings-section-title">Branding</h2>
+                    <div class="settings-grid">
+                        <div>
+                            <label for="logo-select-trigger" class="form-label">
+                                Logo
+                            </label>
+
+                            <!-- *** NEW CUSTOM DROPDOWN (Logo) *** -->
+                            <div class="dropdown-container" id="logo-dropdown-container">
+                                <!-- 1. Trigger Button -->
+                                <button type="button" id="logo-select-trigger" class="dropdown-trigger">
+                                    <span class="dropdown-label" id="logo-select-label">No Logo</span>
+                                    <span class="dropdown-icon-container">
+                                        <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                        </svg>
+                                    </span>
+                                </button>
+                                
+                                <!-- 2. Options Panel (hidden by default) -->
+                                <div id="logo-select-options" class="dropdown-options-panel hidden">
+                                    <button data-value="none" class="custom-logo-option dropdown-option">No Logo</button>
+                                    <button data-value="atikle" class="custom-logo-option dropdown-option">atikle</button>
+                                    <button data-value="upload" class="custom-logo-option dropdown-option">Choose your own</button>
+                                </div>
+                            </div>
+                            <!-- *** END CUSTOM DROPDOWN *** -->
+
+                            <!-- File input -->
+                            <input type="file" id="logo-upload" accept="image/*" class="form-file-input hidden">
+                            
+                            <button id="remove-logo" class="btn btn-danger hidden">
+                                Remove Logo
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside> <!-- end column 2 -->
+
+
+        <!-- --- COLUMN 3: Invoice Preview (50%) --- -->
+        <!-- Takes full width on mobile, 50% on desktop -->
+        <main class="main-content">
+
+            <!-- --- NEW STICKY HEADER / TOOLBAR --- -->
+            <header class="main-header hide-on-print">
+                <!-- Mobile Menu Toggle (for Column 1) -->
+                <button type="button" id="sidebar-open-btn" class="btn-icon-only lg:hidden">
+                    <span class="sr-only">Open menu</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+                
+                <!-- Spacer for mobile to center toolbar -->
+                <div class="lg:hidden"></div>
+
+                <!-- Toolbar -->
+                <div class="invoice-toolbar">
+                    <!-- NEW: New Invoice Button -->
+                    <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="btn-label sm:inline">New</span>
+                    </button>
+                    <!-- NEW: Save Invoice Button -->
+                    <button id="save-invoice-btn" title="Save Invoice" class="btn btn-primary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v13.5A2.25 2.25 0 0118 21.75H6A2.25 2.25 0 013.75 19.5V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" />
+                        </svg>
+                        <span class="btn-label sm:inline">Save</span>
+                    </button>
+                    
+                    <button id="add-item-btn" title="Add item" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span class="btn-label sm:inline">Add Item</span>
+                    </button>
+                    
+                    <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
+                        </svg>
+                        <span class="btn-label sm:inline">Print</span>
+                    </button>
+                    <button id="generate-pdf-btn" class="btn btn-secondary"> <!-- Changed to secondary -->
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        <span class="btn-label sm:inline">Download</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Main scrolling content -->
+            <div class="main-content-container">
+
+                <!-- app-container -->
+                <div class="app-container">
+            
+                    <!-- The Invoice (This is the preview) -->
+                    <div id="invoice">
+                        
+                        <!-- New wrapper for main content -->
+                        <div class="invoice-main-content">
+                            <div class="invoice-header-row">
+                                <div class="header-left">
+                                    <h1 class="title">Invoice</h1>
+                                    <table class="meta-table">
+                                    <tbody>
+                                        <tr><td class="label">TRN</td><td contenteditable="true" id="trn">104032394900003</td></tr>
+                                        <tr><td class="label">Invoice Nr</td><td contenteditable="true" id="invoice-number">P72381-IAGI000528</td></tr>
+                                        <tr><td class="label">Invoice Date</td><td contenteditable="true" id="invoice-date">2024-11-20</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="header-right">
+                                <img id="invoice-logo" src="" alt="Company Logo" class="invoice-logo hidden"/>
+                            </div>
+                        </div>
+
+                        <div class="party-row">
+                            <div class="party">
+                                <h2>Seller</h2>
+                                <div contenteditable="true" class="address" id="seller">
+Seller Name
+123 Main Street
+City, State 12345
+                                </div>
+                            </div>
+                            <div class="party">
+                                <h2>Buyer</h2>
+                                <div contenteditable="true" class="address" id="buyer">
+Recipient Name
+456 Client Ave
+City, State 67890
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table id="items" aria-label="items table">
+                                <thead>
+                                    <tr>
+                                        <th>Line Nr</th>
+                                        <th>Product Code</th>
+                                        <th>Description</th>
+                                        <th>Qty</th>
+                                        <th>Price excl<br/>VAT</th>
+                                        <!-- REMOVED: Tax Category Header -->
+                                        <!-- UPDATED: VAT Rate (read-only) */ -->
+                                        <th>VAT<br/>rate</th>
+                                        <th>VAT<br/>amount</th>
+                                        <th>Price incl<br/>VAT</th>
+                                        <th class="hide-on-print">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items-body">
+                                    <!-- Initial row updated for new structure -->
+                                    <tr class="item">
+                                        <td contenteditable="true" class="line" data-label="Line Nr">1</td>
+                                        <td contenteditable="true" class="code" data-label="Product Code">ASSI12MS</td>
+                                        <td data-label="Description">
+                                            <div contenteditable="true" class="desc">
+StackBase SwiftInvoice Subscription- 1year
+
+Product Serial Nr   N/A
+                                            </div>
+                                            
+                                            <!-- MOVED: Tax Category Dropdown -->
+                                            <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="">
+                                                <button type="button" class="table-dropdown-trigger">
+                                                    <!-- Populated by JS -->
+                                                </button>
+                                                <div class="table-dropdown-panel hidden">
+                                                    <!-- Options loaded by JS -->
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td contenteditable="true" class="qty" data-label="Qty">1</td>
+                                        <td contenteditable="true" class="excl" data-label="Price excl VAT">66.62</td>
+                                        
+                                        <!-- REMOVED: Tax Category Cell -->
+                                        
+                                        <!-- UPDATED: VAT Rate (read-only) -->
+                                        <td class="rate-display" data-label="VAT rate">5.00%</td>
+                                        
+                                        <td contenteditable="true" class="vat" data-label="VAT amount">3.33</td>
+                                        <td contenteditable="true" class="incl" data-label="Price incl VAT">69.95</td>
+                                        <td class="hide-on-print" data-label="Action">
+                                            <button class="delete-btn" title="Delete row">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.5 0a48.108 48.108 0 00-3.478.397m15.956 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m-4.522 0l.04.04m0 0a.75.75 0 00.746-.746H3.75a.75.75 0 00-.746.746z" />
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="margin-top:8px;">
+                            </div>
+
+                        <div class="totals">
+                            <div class="box">
+                                <div class="currency">AED</div>
+                                <table>
+                                    <tbody>
+                                        <tr><td class="label">Subtotal</td><td contenteditable="true" id="subtotal" class="value">66.62</td></tr>
+                                        <tr><td class="label">VAT</td><td contenteditable="true" id="vat-total" class="value">3.33</td></tr>
+                                        <tr><td class="label">Total</td><td contenteditable="true" id="grand" class="value">69.95</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        </div> <!-- End of new wrapper -->
+
+                        <!-- New Invoice Footer Branding -->
+                        <div class="invoice-footer">
+                            <span class="invoice-footer-brand">SwiftInvoice</span> | StackBase
+                        </div>
+
+                    </div>
+                    <!-- End of #invoice -->
+
+                </div> <!-- end app-container -->
+            </div> <!-- end centering container -->
+        </main> <!-- end right column -->
+    
+    </div> <!-- end app-layout -->
+
+<!-- REMOVED: Firebase SDK Imports -->
+<script type="module">
+    // --- Original script content, now as a module ---
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- NEW: LocalStorage State ---
+        let currentInvoiceId = null; // Track the ID of the invoice being edited
+        const STORAGE_KEY = 'swiftInvoices'; // localStorage key
+
+        // --- STATE VARIABLES ---
+        let currentRegion = 'AE';
+        let currentLogoOption = 'none';
+
+        // --- ELEMENT REFERENCES ---
+        const itemsBody = document.getElementById('items-body');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const generatePdfBtn = document.getElementById('generate-pdf-btn');
+        const printBtn = document.getElementById('print-btn');
+        
+        // Custom Region Dropdown
+        const regionTrigger = document.getElementById('region-select-trigger');
+        const regionLabel = document.getElementById('region-select-label');
+        const regionOptions = document.getElementById('region-select-options');
+        
+        // Custom Logo Dropdown
+        const logoTrigger = document.getElementById('logo-select-trigger');
+        const logoLabel = document.getElementById('logo-select-label');
+        const logoOptionsContainer = document.getElementById('logo-select-options');
+
+        // Other UI
+        const logoUpload = document.getElementById('logo-upload');
+        const invoiceLogo = document.getElementById('invoice-logo');
+        const removeLogoBtn = document.getElementById('remove-logo');
+        const regionNote = document.getElementById('region-note');
+        const dismissNoteBtn = document.getElementById('dismiss-note-btn');
+
+        // Mobile Sidebar Elements
+        const sidebar = document.getElementById('history-sidebar'); // UPDATED ID
+        const sidebarOpenBtn = document.getElementById('sidebar-open-btn');
+        const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        // NEW: LocalStorage UI Elements
+        const newInvoiceBtn = document.getElementById('new-invoice-btn');
+        const saveInvoiceBtn = document.getElementById('save-invoice-btn');
+        const invoiceList = document.getElementById('invoice-list');
+        const invoiceSearch = document.getElementById('invoice-search'); // NEW
+        // REMOVED: userIdDisplay
+
+        // --- DATA ---
+        const countryData = {
+            'AE': { 
+                name: 'AED (United Arab Emirates) - VAT', 
+                currency: 'AED', 
+                taxes: [
+                    { category: 'General Goods/Services', rate: 5.0 },
+                    { category: 'Electronics', rate: 5.0 },
+                    { category: 'Basic Foodstuffs', rate: 0.0 },
+                    { category: 'Healthcare (Specific)', rate: 0.0 },
+                    { category: 'Education (Specific)', rate: 0.0 },
+                    { category: 'Local Transport', rate: 0.0 },
+                    { category: 'Exempt', rate: 0.0 }
+                ],
+                defaultTaxCategory: 'General Goods/Services'
+            },
+            'US': { 
+                name: 'USD (United States) - Sales Tax', 
+                currency: 'USD', 
+                taxes: [
+                    { category: 'General Goods (Varies)', rate: 0.0 },
+                    { category: 'Services (Varies)', rate: 0.0 },
+                    { category: 'Prepared Food (Varies)', rate: 0.0 },
+                    { category: 'Groceries (Often 0%)', rate: 0.0 },
+                    { category: 'Clothing (Varies)', rate: 0.0 },
+                    { category: 'Prescription Drugs', rate: 0.0 },
+                    { category: 'Exempt', rate: 0.0 }
+                ],
+                defaultTaxCategory: 'General Goods (Varies)' 
+            },
+            'GB': { 
+                name: 'GBP (United Kingdom) - VAT', 
+                currency: 'GBP', 
+                taxes: [
+                    { category: 'General Goods (20%)', rate: 20.0 },
+                    { category: 'Restaurant/Hotel (20%)', rate: 20.0 },
+                    { category: 'Home Energy (5%)', rate: 5.0 },
+                    { category: 'Children\'s Car Seats (5%)', rate: 5.0 },
+                    { category: 'Most Groceries (0%)', rate: 0.0 },
+                    { category: 'Books & Newspapers (0%)', rate: 0.0 },
+                    { category: 'Medicines (0%)', rate: 0.0 },
+                    { category: 'Children\'s Clothing (0%)', rate: 0.0 }
+                ],
+                defaultTaxCategory: 'General Goods (20%)'
+            },
+            'DE': { 
+                name: 'EUR (Germany) - VAT', 
+                currency: 'EUR', 
+                taxes: [
+                    { category: 'General Goods (19%)', rate: 19.0 },
+                    { category: 'Electronics (19%)', rate: 19.0 },
+                    { category: 'Services (19%)', rate: 19.0 },
+                    { category: 'Foodstuffs (7%)', rate: 7.0 },
+                    { category: 'Books/Newspapers (7%)', rate: 7.0 },
+                    { category: 'Public Transport (7%)', rate: 7.0 },
+                    { category: 'Hotel Stays (7%)', rate: 7.0 }
+                ],
+                defaultTaxCategory: 'General Goods (19%)'
+            },
+            'FR': { 
+                name: 'EUR (France) - VAT', 
+                currency: 'EUR', 
+                taxes: [
+                    { category: 'General Goods (20%)', rate: 20.0 },
+                    { category: 'Alcohol/Tobacco (20%)', rate: 20.0 },
+                    { category: 'Restaurant/Transport (10%)', rate: 10.0 },
+                    { category: 'Home Repairs (10%)', rate: 10.0 },
+                    { category: 'Most Foodstuffs (5.5%)', rate: 5.5 },
+                    { category: 'Water/Books (5.5%)', rate: 5.5 },
+                    { category: 'Prescription Meds (2.1%)', rate: 2.1 }
+                ],
+                defaultTaxCategory: 'General Goods (20%)'
+            },
+            'IN': { 
+                name: 'INR (India) - GST', 
+                currency: 'INR', 
+                taxes: [
+                    { category: 'Services/Computers (18%)', rate: 18.0 },
+                    { category: 'Luxury Goods/Cars (28%)', rate: 28.0 },
+                    { category: 'Processed Food (12%)', rate: 12.0 },
+                    { category: 'Mobile Phones (12%)', rate: 12.0 },
+                    { category: 'Sugar/Tea (5%)', rate: 5.0 },
+                    { category: 'Basic Spices (5%)', rate: 5.0 },
+                    { category: 'Milk/Fresh Veg (0%)', rate: 0.0 },
+                    { category: 'Health/Education (0%)', rate: 0.0 }
+                ],
+                defaultTaxCategory: 'Services/Computers (18%)'
+            }
+        };
+
+        // --- NEW: LocalStorage Helper Functions ---
+        
+        /**
+         * Fetches all invoices from localStorage.
+         * @returns {Array} An array of invoice objects.
+         */
+        function getInvoicesFromStorage() {
+            try {
+                const invoicesJSON = localStorage.getItem(STORAGE_KEY);
+                return invoicesJSON ? JSON.parse(invoicesJSON) : [];
+            } catch (e) {
+                console.error("Failed to parse invoices from localStorage", e);
+                return [];
+            }
+        }
+        
+        /**
+         * Saves the entire array of invoices to localStorage.
+         * @param {Array} invoices - The array of invoice objects to save.
+         */
+        function saveInvoicesToStorage(invoices) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
+            } catch (e) {
+                console.error("Failed to save invoices to localStorage", e);
+                // Handle potential quota errors later
+            }
+        }
+
+        /**
+         * Loads invoices from storage, filters, sorts, and renders the list.
+         */
+        function handleInvoiceListUpdate() {
+            const searchTerm = invoiceSearch.value.toLowerCase().trim();
+            const allInvoices = getInvoicesFromStorage();
+
+            let filteredInvoices = allInvoices;
+
+            if (searchTerm) {
+                filteredInvoices = allInvoices.filter(invoice => {
+                    const buyerName = (invoice.buyer || '').split('\n')[0].trim().toLowerCase();
+                    const invoiceNumber = (invoice.invoiceNumber || '').toLowerCase();
+                    return buyerName.includes(searchTerm) || invoiceNumber.includes(searchTerm);
+                });
+            }
+            
+            // Sort the (potentially filtered) list
+            filteredInvoices.sort((a, b) => {
+                const dateA = new Date(a.invoiceDate);
+                const dateB = new Date(b.invoiceDate);
+                return dateB - dateA; // Newest first
+            });
+
+            renderInvoiceList(filteredInvoices, searchTerm); // Pass searchTerm to render
+        }
+        
+        // --- NEW: Render Invoice List ---
+        function renderInvoiceList(invoices, searchTerm = '') {
+            invoiceList.innerHTML = ''; // Clear the list
+            if (invoices.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'list-placeholder';
+                
+                let message = 'No saved invoices.';
+                if (searchTerm) {
+                    message = 'No results for "' + searchTerm + '".';
+                }
+                
+                li.innerHTML = `
+                    <svg class="list-placeholder-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    <span>${message}</span>
+                `;
+                invoiceList.appendChild(li);
+                return;
+            }
+
+            invoices.forEach(invoice => {
+                const li = document.createElement('li');
+                // Extract first line of buyer address
+                const buyerName = (invoice.buyer || 'Unknown Buyer').split('\n')[0].trim();
+                
+                li.dataset.id = invoice.id; // Set ID on the LI
+                li.innerHTML = `
+                    <button class="list-item-content list-btn-load ${invoice.id === currentInvoiceId ? 'active' : ''}">
+                        <strong>${invoice.invoiceNumber || 'Untitled'}</strong>
+                        <span>${buyerName} - ${invoice.date || 'No Date'}</span>
+                    </button>
+                    <div class="list-item-actions">
+                        <button class="btn list-btn list-btn-delete" title="Delete"> <!-- data-id removed -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.5 0a48.108 48.108 0 00-3.478.397m15.956 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m-4.522 0l.04.04m0 0a.75.75 0 00.746-.746H3.75a.75.75 0 00-.746.746z" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                invoiceList.appendChild(li);
+            });
+        }
+        
+        // --- NEW: Invoice List Click Handler (Load/Delete) ---
+        invoiceList.addEventListener('click', (e) => {
+            const targetLi = e.target.closest('li');
+            if (!targetLi) return; // Clicked on empty space
+
+            const docId = targetLi.dataset.id;
+            if (!docId) return; // No ID, probably placeholder
+
+            const loadBtn = e.target.closest('.list-btn-load');
+            const deleteBtn = e.target.closest('.list-btn-delete');
+
+            if (loadBtn) {
+                loadInvoice(docId);
+            }
+            if (deleteBtn) {
+                // Delete from localStorage
+                let invoices = getInvoicesFromStorage();
+                invoices = invoices.filter(inv => inv.id !== docId);
+                saveInvoicesToStorage(invoices);
+                
+                // Refresh the list
+                handleInvoiceListUpdate(); // UPDATED
+                
+                // If the deleted invoice is the one being edited, clear the form
+                if (currentInvoiceId === docId) {
+                    clearInvoiceForm();
+                }
+            }
+        });
+
+        // --- NEW: Load Invoice Function ---
+        function loadInvoice(docId) {
+            const invoices = getInvoicesFromStorage();
+            const invoiceData = invoices.find(inv => inv.id === docId);
+            
+            if (invoiceData) {
+                setInvoiceDataToDOM(invoiceData);
+                currentInvoiceId = docId; // Set the ID so we can 'save' (update)
+                
+                // NEW: Update active class
+                updateActiveInvoiceInList();
+                
+                closeSidebar(); // Close sidebar on mobile after loading
+            } else {
+                console.error("No such document!");
+                clearInvoiceForm(); // Clear form if doc not found
+            }
+        }
+        
+        // --- NEW: Data <> DOM Helper Functions ---
+
+        /**
+         * Gets all invoice data from the DOM and returns a JS object.
+         */
+        function getInvoiceDataFromDOM() {
+            const items = [];
+            itemsBody.querySelectorAll('tr.item').forEach(row => {
+                items.push({
+                    line: row.querySelector('.line').textContent,
+                    code: row.querySelector('.code').textContent,
+                    desc: row.querySelector('.desc').innerHTML, // Use innerHTML to keep line breaks
+                    taxCategory: row.querySelector('.table-dropdown-trigger').textContent.trim(),
+                    qty: row.querySelector('.qty').textContent,
+                    excl: row.querySelector('.excl').textContent,
+                    rate: row.querySelector('.rate-display').textContent,
+                    vat: row.querySelector('.vat').textContent,
+                    incl: row.querySelector('.incl').textContent,
+                });
+            });
+
+            return {
+                // 'id' will be added during the save process
+                invoiceNumber: document.getElementById('invoice-number').textContent,
+                invoiceDate: document.getElementById('invoice-date').textContent,
+                trn: document.getElementById('trn').textContent,
+                seller: document.getElementById('seller').innerHTML,
+                buyer: document.getElementById('buyer').innerHTML,
+                region: currentRegion,
+                logoOption: currentLogoOption,
+                logoSrc: invoiceLogo.src.startsWith('data:') ? invoiceLogo.src : '', // Only save uploaded logos
+                items: items,
+                subtotal: document.getElementById('subtotal').textContent,
+                vatTotal: document.getElementById('vat-total').textContent,
+                grandTotal: document.getElementById('grand').textContent,
+            };
+        }
+
+        /**
+         * Populates the entire invoice form from a JS object.
+         */
+        function setInvoiceDataToDOM(data) {
+            // 1. Set simple fields
+            document.getElementById('invoice-number').textContent = data.invoiceNumber || '';
+            document.getElementById('invoice-date').textContent = data.invoiceDate || '';
+            document.getElementById('trn').textContent = data.trn || '';
+            document.getElementById('seller').innerHTML = data.seller || '';
+            document.getElementById('buyer').innerHTML = data.buyer || '';
+            document.getElementById('subtotal').textContent = data.subtotal || '0.00';
+            document.getElementById('vat-total').textContent = data.vatTotal || '0.00';
+            document.getElementById('grand').textContent = data.grandTotal || '0.00';
+
+            // 2. Set Region
+            currentRegion = data.region || 'AE';
+            regionLabel.textContent = countryData[currentRegion] ? countryData[currentRegion].name : 'Select Region';
+            // updateRegion() will be called, which handles currency and recalcs
+            
+            // 3. Set Logo
+            currentLogoOption = data.logoOption || 'none';
+            logoLabel.textContent = logoOptionsContainer.querySelector(`[data-value="${currentLogoOption}"]`).textContent;
+            
+            if (currentLogoOption === 'upload' && data.logoSrc) {
+                invoiceLogo.src = data.logoSrc;
+                invoiceLogo.crossOrigin = null;
+            }
+            handleLogoChange(); // Apply the logo state
+
+            // 4. Clear and rebuild items table
+            itemsBody.innerHTML = '';
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => addNewRow(item));
+            } else {
+                addNewRow(); // Add one blank row if no items
+            }
+            
+            // 5. Final recalcs (updateRegion will do most of it)
+            updateRegion();
+        }
+
+        /**
+         * Clears the form to a blank state.
+         */
+        function clearInvoiceForm() {
+            // 1. Set default data
+            const defaultData = {
+                invoiceNumber: 'INV-00001',
+                invoiceDate: new Date().toISOString().split('T')[0],
+                trn: 'Your TRN',
+                seller: 'Your Company\nAddress Line 1\nAddress Line 2',
+                buyer: 'Customer Name\nAddress Line 1\nAddress Line 2',
+                region: 'AE', // Default region
+                logoOption: 'none',
+                logoSrc: '',
+                items: [], // This will cause one blank row to be added
+                subtotal: '0.00',
+                vatTotal: '0.00',
+                grandTotal: '0.00',
+            };
+            
+            // 2. Populate the form
+            setInvoiceDataToDOM(defaultData);
+            
+            // 3. Reset state
+            currentInvoiceId = null;
+            
+            // NEW: Clear active class from list
+            updateActiveInvoiceInList();
+        }
+        
+        // NEW: Helper to manage active class
+        function updateActiveInvoiceInList() {
+            invoiceList.querySelectorAll('.list-item-content').forEach(btn => {
+                const li = btn.closest('li');
+                if (li && li.dataset.id === currentInvoiceId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+
+        // --- Mobile Sidebar Logic ---
+        function openSidebar() {
+            sidebar.classList.add('mobile-sidebar-open');
+            sidebarOverlay.classList.remove('hidden');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-sidebar-open');
+            sidebarOverlay.classList.add('hidden');
+        }
+
+        sidebarOpenBtn.addEventListener('click', openSidebar);
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+
+        // --- CUSTOM DROPDOWN LOGIC ---
+
+        // Populate and setup Region Dropdown
+        function populateDropdown() {
+            regionOptions.innerHTML = ''; // Clear existing
+            for (const [code, data] of Object.entries(countryData)) {
+                const optionBtn = document.createElement('button');
+                optionBtn.dataset.value = code;
+                optionBtn.textContent = data.name; // This now uses the new descriptive name
+                optionBtn.className = "dropdown-option"; 
+                
+                optionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Stop window click
+                    currentRegion = code; // Update state
+                    regionLabel.textContent = data.name; // Update label with new name
+                    regionOptions.classList.add('hidden'); // Close
+                    updateRegion(); // Call original logic
+                });
+                regionOptions.appendChild(optionBtn);
+            }
+            // Set default label
+            regionLabel.textContent = countryData[currentRegion].name;
+        }
+
+        // Setup Logo Dropdown
+        logoOptionsContainer.querySelectorAll('.custom-logo-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop window click
+                currentLogoOption = option.dataset.value; // Update state
+                logoLabel.textContent = option.textContent; // Update label
+                logoOptionsContainer.classList.add('hidden'); // Close
+                handleLogoChange(); // Call original logic
+            });
+        });
+        // Set default logo label
+        logoLabel.textContent = 'No Logo';
+
+        // Toggle Handlers
+        regionTrigger.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling to window
+            logoOptionsContainer.classList.add('hidden'); // Close other dropdown
+            // Close all table dropdowns
+            document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+            regionOptions.classList.toggle('hidden');
+        });
+
+        logoTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            regionOptions.classList.add('hidden'); // Close other dropdown
+            // Close all table dropdowns
+            document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+            logoOptionsContainer.classList.toggle('hidden');
+        });
+
+        // Click outside to close all dropdowns
+        window.addEventListener('click', () => {
+            regionOptions.classList.add('hidden');
+            logoOptionsContainer.classList.add('hidden');
+            // Close all table dropdowns
+            document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+        });
+
+
+        // --- INVOICE LOGIC ---
+
+        // number helpers
+        function parseNum(s){
+            if(!s) return 0;
+            return parseFloat(String(s).replace(/,/g,'').replace(/%/g,'').trim()) || 0;
+        }
+        function fmt(n){
+            if(isNaN(n)) return '0.00';
+            return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // update totals from table rows
+        function recalcTotals(){
+            let subtotal=0, vatTotal=0;
+            itemsBody.querySelectorAll('.item').forEach(row=>{
+                // Get values from the row cells
+                const qty = parseNum(row.querySelector('.qty').textContent);
+                const excl = parseNum(row.querySelector('.excl').textContent);
+                const vat = parseNum(row.querySelector('.vat').textContent);
+                
+                // Sum up totals
+                subtotal += qty * excl;
+                vatTotal += vat; // Use the calculated vat amount from the row
+            });
+            
+            // Update the footer totals
+            document.getElementById('subtotal').textContent = fmt(subtotal);
+            document.getElementById('vat-total').textContent = fmt(vatTotal);
+            document.getElementById('grand').textContent = fmt(subtotal + vatTotal);
+        }
+
+        // Recalculates all rows (used when VAT rate changes)
+        function recalcAllRows() {
+            itemsBody.querySelectorAll('tr.item').forEach(calcRow);
+            recalcTotals(); // Update totals after all rows are done
+        }
+
+        function calcRow(row){
+            const qty = parseNum(row.querySelector('.qty').textContent) || 1; // Default to 1 to avoid division by zero
+            let exclCell = row.querySelector('.excl');
+            let rate = parseNum(row.querySelector('.rate-display').textContent);
+            let vatCell = row.querySelector('.vat');
+            let inclCell = row.querySelector('.incl');
+
+            if(document.activeElement === inclCell){
+                const incl = parseNum(inclCell.textContent);
+                const totalExcl = (incl / (1 + rate/100));
+                const exclPerUnit = totalExcl / qty;
+                const vatAmount = incl - totalExcl;
+                exclCell.textContent = fmt(exclPerUnit);
+                vatCell.textContent = fmt(vatAmount);
+
+            } else {
+                let excl = parseNum(exclCell.textContent);
+                const totalExcl = excl * qty;
+                const vatAmount = totalExcl * (rate/100);
+                const totalIncl = totalExcl + vatAmount;
+                vatCell.textContent = fmt(vatAmount);
+                inclCell.textContent = fmt(totalIncl);
+            }
+        }
+        
+        function getCustomTaxOptions(regionCode, selectedCategoryName) {
+            const region = countryData[regionCode];
+            if (!region) return { optionsHTML: '', selectedName: 'N/A', selectedRate: 0 };
+
+            let selectedRate = 0;
+            let selectedName = '';
+            let foundSelected = false;
+
+            if (selectedCategoryName) {
+                const matchingTax = region.taxes.find(tax => tax.category === selectedCategoryName);
+                if (matchingTax) {
+                    selectedRate = matchingTax.rate;
+                    selectedName = matchingTax.category;
+                    foundSelected = true;
+                }
+            }
+            
+            if (!foundSelected) {
+                const defaultTax = region.taxes.find(t => t.category === region.defaultTaxCategory) || region.taxes[0];
+                if (defaultTax) {
+                    selectedRate = defaultTax.rate;
+                    selectedName = defaultTax.category;
+                }
+            }
+
+            const optionsHTML = region.taxes.map(tax => {
+                return `<button type="button" 
+                                class="table-dropdown-option" 
+                                data-value="${tax.category}" 
+                                data-rate="${tax.rate}">
+                          ${tax.category}
+                        </button>`;
+            }).join('');
+
+            return { optionsHTML, selectedName, selectedRate };
+        }
+
+
+        // REFACTORED: Add new row with optional data
+        /**
+         * Adds a new row to the invoice.
+         * @param {object | null} itemData - Optional data to populate the row.
+         */
+        function addNewRow(itemData = null) {
+            const tr = document.createElement('tr');
+            tr.className = 'item';
+            
+            // Get tax options and default rate for the current region
+            // If itemData exists, use its category, otherwise use default
+            const categoryToSelect = itemData ? itemData.taxCategory : null;
+            const taxData = getCustomTaxOptions(currentRegion, categoryToSelect);
+
+            // Use provided data or defaults
+            const line = itemData ? itemData.line : '';
+            const code = itemData ? itemData.code : '';
+            const desc = itemData ? itemData.desc : 'New Item\n\nProduct Serial Nr   ';
+            const qty = itemData ? itemData.qty : '1';
+            const excl = itemData ? itemData.excl : '0.00';
+            const rateStr = itemData ? itemData.rate : (taxData.selectedRate.toFixed(2) + '%');
+            const vat = itemData ? itemData.vat : '0.00';
+            const incl = itemData ? itemData.incl : '0.00';
+            
+            tr.innerHTML = `
+                <td contenteditable="true" class="line" data-label="Line Nr">${line}</td>
+                <td contenteditable="true" class="code" data-label="Product Code">${code}</td>
+                <td data-label="Description">
+                    <div contenteditable="true" class="desc">${desc}</div>
+                    <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="${taxData.selectedName}">
+                        <button type="button" class="table-dropdown-trigger">
+                            ${taxData.selectedName}
+                        </button>
+                        <div class="table-dropdown-panel hidden">
+                            ${taxData.optionsHTML}
+                        </div>
+                    </div>
+                </td>
+                <td contenteditable="true" class="qty" data-label="Qty">${qty}</td>
+                <td contenteditable="true" class="excl" data-label="Price excl VAT">${excl}</td>
+                <td class="rate-display" data-label="VAT rate">${rateStr}</td>
+                <td contenteditable="true" class="vat" data-label="VAT amount">${vat}</td>
+                <td contenteditable="true" class="incl" data-label="Price incl VAT">${incl}</td>
+                <td class="hide-on-print" data-label="Action">
+                    <button class="delete-btn" title="Delete row">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.5 0a48.108 48.108 0 00-3.478.397m15.956 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m-4.522 0l.04.04m0 0a.75.75 0 00.746-.746H3.75a.75.75 0 00-.746.746z" />
+                        </svg>
+                    </button>
+                </td>
+            `;
+            itemsBody.appendChild(tr);
+            
+            if (!itemData) {
+                // If it's a new blank row, focus and calc
+                tr.querySelector('.desc').focus();
+                calcRow(tr);
+            }
+            updateLineNumbers();
+            recalcTotals();
+        }
+        
+        // Add item button now uses the refactored function
+        addItemBtn.addEventListener('click', () => {
+            addNewRow(); // Adds a new, blank row
+        });
+
+        // Renumbers all rows in the 'Line Nr' column
+        function updateLineNumbers(){
+            itemsBody.querySelectorAll('.line').forEach((c,i)=> c.textContent = i+1);
+        }
+
+        // listen for edits on table to recalc
+        itemsBody.addEventListener('input', (e)=>{
+            const row = e.target.closest('tr.item');
+            if(!row) return;
+            calcRow(row);
+            recalcTotals();
+        });
+
+        /* Event delegation for clicks on itemsBody */
+        itemsBody.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop bubbling to window
+            
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                const row = deleteBtn.closest('tr.item');
+                if (row) {
+                    row.remove(); 
+                    updateLineNumbers(); 
+                    recalcTotals(); 
+                }
+                return;
+            }
+            
+            const triggerBtn = e.target.closest('.table-dropdown-trigger');
+            if (triggerBtn) {
+                const panel = triggerBtn.nextElementSibling;
+                const isOpen = !panel.classList.contains('hidden');
+                document.querySelectorAll('.dropdown-options-panel, .table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+                if (!isOpen) {
+                    panel.classList.remove('hidden');
+                }
+                return; 
+            }
+            
+            const optionBtn = e.target.closest('.table-dropdown-option');
+            if (optionBtn) {
+                const row = optionBtn.closest('tr.item');
+                if (!row) return;
+
+                const categoryName = optionBtn.dataset.value;
+                const newRate = parseFloat(optionBtn.dataset.rate);
+
+                const trigger = row.querySelector('.table-dropdown-trigger');
+                trigger.textContent = categoryName;
+
+                const rateDisplayCell = row.querySelector('.rate-display');
+                rateDisplayCell.textContent = newRate.toFixed(2) + '%';
+                
+                const categoryWrapper = row.querySelector('.tax-category-wrapper');
+                categoryWrapper.dataset.categoryPrint = categoryName;
+                
+                optionBtn.closest('.table-dropdown-panel').classList.add('hidden');
+
+                calcRow(row);
+                recalcTotals();
+                return; 
+            }
+        });
+
+
+        function updateRegion() {
+            const data = countryData[currentRegion];
+            if (!data) return;
+
+            document.querySelector('.currency').textContent = data.currency;
+
+            itemsBody.querySelectorAll('tr.item').forEach(row => {
+                const trigger = row.querySelector('.table-dropdown-trigger');
+                const panel = row.querySelector('.table-dropdown-panel');
+                const rateDisplay = row.querySelector('.rate-display');
+                const categoryWrapper = row.querySelector('.tax-category-wrapper');
+                
+                const currentCategoryName = trigger.textContent.trim();
+                const taxData = getCustomTaxOptions(currentRegion, currentCategoryName);
+                
+                panel.innerHTML = taxData.optionsHTML;
+                trigger.textContent = taxData.selectedName;
+                rateDisplay.textContent = taxData.selectedRate.toFixed(2) + '%';
+                categoryWrapper.dataset.categoryPrint = taxData.selectedName;
+            });
+
+            recalcAllRows();
+            regionNote.classList.remove('hidden');
+        }
+
+        // --- Logo Handling Logic ---
+        function handleLogoChange() {
+            const selection = currentLogoOption;
+            
+            logoUpload.classList.add('hidden'); 
+            invoiceLogo.classList.remove('hidden'); 
+            removeLogoBtn.classList.remove('hidden'); 
+
+            if (selection === 'none') {
+                invoiceLogo.src = '';
+                invoiceLogo.classList.add('hidden');
+                removeLogoBtn.classList.add('hidden');
+                logoUpload.value = null; 
+            } 
+            else if (selection === 'atikle') {
+                invoiceLogo.src = 'https://atikle.github.io/resource/atikle-logo_multicolor.png';
+                invoiceLogo.crossOrigin = "anonymous"; 
+                logoUpload.value = null; 
+            }
+            else if (selection === 'upload') {
+                logoUpload.classList.remove('hidden');
+                // If no file is uploaded AND we didn't just load one from DB
+                if (!logoUpload.files.length && !invoiceLogo.src.startsWith('data:')) {
+                    invoiceLogo.src = '';
+                    invoiceLogo.classList.add('hidden');
+                    removeLogoBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        logoUpload.addEventListener('change', () => {
+            const file = logoUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    invoiceLogo.src = e.target.result;
+                    invoiceLogo.crossOrigin = null;
+                    invoiceLogo.classList.remove('hidden');
+                    removeLogoBtn.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeLogoBtn.addEventListener('click', () => {
+            currentLogoOption = 'none'; 
+            logoLabel.textContent = 'No Logo'; 
+            handleLogoChange(); 
+        });
+
+        dismissNoteBtn.addEventListener('click', () => {
+            regionNote.classList.add('hidden');
+        });
+
+        // --- NEW: Toolbar Button Listeners ---
+        
+        newInvoiceBtn.addEventListener('click', () => {
+            clearInvoiceForm();
+        });
+
+        saveInvoiceBtn.addEventListener('click', () => {
+            const data = getInvoiceDataFromDOM();
+            let invoices = getInvoicesFromStorage();
+            
+            // Show loading state
+            saveInvoiceBtn.disabled = true;
+            const originalText = saveInvoiceBtn.querySelector('.btn-label').textContent;
+            saveInvoiceBtn.querySelector('.btn-label').textContent = 'Saving...';
+
+            try {
+                if (currentInvoiceId) {
+                    // Update existing document
+                    const index = invoices.findIndex(inv => inv.id === currentInvoiceId);
+                    if (index > -1) {
+                        invoices[index] = { ...data, id: currentInvoiceId }; // Update
+                    } else {
+                        // Not found, so add as new (shouldn't happen, but safe)
+                        data.id = currentInvoiceId;
+                        invoices.push(data);
+                    }
+                } else {
+                    // Create new document
+                    data.id = 'inv_' + Date.now(); // Simple unique ID
+                    currentInvoiceId = data.id; // Set ID for future saves
+                    invoices.push(data);
+                }
+                
+                saveInvoicesToStorage(invoices);
+                handleInvoiceListUpdate(); // Update the sidebar
+                
+                // Show success
+                saveInvoiceBtn.querySelector('.btn-label').textContent = 'Saved!';
+
+            } catch (error) {
+                console.error("Error saving invoice: ", error);
+                saveInvoiceBtn.querySelector('.btn-label').textContent = 'Error!';
+            } finally {
+                // Restore button state
+                setTimeout(() => {
+                    saveInvoiceBtn.disabled = false;
+                    saveInvoiceBtn.querySelector('.btn-label').textContent = originalText;
+                }, 1500);
+            }
+        });
+
+        // --- NEW: Search Box Listener ---
+        invoiceSearch.addEventListener('input', handleInvoiceListUpdate);
+
+
+        // --- INITIALIZATION ---
+        
+        populateDropdown();
+        regionNote.classList.add('hidden'); // Hide note on initial load
+        handleLogoChange(); // Initialize logo state (will default to 'none')
+        clearInvoiceForm(); // Load a blank invoice to start
+        handleInvoiceListUpdate(); // Load and display any saved invoices on start
+
+        printBtn.addEventListener('click', () => {
+            itemsBody.querySelectorAll('.tax-category-wrapper').forEach(cell => {
+                const trigger = cell.querySelector('.table-dropdown-trigger');
+                if (trigger) {
+                    cell.dataset.categoryPrint = trigger.textContent.trim();
+                }
+            });
+            window.print();
+        });
+
+
+        /* PDF generation logic */
+        generatePdfBtn.addEventListener('click', async () => {
+            const invoiceEl = document.getElementById('invoice');
+            
+            if(document.activeElement) document.activeElement.blur();
+            
+            generatePdfBtn.disabled = true;
+            const originalBtnHtml = generatePdfBtn.innerHTML;
+            generatePdfBtn.innerHTML = `
+                <svg class="btn-icon animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" style="opacity: 0.25;"></circle>
+                    <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" style="opacity: 0.75;"></path>
+                </svg>
+                <span class="btn-label sm:inline">Generating...</span>
+            `;
+            
+            const elementsToHide = document.querySelectorAll('.hide-on-print');
+            elementsToHide.forEach(el => el.style.display = 'none');
+
+            const appContainer = document.querySelector('.app-container');
+            const originalShadow = appContainer.style.boxShadow;
+            const originalBorder = invoiceEl.style.border;
+            const originalMinHeight = invoiceEl.style.minHeight;
+
+            appContainer.style.boxShadow = 'none';
+            invoiceEl.style.border = 'none';
+            invoiceEl.style.minHeight = 'auto'; 
+
+            itemsBody.querySelectorAll('.tax-category-wrapper').forEach(cell => {
+                const trigger = cell.querySelector('.table-dropdown-trigger');
+                if (trigger) {
+                    cell.dataset.categoryPrint = trigger.textContent.trim();
+                }
+            });
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfW = pdf.internal.pageSize.getWidth();
+                const pdfH = pdf.internal.pageSize.getHeight();
+                const margin = 15; 
+                const contentWidth = pdfW - (margin * 2);
+                const pageContentHeight = pdfH - (margin * 2);
+                let currentY = margin; 
+
+                async function renderElement(element, pdf) {
+                    const clonedEl = element.cloneNode(true);
+                    
+                    clonedEl.style.width = '100%';
+                    clonedEl.style.boxSizing = 'border-box';
+                    
+                    clonedEl.querySelectorAll('[contenteditable]').forEach(el => {
+                        el.style.outline = 'none';
+                        el.style.background = 'transparent';
+                    });
+                    
+                    clonedEl.querySelectorAll('.table-dropdown-trigger, .table-dropdown-panel, .delete-btn, .hide-on-print').forEach(el => {
+                        el.parentNode.removeChild(el);
+                    });
+                    
+                    clonedEl.querySelectorAll('.tax-category-wrapper').forEach(cell => {
+                        const printText = cell.dataset.categoryPrint || '';
+                        cell.innerHTML = ''; 
+                        cell.style.fontSize = '12px';
+                        cell.style.color = '#111827';
+                        cell.style.whiteSpace = 'nowrap';
+                        cell.style.marginTop = '8px';
+                        cell.innerHTML = `<span style="font-weight: 600; color: #4b5563; padding-right: 8px;">Tax Category:</span>${printText}`;
+                    });
+                    
+                    const renderContainer = document.createElement('div');
+                    renderContainer.style.position = 'absolute';
+                    renderContainer.style.left = '-9999px';
+                    renderContainer.style.width = `1200px`; 
+                    renderContainer.style.background = '#fff';
+                    renderContainer.style.padding = '0'; 
+                    renderContainer.style.margin = '0';
+                    renderContainer.style.fontFamily = "'Inter', Arial, sans-serif";
+                    renderContainer.style.fontSize = '12px';
+                    
+                    renderContainer.appendChild(clonedEl);
+                    document.body.appendChild(renderContainer);
+                    
+                    const canvas = await html2canvas(renderContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        width: renderContainer.scrollWidth,
+                        height: renderContainer.scrollHeight 
+                    });
+                    
+                    document.body.removeChild(renderContainer); 
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const canvasW = canvas.width;
+                    const canvasH = canvas.height;
+                    const ratio = canvasH / canvasW;
+                    
+                    const imgW = contentWidth;
+                    const imgH = imgW * ratio;
+                    
+                    if (currentY + imgH > pageContentHeight) {
+                        pdf.addPage();
+                        currentY = margin;
+                    }
+                    
+                    pdf.addImage(imgData, 'PNG', margin, currentY, imgW, imgH, undefined, 'FAST');
+                    currentY += imgH; 
+                    
+                    if (element.tagName === 'TR') {
+                        currentY += 0.5; 
+                    } else {
+                        currentY += 2; 
+                    }
+                }
+                
+                const headerBlock = document.createElement('div');
+                headerBlock.appendChild(invoiceEl.querySelector('.invoice-header-row').cloneNode(true));
+                headerBlock.appendChild(invoiceEl.querySelector('.party-row').cloneNode(true));
+
+                const tableHead = invoiceEl.querySelector('#items thead').cloneNode(true);
+                
+                const itemRows = invoiceEl.querySelectorAll('#items-body .item');
+
+                const colgroup = document.createElement('colgroup');
+                colgroup.innerHTML = `
+                    <col style="width: 40px;">
+                    <col style="width: 80px;">
+                    <col style="width: 680px;">
+                    <col style="width: 40px;">
+                    <col style="width: 90px;">
+                    <col style="width: 60px;">
+                    <col style="width: 80px;">
+                    <col style="width: 90px;">
+                    <col style="width: 40px;">
+                `;
+                
+                const footerBlock = document.createElement('div');
+                footerBlock.appendChild(invoiceEl.querySelector('.totals').cloneNode(true));
+                footerBlock.appendChild(invoiceEl.querySelector('.invoice-footer').cloneNode(true));
+
+                
+                await renderElement(headerBlock, pdf);
+
+                const tableHeadWrapper = document.createElement('table');
+                tableHeadWrapper.id = 'items';
+                tableHeadWrapper.style.width = '100%';
+                tableHeadWrapper.style.borderCollapse = 'collapse';
+                tableHeadWrapper.style.tableLayout = 'fixed'; 
+                tableHeadWrapper.appendChild(colgroup.cloneNode(true));
+                tableHeadWrapper.appendChild(tableHead);
+                await renderElement(tableHeadWrapper, pdf);
+                
+                for (const row of itemRows) {
+                    const tableRowWrapper = document.createElement('table');
+                    tableRowWrapper.id = 'items';
+                    tableRowWrapper.style.width = '100%';
+                    tableRowWrapper.style.borderCollapse = 'collapse';
+                    tableRowWrapper.style.tableLayout = 'fixed'; 
+                    tableRowWrapper.appendChild(colgroup.cloneNode(true));
+
+                    const tBody = document.createElement('tbody');
+                    tBody.appendChild(row.cloneNode(true));
+                    tableRowWrapper.appendChild(tBody);
+                    
+                    await renderElement(tableRowWrapper, pdf);
+                }
+                
+                await renderElement(footerBlock, pdf);
+                
+                pdf.save('Invoice.pdf');
+
+            } catch (err) {
+                console.error('PDF generation error', err);
+            } finally {
+                elementsToHide.forEach(el => el.style.display = '');
+                appContainer.style.boxShadow = originalShadow;
+                invoiceEl.style.border = originalBorder;
+                invoiceEl.style.minHeight = originalMinHeight;
+                
+                generatePdfBtn.disabled = false;
+                generatePdfBtn.innerHTML = originalBtnHtml;
+            }
+        });
+
+    }); // End DOMContentLoaded
+</script>
+</body>
+</html>
