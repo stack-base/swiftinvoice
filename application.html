@@ -425,21 +425,28 @@
                         <div class="settings-grid">
                             <div>
                                 <div class="data-actions-wrapper" style="display: flex; gap: 0.5rem;">
-                                    <button id="export-data-btn" title="Export all invoices" class="btn btn-secondary" style="width: 100%;">
+                                    <button id="export-data-btn" title="Export all invoices" class="btn btn-secondary" style="flex: 1;">
                                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                         </svg>
-                                        Export All
+                                        Export Data
                                     </button>
-                                    <label for="import-data-input" class="btn btn-secondary" style="width: 100%; cursor: pointer;" title="Import invoices (will overwrite existing)">
+                                    <button id="export-settings-btn" title="Export all settings" class="btn btn-secondary" style="flex: 1;">
+                                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h3.75" />
+                                        </svg>
+                                        Export Settings
+                                    </button>
+                                    <label for="import-data-input" class="btn btn-secondary" style="flex: 1; cursor: pointer;" title="Import invoices (will overwrite existing)">
                                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                                         </svg>
-                                        Import
+                                        Import Data
                                     </label>
                                 </div>
                                 <input type="file" id="import-data-input" accept=".json,application/json" class="hidden">
-                                <p class="form-helper-text" style="margin-top: 0.75rem;">Export all invoices to a JSON file or import a backup. Importing will overwrite all existing data.</p>
+                                <p class="form-helper-text" style="margin-top: 0.75rem;">Export all invoices or settings to a JSON file. Import a data backup (will overwrite all existing data).</p>
+                                <p class="form-helper-text" id="export-timestamp-helper" style="margin-top: 0.25rem; font-size: 0.75rem; color: #6b7280;"></p>
                             </div>
                         </div>
                     </section>
@@ -755,7 +762,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const taxSlabsTitle = document.getElementById('tax-slabs-title'); 
     const taxSlabsList = document.getElementById('tax-slabs-list'); 
     const exportDataBtn = document.getElementById('export-data-btn');
+    const exportSettingsBtn = document.getElementById('export-settings-btn');
     const importDataInput = document.getElementById('import-data-input');
+    const exportTimestampHelper = document.getElementById('export-timestamp-helper');
     const btnShowInvoices = document.getElementById('btn-show-invoices');
     const btnShowAppSettings = document.getElementById('btn-show-app-settings');
     const invoiceListSection = document.getElementById('invoice-list-section');
@@ -1073,6 +1082,7 @@ document.addEventListener('DOMContentLoaded', () => {
             invoiceList.appendChild(li);
         });
     }
+    
     function exportData() {
         try {
             const invoices = getInvoicesFromStorage();
@@ -1080,21 +1090,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("No invoices to export.");
                 return;
             }
-            const dataStr = JSON.stringify(invoices, null, 2);
+            const exportTime = new Date();
+            
+            const exportData = {
+                exportedAt: exportTime.toISOString(),
+                invoices: invoices
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `swiftinvoice_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `swiftinvoice_backup_${exportTime.toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            if(exportTimestampHelper) {
+                exportTimestampHelper.textContent = `Data exported at: ${exportTime.toLocaleString()}`;
+            }
+
         } catch (e) {
             console.error("Failed to export data", e);
             alert("Error exporting data. See console for details.");
         }
     }
+    
+    function exportSettings() {
+        try {
+            const configJSON = localStorage.getItem(CONFIG_STORAGE_KEY);
+            if (!configJSON) {
+                alert("No settings to export.");
+                return;
+            }
+            
+            const settings = JSON.parse(configJSON);
+            const exportTime = new Date();
+            const exportData = {
+                exportedAt: exportTime.toISOString(),
+                settings: settings
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `swiftinvoice_settings_${exportTime.toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            if(exportTimestampHelper) {
+                exportTimestampHelper.textContent = `Settings exported at: ${exportTime.toLocaleString()}`;
+            }
+
+        } catch (e) {
+            console.error("Failed to export settings", e);
+            alert("Error exporting settings. See console for details.");
+        }
+    }
+
     function importData(event) {
         const file = event.target.files[0];
         if (!file) {
@@ -1108,10 +1167,22 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = (e) => {
             try {
                 const content = e.target.result;
-                const invoices = JSON.parse(content);
-                if (!Array.isArray(invoices)) {
-                    throw new Error("Invalid format: File must contain a JSON array.");
+                const parsedContent = JSON.parse(content);
+                
+                let invoices;
+                // Check if it's the new format (an object with an 'invoices' key)
+                if (typeof parsedContent === 'object' && parsedContent !== null && Array.isArray(parsedContent.invoices)) {
+                    invoices = parsedContent.invoices;
+                } 
+                // Check if it's the old format (just an array)
+                else if (Array.isArray(parsedContent)) {
+                    invoices = parsedContent;
+                } 
+                // Else, it's an invalid format
+                else {
+                    throw new Error("Invalid format: File must contain a JSON array of invoices or an object with an 'invoices' key.");
                 }
+
                 saveInvoicesToStorage(invoices);
                 clearInvoiceForm();
                 handleInvoiceListUpdate();
@@ -1129,6 +1200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsText(file);
     }
+
     invoiceList.addEventListener('click', (e) => {
         const targetLi = e.target.closest('li');
         if (!targetLi) return;
@@ -1894,6 +1966,7 @@ document.addEventListener('DOMContentLoaded', () => {
     invoiceSearch.addEventListener('input', handleInvoiceListUpdate);
     
     exportDataBtn.addEventListener('click', exportData);
+    exportSettingsBtn.addEventListener('click', exportSettings);
     importDataInput.addEventListener('change', importData);
 
     loadGlobalConfig(); 
