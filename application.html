@@ -247,6 +247,30 @@
                         <input type="text" id="invoice-search" class="search-input" placeholder="Search by name or number...">
                     </div>
                     
+                    <!-- Changed: Replaced select with custom dropdown -->
+                    <div style="margin-top: 0.75rem;">
+                        <label for="sort-select-trigger" class="form-label">
+                            Sort by
+                        </label>
+                        <div class="dropdown-container" id="sort-dropdown-container">
+                            <button type="button" id="sort-select-trigger" class="dropdown-trigger">
+                                <span class="dropdown-label" id="sort-select-label">Sort by Date (Newest)</span>
+                                <span class="dropdown-icon-container">
+                                    <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                    </svg>
+                                </span>
+                            </button>
+                            <div id="sort-select-options" class="dropdown-options-panel hidden">
+                                <button data-value="date-desc" class="dropdown-option">Sort by Date (Newest)</button>
+                                <button data-value="date-asc" class="dropdown-option">Sort by Date (Oldest)</button>
+                                <button data-value="number-asc" class="dropdown-option">Sort by Number (A-Z)</button>
+                                <button data-value="number-desc" class="dropdown-option">Sort by Number (Z-A)</button>
+                                <button data-value="buyer-asc" class="dropdown-option">Sort by Buyer (A-Z)</button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div id="invoice-list-container">
                         <ul id="invoice-list">
                             <li class="list-placeholder">No saved invoices.</li>
@@ -359,6 +383,8 @@
                                 </svg>
                             </button>
                         </div>
+                        
+                        <!-- Moved: Tax slabs container is now in its own section at the end -->
                     </div>
                 </section>
                 <section>
@@ -388,6 +414,18 @@
                                 Remove Logo
                             </button>
                         </div>
+                    </div>
+                </section>
+                
+                <!-- Added: New section for Tax Slabs at the end -->
+                <section>
+                     <div id="tax-slabs-container" class="tax-slabs-display hidden" style="margin-top: 0;">
+                        <h3 id="tax-slabs-title" class="settings-section-title" style="font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                            Tax Slabs
+                        </h3>
+                        <ul id="tax-slabs-list" class="tax-slabs-list" style="list-style-type: none; padding: 0; margin: 0; font-size: 0.875rem; color: #374151; display: flex; flex-direction: column; gap: 0.25rem;">
+                            <!-- Slabs will be populated by JS -->
+                        </ul>
                     </div>
                 </section>
             </div>
@@ -505,8 +543,9 @@ Product Serial Nr   N/A
 document.addEventListener('DOMContentLoaded', () => {
     let currentInvoiceId = null;
     const STORAGE_KEY = 'swiftInvoices';
-    let currentRegion = 'AE';
+    let currentRegion = 'IN'; // Default region set to India
     let currentLogoOption = 'none';
+    let currentSortCriteria = 'date-desc'; // Sorting state
     const itemsBody = document.getElementById('items-body');
     const addItemBtn = document.getElementById('add-item-btn');
     const generatePdfBtn = document.getElementById('generate-pdf-btn');
@@ -530,6 +569,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveInvoiceBtn = document.getElementById('save-invoice-btn');
     const invoiceList = document.getElementById('invoice-list');
     const invoiceSearch = document.getElementById('invoice-search');
+    
+    // Changed: New sort dropdown elements
+    const sortTrigger = document.getElementById('sort-select-trigger');
+    const sortLabel = document.getElementById('sort-select-label');
+    const sortOptions = document.getElementById('sort-select-options');
+
+    const taxSlabsContainer = document.getElementById('tax-slabs-container'); // Tax slab container
+    const taxSlabsTitle = document.getElementById('tax-slabs-title'); // Tax slab title
+    const taxSlabsList = document.getElementById('tax-slabs-list'); // Tax slab list
     const exportDataBtn = document.getElementById('export-data-btn');
     const importDataInput = document.getElementById('import-data-input');
     const btnShowInvoices = document.getElementById('btn-show-invoices');
@@ -571,11 +619,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 return buyerName.includes(searchTerm) || invoiceNumber.includes(searchTerm);
             });
         }
+        
+        // Sorting logic
         filteredInvoices.sort((a, b) => {
-            const dateA = new Date(a.invoiceDate);
-            const dateB = new Date(b.invoiceDate);
-            return dateB - dateA;
+            const buyerA = (a.buyer || '').split('\n')[0].trim().toLowerCase();
+            const buyerB = (b.buyer || '').split('\n')[0].trim().toLowerCase();
+            const dateA = a.invoiceDate ? new Date(a.invoiceDate) : 0;
+            const dateB = b.invoiceDate ? new Date(b.invoiceDate) : 0;
+            
+            switch (currentSortCriteria) {
+                case 'date-asc':
+                    return dateA - dateB;
+                case 'number-asc':
+                    return (a.invoiceNumber || '').localeCompare(b.invoiceNumber || '', undefined, { numeric: true });
+                case 'number-desc':
+                    return (b.invoiceNumber || '').localeCompare(a.invoiceNumber || '', undefined, { numeric: true });
+                case 'buyer-asc':
+                    return buyerA.localeCompare(buyerB);
+                case 'date-desc':
+                default:
+                    return dateB - dateA;
+            }
         });
+
         renderInvoiceList(filteredInvoices, searchTerm);
     }
     function renderInvoiceList(invoices, searchTerm = '') {
@@ -744,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('subtotal').textContent = data.subtotal || '0.00';
         document.getElementById('vat-total').textContent = data.vatTotal || '0.00';
         document.getElementById('grand').textContent = data.grandTotal || '0.00';
-        currentRegion = data.region || 'AE';
+        currentRegion = data.region || 'IN'; // Default region fallback
         regionLabel.textContent = countryData[currentRegion] ? countryData[currentRegion].name : 'Select Region';
         currentLogoOption = data.logoOption || 'none';
         const logoOptionEl = logoOptionsContainer.querySelector(`[data-value="${currentLogoOption}"]`);
@@ -761,15 +827,39 @@ document.addEventListener('DOMContentLoaded', () => {
             addNewRow();
         }
         updateRegion();
+        updateTaxSlabDisplay(currentRegion); // Update tax display
     }
+
+    // Function to get the next sequential invoice number
+    function getNextInvoiceNumber() {
+        const allInvoices = getInvoicesFromStorage();
+        const prefix = 'INV-';
+        let maxNum = 0;
+
+        if (allInvoices.length > 0) {
+            allInvoices.forEach(invoice => {
+                if (invoice.invoiceNumber && invoice.invoiceNumber.startsWith(prefix)) {
+                    const numPart = invoice.invoiceNumber.substring(prefix.length);
+                    const num = parseInt(numPart, 10);
+                    if (!isNaN(num) && num > maxNum) {
+                        maxNum = num;
+                    }
+                }
+            });
+        }
+        
+        const nextNum = maxNum + 1;
+        return `${prefix}${nextNum.toString().padStart(5, '0')}`; // e.g., INV-00001
+    }
+
     function clearInvoiceForm() {
         const defaultData = {
-            invoiceNumber: 'INV-00001',
+            invoiceNumber: getNextInvoiceNumber(), // Use automatic number
             invoiceDate: new Date().toISOString().split('T')[0],
-            trn: 'Your TRN',
+            trn: 'Your TRN / GSTIN',
             seller: 'Your Company\nAddress Line 1\nAddress Line 2',
             buyer: 'Customer Name\nAddress Line 1\nAddress Line 2',
-            region: 'AE',
+            region: 'IN', // Default region set to India
             logoOption: 'none',
             logoSrc: '',
             items: [],
@@ -780,6 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setInvoiceDataToDOM(defaultData);
         currentInvoiceId = null;
         updateActiveInvoiceInList();
+        updateTaxSlabDisplay(defaultData.region); // Update tax display
     }
     function updateActiveInvoiceInList() {
         invoiceList.querySelectorAll('.list-item-content').forEach(btn => {
@@ -827,10 +918,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 regionLabel.textContent = data.name;
                 regionOptions.classList.add('hidden');
                 updateRegion();
+                updateTaxSlabDisplay(currentRegion); // Update tax display
             });
             regionOptions.appendChild(optionBtn);
         }
         regionLabel.textContent = countryData[currentRegion].name;
+        updateTaxSlabDisplay(currentRegion); // Update tax display
     }
     logoOptionsContainer.querySelectorAll('.custom-logo-option').forEach(option => {
         option.addEventListener('click', (e) => {
@@ -842,22 +935,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     logoLabel.textContent = 'No Logo';
+
+    // Helper to close all dropdowns
+    function closeAllDropdowns() {
+        regionOptions.classList.add('hidden');
+        logoOptionsContainer.classList.add('hidden');
+        sortOptions.classList.add('hidden');
+        document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+    }
+
     regionTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
-        logoOptionsContainer.classList.add('hidden');
-        document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
-        regionOptions.classList.toggle('hidden');
+        const wasOpen = !regionOptions.classList.contains('hidden');
+        closeAllDropdowns();
+        if (!wasOpen) {
+            regionOptions.classList.remove('hidden');
+        }
     });
     logoTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
-        regionOptions.classList.add('hidden');
-        document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
-        logoOptionsContainer.classList.toggle('hidden');
+        const wasOpen = !logoOptionsContainer.classList.contains('hidden');
+        closeAllDropdowns();
+        if (!wasOpen) {
+            logoOptionsContainer.classList.remove('hidden');
+        }
     });
+    // Changed: Added listeners for new sort dropdown
+    sortTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = !sortOptions.classList.contains('hidden');
+        closeAllDropdowns();
+        if (!wasOpen) {
+            sortOptions.classList.remove('hidden');
+        }
+    });
+    sortOptions.addEventListener('click', (e) => {
+        const optionBtn = e.target.closest('.dropdown-option');
+        if (optionBtn) {
+            e.stopPropagation();
+            currentSortCriteria = optionBtn.dataset.value;
+            sortLabel.textContent = optionBtn.textContent;
+            sortOptions.classList.add('hidden');
+            handleInvoiceListUpdate();
+        }
+    });
+
     window.addEventListener('click', () => {
-        regionOptions.classList.add('hidden');
-        logoOptionsContainer.classList.add('hidden');
-        document.querySelectorAll('.table-dropdown-panel').forEach(p => p.classList.add('hidden'));
+        closeAllDropdowns();
     });
     function parseNum(s){
         if(!s) return 0;
@@ -867,6 +991,40 @@ document.addEventListener('DOMContentLoaded', () => {
         if(isNaN(n)) return '0.00';
         return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+    
+    // Function to update tax slab display
+    function updateTaxSlabDisplay(regionCode) {
+        const region = countryData[regionCode];
+        if (!region || !region.taxes || region.taxes.length === 0) {
+            taxSlabsContainer.classList.add('hidden');
+            return;
+        }
+
+        taxSlabsTitle.textContent = `Tax Slabs for ${region.name.split(' (')[0].trim()}`;
+        taxSlabsList.innerHTML = ''; // Clear old list
+
+        region.taxes.forEach(tax => {
+            const li = document.createElement('li');
+            li.style.display = 'flex';
+            li.style.justifyContent = 'space-between';
+            li.style.padding = '0.25rem 0';
+            
+            const categorySpan = document.createElement('span');
+            categorySpan.textContent = tax.category;
+            categorySpan.style.paddingRight = '0.5rem';
+            
+            const rateSpan = document.createElement('span');
+            rateSpan.textContent = `${tax.rate.toFixed(2)}%`;
+            rateSpan.style.fontWeight = '500';
+
+            li.appendChild(categorySpan);
+            li.appendChild(rateSpan);
+            taxSlabsList.appendChild(li);
+        });
+
+        taxSlabsContainer.classList.remove('hidden');
+    }
+
     function recalcTotals(){
         let subtotal=0, vatTotal=0;
         itemsBody.querySelectorAll('.item').forEach(row=>{
@@ -1012,15 +1170,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const triggerBtn = e.target.closest('.table-dropdown-trigger');
         if (triggerBtn) {
             const panel = triggerBtn.nextElementSibling;
-            const isOpen = !panel.classList.contains('hidden');
-            document.querySelectorAll('.dropdown-options-panel, .table-dropdown-panel').forEach(p => p.classList.add('hidden'));
-            if (!isOpen) {
+            const wasOpen = !panel.classList.contains('hidden');
+            closeAllDropdowns();
+            if (!wasOpen) {
                 panel.classList.remove('hidden');
             }
             return; 
         }
         const optionBtn = e.target.closest('.table-dropdown-option');
-        if (optionBtn) {
+        if (optionBtn && !optionBtn.closest('#sort-select-options')) { // ensure it's not the sort dropdown
             const row = optionBtn.closest('tr.item');
             if (!row) return;
             const categoryName = optionBtn.dataset.value;
@@ -1139,6 +1297,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     invoiceSearch.addEventListener('input', handleInvoiceListUpdate);
+
+    // Changed: Removed old sort listener
+    
     exportDataBtn.addEventListener('click', exportData);
     importDataInput.addEventListener('change', importData);
     populateDropdown();
@@ -1191,6 +1352,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const contentWidth = pdfW - (margin * 2);
             const pageContentHeight = pdfH - (margin * 2);
             let currentY = margin; 
+            const invoiceNumber = document.getElementById('invoice-number').textContent.trim() || 'Invoice';
+
             async function renderElement(element, pdf) {
                 const clonedEl = element.cloneNode(true);
                 clonedEl.style.width = '100%';
@@ -1290,7 +1453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await renderElement(tableRowWrapper, pdf);
             }
             await renderElement(footerBlock, pdf);
-            pdf.save('Invoice.pdf');
+            pdf.save(`${invoiceNumber}.pdf`);
         } catch (err) {
             console.error('PDF generation error', err);
         } finally {
