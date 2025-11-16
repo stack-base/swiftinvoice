@@ -56,7 +56,22 @@
         .table-dropdown-trigger { width: 100%; padding: 4px 2px; font-size: 12px; border: 1px solid #e5e7eb; border-radius: 4px; background-color: #f9fafb; font-family: 'Inter', Arial, sans-serif; text-align: left; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.5'%3e%3cpath d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px 16px; }
         .table-dropdown-trigger:hover { background-color: #f3f4f6; }
         .table-dropdown-trigger:focus { outline:1px dashed #9ca3af; border-color: #9ca3af; background-color: #fff; }
-        .table-dropdown-panel { position: absolute; z-index: 10; bottom: 100%; margin-bottom: 4px; width: 180px; max-height: 15rem; overflow: auto; border-radius: 0.375rem; background-color: #ffffff; padding-top: 0.25rem; padding-bottom: 0.25rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: 1px solid #e5e7eb; }
+        /* Fix: Changed dropdown to open downwards */
+        .table-dropdown-panel { 
+            position: absolute; 
+            z-index: 10; 
+            top: 100%; /* Was bottom: 100% */
+            margin-top: 4px; /* Was margin-bottom: 4px */
+            width: 180px; 
+            max-height: 15rem; 
+            overflow: auto; 
+            border-radius: 0.375rem; 
+            background-color: #ffffff; 
+            padding-top: 0.25rem; 
+            padding-bottom: 0.25rem; 
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); 
+            border: 1px solid #e5e7eb; 
+        }
         .table-dropdown-option { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; font-size: 12px; line-height: 1.25; color: #374151; background: none; border: none; cursor: pointer; white-space: nowrap; }
         .table-dropdown-option:hover { background-color: #f0fdfa; color: #0f766e; }
         .rate-display { text-align: right !important; color: #4b5563; font-size: 12px; padding-right: 8px; }
@@ -78,7 +93,7 @@
         @media (min-width: 640px) { .sm\:inline { display: inline; } }
         @media (min-width: 1024px) { .lg\:hidden { display: none !important; } .lg\:block { display: block; } .lg\:relative { position: relative; } .lg\:translate-x-0 { transform: translateX(0); } }
         .app-layout { }
-        @media (min-width: 1024px) { .app-layout { display: flex; } }
+        @media (min-width: 1024px) { .app-layout { display: flex; height: 100vh; } } /* Added height: 100vh here */
         .sidebar { width: 100%; max-width: 24rem; background-color: #ffffff; border-right: 1px solid #e5e7eb; flex-shrink: 0; position: fixed; inset-y: 0; left: 0; z-index: 20; transform: translateX(-100%); transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; display: flex; flex-direction: column; height: 100vh; }
         .sidebar.mobile-sidebar-open { transform: translateX(0); }
         @media (min-width: 1024px) { .sidebar { width: 20%; max-width: none; position: fixed; transform: translateX(0); } }
@@ -197,7 +212,17 @@
         .list-btn-delete:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #f87171; box-shadow: 0 0 0 2px #f87171; }
         #invoice-list .list-placeholder { padding: 1.5rem 1rem; text-align: center; font-size: 0.875rem; color: #6b7280; font-style: italic; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; min-height: 100px; justify-content: center; }
         #invoice-list .list-placeholder-icon { width: 2rem; height: 2rem; color: #d1d5db; }
-        @media (max-width: 1023px) { body { overflow: auto; } .settings-column-wrapper { background-color: transparent; border-bottom: none; } .settings-column-wrapper .settings-panel { padding-top: 0; } .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; } #invoice { padding: 20px; min-height: 0; } .invoice-header-row { flex-direction: column; gap: 16px; margin-bottom: 24px; } .header-left, .header-right { width: 100%; } .header-right { align-items: flex-start; } .party-row { flex-direction: column; gap: 20px; } .party { width: 100%; } h1.title { font-size: 28px; } .table-wrap { overflow-x: hidden; } #items { border-collapse: separate; border-spacing: 0; } #items thead { display: none; } #items tr.item { display: block; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); padding: 0; } #items td { display: block; width: 100% !important; box-sizing: border-box; text-align: right !important; padding: 0.75rem 1rem; padding-left: 9rem; position: relative; border: none; border-bottom: 1px solid #f3f4f6; } #items tr.item td:last-child { border-bottom: none; } #items td::before { content: attr(data-label); position: absolute; left: 1rem; top: 0.75rem; padding-right: 0.5rem; font-weight: 600; color: #4b5563; text-align: left; white-space: nowrap; } #items td[data-label="Description"] { padding-top: 1rem; padding-bottom: 1rem; } .desc { text-align: right; padding: 0; } .tax-category-wrapper { max-width: none; } .table-dropdown-trigger { padding-top: 8px; padding-bottom: 8px; } .table-dropdown-panel { bottom: auto; top: 100%; margin-bottom: 0; margin-top: 4px; width: 100%; left: 0; width: 100%; } .rate-display { padding-top: 1rem; padding-bottom: 1rem; } #items td[data-label="Action"] { padding: 0; height: 3.5rem; } .delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem; background-color: #fef2f2; } .delete-btn:hover { background-color: #fee2e2; } .delete-btn svg { width: 1.25rem; height: 1.25rem; } .totals { margin-top: 24px; } .totals .box { width: 100%; } }
+        @media (max-width: 1023px) { body { overflow: auto; } .settings-column-wrapper { background-color: transparent; border-bottom: none; } .settings-column-wrapper .settings-panel { padding-top: 0; } .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; } #invoice { padding: 20px; min-height: 0; } .invoice-header-row { flex-direction: column; gap: 16px; margin-bottom: 24px; } .header-left, .header-right { width: 100%; } .header-right { align-items: flex-start; } .party-row { flex-direction: column; gap: 20px; } .party { width: 100%; } h1.title { font-size: 28px; } .table-wrap { overflow-x: hidden; } #items { border-collapse: separate; border-spacing: 0; } #items thead { display: none; } #items tr.item { display: block; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); padding: 0; } #items td { display: block; width: 100% !important; box-sizing: border-box; text-align: right !important; padding: 0.75rem 1rem; padding-left: 9rem; position: relative; border: none; border-bottom: 1px solid #f3f4f6; } #items tr.item td:last-child { border-bottom: none; } #items td::before { content: attr(data-label); position: absolute; left: 1rem; top: 0.75rem; padding-right: 0.5rem; font-weight: 600; color: #4b5563; text-align: left; white-space: nowrap; } #items td[data-label="Description"] { padding-top: 1rem; padding-bottom: 1rem; } .desc { text-align: right; padding: 0; } .tax-category-wrapper { max-width: none; } .table-dropdown-trigger { padding-top: 8px; padding-bottom: 8px; } 
+        /* Fix: mobile dropdown was already correct, just ensure consistency */
+        .table-dropdown-panel { 
+            bottom: auto; 
+            top: 100%; 
+            margin-bottom: 0; 
+            margin-top: 4px; 
+            width: 100%; 
+            left: 0; 
+        } 
+        .rate-display { padding-top: 1rem; padding-bottom: 1rem; } #items td[data-label="Action"] { padding: 0; height: 3.5rem; } .delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem; background-color: #fef2f2; } .delete-btn:hover { background-color: #fee2e2; } .delete-btn svg { width: 1.25rem; height: 1.25rem; } .totals { margin-top: 24px; } .totals .box { width: 100%; } }
         @media print { .hide-on-print { display:none; } body { background:#fff; padding:0; margin: 0; height: auto; overflow: visible; } .app-layout { display: block; } main.main-content { display: block; width: 100%; height: auto; overflow: visible; padding: 0; margin: 0; margin-left: 0; } main .main-content-container { max-width: none; padding: 0; margin: 0; } .app-container { box-shadow: none; border-radius: 0; margin: 0; } #invoice { border: none; border-radius: 0; padding: 0; } .main-header { display: none; } .table-dropdown-trigger { display: none; } .table-dropdown-panel { display: none; } .tax-category-wrapper::after { content: attr(data-category-print); font-size: 12px; color: #111827; white-space: nowrap; padding-left: 8px; } .tax-category-wrapper::before { content: "Tax Category:"; font-size: 12px; font-weight: 600; color: #4b5563; } }
     </style>
 </head>
@@ -441,9 +466,11 @@
                                     <h1 class="title">Invoice</h1>
                                     <table class="meta-table">
                                     <tbody>
-                                        <tr><td class="label">TRN</td><td contenteditable="true" id="trn">104032394900003</td></tr>
+                                        <!-- Removed TRN Row -->
                                         <tr><td class="label">Invoice Nr</td><td contenteditable="true" id="invoice-number">P72381-IAGI000528</td></tr>
                                         <tr><td class="label">Invoice Date</td><td contenteditable="true" id="invoice-date">2024-11-20</td></tr>
+                                        <!-- Added Invoice Time Row -->
+                                        <tr><td class="label">Invoice Time</td><td contenteditable="true" id="invoice-time">08:14 PM</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -570,7 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const invoiceList = document.getElementById('invoice-list');
     const invoiceSearch = document.getElementById('invoice-search');
     
-    // Changed: New sort dropdown elements
     const sortTrigger = document.getElementById('sort-select-trigger');
     const sortLabel = document.getElementById('sort-select-label');
     const sortOptions = document.getElementById('sort-select-options');
@@ -778,7 +804,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 line: row.querySelector('.line').textContent,
                 code: row.querySelector('.code').textContent,
                 desc: row.querySelector('.desc').innerHTML,
-                taxCategory: row.querySelector('.table-dropdown-trigger').textContent.trim(),
+                // If rate cell is editable, category is 'Custom'
+                taxCategory: row.querySelector('.rate-display').contentEditable ? 'Custom' : row.querySelector('.table-dropdown-trigger').textContent.trim(),
                 qty: row.querySelector('.qty').textContent,
                 excl: row.querySelector('.excl').textContent,
                 rate: row.querySelector('.rate-display').textContent,
@@ -789,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             invoiceNumber: document.getElementById('invoice-number').textContent,
             invoiceDate: document.getElementById('invoice-date').textContent,
-            trn: document.getElementById('trn').textContent,
+            invoiceTime: document.getElementById('invoice-time').textContent, // Added
             seller: document.getElementById('seller').innerHTML,
             buyer: document.getElementById('buyer').innerHTML,
             region: currentRegion,
@@ -804,7 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setInvoiceDataToDOM(data) {
         document.getElementById('invoice-number').textContent = data.invoiceNumber || '';
         document.getElementById('invoice-date').textContent = data.invoiceDate || '';
-        document.getElementById('trn').textContent = data.trn || '';
+        document.getElementById('invoice-time').textContent = data.invoiceTime || ''; // Added
         document.getElementById('seller').innerHTML = data.seller || '';
         document.getElementById('buyer').innerHTML = data.buyer || '';
         document.getElementById('subtotal').textContent = data.subtotal || '0.00';
@@ -826,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             addNewRow();
         }
-        updateRegion();
+        updateRegion(false); // Pass false to avoid showing region-change note
         updateTaxSlabDisplay(currentRegion); // Update tax display
     }
 
@@ -852,11 +879,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${prefix}${nextNum.toString().padStart(5, '0')}`; // e.g., INV-00001
     }
 
+    // Helper function to get formatted current time
+    function getFormattedCurrentTime() {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minutesStr} ${ampm}`;
+    }
+
     function clearInvoiceForm() {
         const defaultData = {
             invoiceNumber: getNextInvoiceNumber(), // Use automatic number
             invoiceDate: new Date().toISOString().split('T')[0],
-            trn: 'Your TRN / GSTIN',
+            invoiceTime: getFormattedCurrentTime(), // Added
             seller: 'Your Company\nAddress Line 1\nAddress Line 2',
             buyer: 'Customer Name\nAddress Line 1\nAddress Line 2',
             region: 'IN', // Default region set to India
@@ -1042,35 +1081,80 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsBody.querySelectorAll('tr.item').forEach(calcRow);
         recalcTotals();
     }
+    // Updated calcRow logic
     function calcRow(row){
         const qty = parseNum(row.querySelector('.qty').textContent) || 1;
         let exclCell = row.querySelector('.excl');
-        let rate = parseNum(row.querySelector('.rate-display').textContent);
+        let rateCell = row.querySelector('.rate-display');
         let vatCell = row.querySelector('.vat');
         let inclCell = row.querySelector('.incl');
-        if(document.activeElement === inclCell){
-            const incl = parseNum(inclCell.textContent);
-            const totalExcl = (incl / (1 + rate/100));
-            const exclPerUnit = totalExcl / qty;
-            const vatAmount = incl - totalExcl;
-            exclCell.textContent = fmt(exclPerUnit);
-            vatCell.textContent = fmt(vatAmount);
-        } else {
-            let excl = parseNum(exclCell.textContent);
-            const totalExcl = excl * qty;
-            const vatAmount = totalExcl * (rate/100);
-            const totalIncl = totalExcl + vatAmount;
-            vatCell.textContent = fmt(vatAmount);
-            inclCell.textContent = fmt(totalIncl);
+        
+        let rate = parseNum(rateCell.textContent);
+        
+        // If custom rate is active, rate cell is editable, vat cell is not.
+        if (rateCell.contentEditable) {
+            vatCell.contentEditable = false;
+            
+            // If user is editing Incl cell
+            if (document.activeElement === inclCell) {
+                const incl = parseNum(inclCell.textContent);
+                const totalExcl = (incl / (1 + rate/100));
+                const exclPerUnit = totalExcl / qty;
+                const vatAmount = incl - totalExcl;
+                exclCell.textContent = fmt(exclPerUnit);
+                vatCell.textContent = fmt(vatAmount);
+            } 
+            // If user is editing Excl, Qty, or Rate
+            else {
+                let excl = parseNum(exclCell.textContent);
+                const totalExcl = excl * qty;
+                const vatAmount = totalExcl * (rate/100);
+                const totalIncl = totalExcl + vatAmount;
+                vatCell.textContent = fmt(vatAmount);
+                inclCell.textContent = fmt(totalIncl);
+            }
+        } 
+        // Standard logic (rate cell not editable, vat cell is)
+        else {
+            vatCell.contentEditable = true;
+            if(document.activeElement === inclCell){
+                const incl = parseNum(inclCell.textContent);
+                const totalExcl = (incl / (1 + rate/100));
+                const exclPerUnit = totalExcl / qty;
+                const vatAmount = incl - totalExcl;
+                exclCell.textContent = fmt(exclPerUnit);
+                vatCell.textContent = fmt(vatAmount);
+            } else if (document.activeElement === vatCell) {
+                // User is editing VAT directly
+                let excl = parseNum(exclCell.textContent);
+                const totalExcl = excl * qty;
+                const vatAmount = parseNum(vatCell.textContent);
+                const totalIncl = totalExcl + vatAmount;
+                inclCell.textContent = fmt(totalIncl);
+            } else {
+                // Standard: editing Qty or Excl
+                let excl = parseNum(exclCell.textContent);
+                const totalExcl = excl * qty;
+                const vatAmount = totalExcl * (rate/100);
+                const totalIncl = totalExcl + vatAmount;
+                vatCell.textContent = fmt(vatAmount);
+                inclCell.textContent = fmt(totalIncl);
+            }
         }
     }
+    // Updated getCustomTaxOptions to include "Custom"
     function getCustomTaxOptions(regionCode, selectedCategoryName) {
         const region = countryData[regionCode];
         if (!region) return { optionsHTML: '', selectedName: 'N/A', selectedRate: 0 };
         let selectedRate = 0;
         let selectedName = '';
         let foundSelected = false;
-        if (selectedCategoryName) {
+
+        if (selectedCategoryName === 'Custom') {
+             selectedName = 'Custom';
+             selectedRate = -1; // Special value for custom
+             foundSelected = true;
+        } else if (selectedCategoryName) {
             const matchingTax = region.taxes.find(tax => tax.category === selectedCategoryName);
             if (matchingTax) {
                 selectedRate = matchingTax.rate;
@@ -1078,6 +1162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 foundSelected = true;
             }
         }
+
         if (!foundSelected) {
             const defaultTax = region.taxes.find(t => t.category === region.defaultTaxCategory) || region.taxes[0];
             if (defaultTax) {
@@ -1085,6 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedName = defaultTax.category;
             }
         }
+        
         const optionsHTML = region.taxes.map(tax => {
             return `<button type="button" 
                             class="table-dropdown-option" 
@@ -1093,21 +1179,29 @@ document.addEventListener('DOMContentLoaded', () => {
                       ${tax.category}
                     </button>`;
         }).join('');
-        return { optionsHTML, selectedName, selectedRate };
+
+        const customOption = `<button type="button" class="table-dropdown-option" data-value="Custom" data-rate="-1">Custom Rate...</button>`;
+        
+        return { optionsHTML: optionsHTML + customOption, selectedName, selectedRate };
     }
+    // Updated addNewRow to handle custom tax state
     function addNewRow(itemData = null) {
         const tr = document.createElement('tr');
         tr.className = 'item';
+        
         const categoryToSelect = itemData ? itemData.taxCategory : null;
         const taxData = getCustomTaxOptions(currentRegion, categoryToSelect);
+        
         const line = itemData ? itemData.line : '';
         const code = itemData ? itemData.code : '';
         const desc = itemData ? itemData.desc : 'New Item\n\nProduct Serial Nr   ';
         const qty = itemData ? itemData.qty : '1';
         const excl = itemData ? itemData.excl : '0.00';
-        const rateStr = itemData ? itemData.rate : (taxData.selectedRate.toFixed(2) + '%');
+        // Use itemData.rate if available, otherwise default
+        const rateStr = itemData ? itemData.rate : (taxData.selectedRate !== -1 ? taxData.selectedRate.toFixed(2) + '%' : '0.00%');
         const vat = itemData ? itemData.vat : '0.00';
         const incl = itemData ? itemData.incl : '0.00';
+        
         tr.innerHTML = `
             <td contenteditable="true" class="line" data-label="Line Nr">${line}</td>
             <td contenteditable="true" class="code" data-label="Product Code">${code}</td>
@@ -1136,10 +1230,24 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
         `;
         itemsBody.appendChild(tr);
+
+        // Set editable status after appending
+        const rateCell = tr.querySelector('.rate-display');
+        const vatCell = tr.querySelector('.vat');
+        
+        if (itemData && itemData.taxCategory === 'Custom') {
+            rateCell.contentEditable = true;
+            vatCell.contentEditable = false;
+        } else {
+            rateCell.contentEditable = false;
+            vatCell.contentEditable = true;
+        }
+        
         if (!itemData) {
             tr.querySelector('.desc').focus();
             calcRow(tr);
         }
+        
         updateLineNumbers();
         recalcTotals();
     }
@@ -1149,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateLineNumbers(){
         itemsBody.querySelectorAll('.line').forEach((c,i)=> c.textContent = i+1);
     }
+    // Simplified input listener
     itemsBody.addEventListener('input', (e)=>{
         const row = e.target.closest('tr.item');
         if(!row) return;
@@ -1178,24 +1287,39 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
         const optionBtn = e.target.closest('.table-dropdown-option');
+        // Updated click handler for options
         if (optionBtn && !optionBtn.closest('#sort-select-options')) { // ensure it's not the sort dropdown
             const row = optionBtn.closest('tr.item');
             if (!row) return;
+            
             const categoryName = optionBtn.dataset.value;
             const newRate = parseFloat(optionBtn.dataset.rate);
+            
             const trigger = row.querySelector('.table-dropdown-trigger');
-            trigger.textContent = categoryName;
             const rateDisplayCell = row.querySelector('.rate-display');
-            rateDisplayCell.textContent = newRate.toFixed(2) + '%';
+            const vatCell = row.querySelector('.vat');
             const categoryWrapper = row.querySelector('.tax-category-wrapper');
+
+            trigger.textContent = categoryName;
             categoryWrapper.dataset.categoryPrint = categoryName;
+            
+            if (categoryName === 'Custom') {
+                rateDisplayCell.contentEditable = true;
+                vatCell.contentEditable = false;
+                rateDisplayCell.focus(); // Focus the cell for editing
+            } else {
+                rateDisplayCell.contentEditable = false;
+                vatCell.contentEditable = true;
+                rateDisplayCell.textContent = newRate.toFixed(2) + '%';
+            }
+            
             optionBtn.closest('.table-dropdown-panel').classList.add('hidden');
             calcRow(row);
             recalcTotals();
             return; 
         }
     });
-    function updateRegion() {
+    function updateRegion(showNote = true) {
         const data = countryData[currentRegion];
         if (!data) return;
         document.querySelector('.currency').textContent = data.currency;
@@ -1204,15 +1328,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const panel = row.querySelector('.table-dropdown-panel');
             const rateDisplay = row.querySelector('.rate-display');
             const categoryWrapper = row.querySelector('.tax-category-wrapper');
-            const currentCategoryName = trigger.textContent.trim();
-            const taxData = getCustomTaxOptions(currentRegion, currentCategoryName);
-            panel.innerHTML = taxData.optionsHTML;
-            trigger.textContent = taxData.selectedName;
-            rateDisplay.textContent = taxData.selectedRate.toFixed(2) + '%';
-            categoryWrapper.dataset.categoryPrint = taxData.selectedName;
+            
+            // If rate is custom, keep it as "Custom"
+            if (rateDisplay.contentEditable) {
+                const taxData = getCustomTaxOptions(currentRegion, "Custom");
+                panel.innerHTML = taxData.optionsHTML;
+                trigger.textContent = "Custom";
+                categoryWrapper.dataset.categoryPrint = "Custom";
+            } else {
+                const currentCategoryName = trigger.textContent.trim();
+                const taxData = getCustomTaxOptions(currentRegion, currentCategoryName);
+                panel.innerHTML = taxData.optionsHTML;
+                trigger.textContent = taxData.selectedName;
+                rateDisplay.textContent = taxData.selectedRate.toFixed(2) + '%';
+                categoryWrapper.dataset.categoryPrint = taxData.selectedName;
+            }
         });
         recalcAllRows();
-        regionNote.classList.remove('hidden');
+        if (showNote) {
+            regionNote.classList.remove('hidden');
+        }
     }
     function handleLogoChange() {
         const selection = currentLogoOption;
@@ -1297,8 +1432,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     invoiceSearch.addEventListener('input', handleInvoiceListUpdate);
-
-    // Changed: Removed old sort listener
     
     exportDataBtn.addEventListener('click', exportData);
     importDataInput.addEventListener('change', importData);
