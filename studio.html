@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Data Manager | SwiftInvoice</title>
+    <title>Data Studio | SwiftInvoice</title>
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -120,12 +120,13 @@
         #view-app { display: flex; height: 100vh; width: 100%; opacity: 0; transform: scale(1.02); transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; }
         #view-app.active { opacity: 1; transform: scale(1); }
 
-        .sidebar { width: 100%; max-width: 20rem; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s ease; }
+        /* SIDEBAR (Mobile Default - 100% Width) */
+        .sidebar { width: 100%; max-width: none; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s ease; }
         .sidebar.sidebar-open { transform: translateX(0); }
         .sidebar-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
         
-        /* DESKTOP LAYOUT SETTINGS */
+        /* DESKTOP LAYOUT SETTINGS (Sidebar 20%) */
         @media (min-width: 1024px) { 
             .sidebar { width: 20%; max-width: none; position: relative; transform: none; z-index: 20; }
             .sidebar-overlay { display: none; }
@@ -354,7 +355,7 @@
                     </svg>
                 </span>
                 <h1 class="landing-title">SwiftInvoice</h1>
-                <div class="landing-subtitle">Data Manager Tool</div>
+                <div class="landing-subtitle">Data Studio</div>
             </div>
 
             <div id="landing-status" class="status-box error hidden"></div>
@@ -407,7 +408,7 @@
                     </span>
                     <div>
                         <h1 class="sidebar-title">SwiftInvoice</h1>
-                        <div class="sidebar-subtitle">Data Manager Tool</div>
+                        <div class="sidebar-subtitle">Data Studio</div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
