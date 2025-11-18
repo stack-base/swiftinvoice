@@ -100,7 +100,7 @@
         .landing-logo-bg { display: flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background-color: var(--primary); border-radius: 0.75rem; margin-bottom: 1rem; }
         .landing-logo-icon { width: 2rem; height: 2rem; color: #ffffff; }
         .landing-title { font-family: 'Ubuntu', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text-accent); margin: 0; }
-        .landing-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .landing-subtitle { font-size: 1.25rem; color: var(--text-secondary); margin-top: 0.25rem; font-weight: 500; }
         .landing-state-section { transition: opacity 0.3s ease, transform 0.3s ease; }
         .landing-state-active { opacity: 1; transform: translateX(0); display: block; }
         .landing-state-inactive { opacity: 0; transform: translateX(-20px); display: none; }
@@ -224,7 +224,12 @@
             .app-container { margin: 0; border-radius: 0; border: none; border-bottom: 1px solid var(--border-color); }
             .right-pane-header { top: 1rem; }
             .pane-content-area { padding-top: 0; } 
-            .main-content-container, .raw-data-container { padding-top: 5.5rem; }
+            /* FIX: Reduced padding for mobile view to reclaim screen space */
+            .main-content-container, .raw-data-container { 
+                padding-top: 5.5rem; 
+                padding-left: 1rem; 
+                padding-right: 1rem; 
+            }
             #content-preview .main-content-container { padding-top: 0; }
             #mobile-invoice-controls.active { display: flex; }
             body.mobile-menu-open #mobile-invoice-controls { display: none !important; }
@@ -249,7 +254,7 @@
         .sidebar-logo-bg { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background-color: var(--primary); border-radius: 0.5rem; flex-shrink: 0; }
         .sidebar-logo-icon { width: 1.5rem; height: 1.5rem; color: #ffffff; }
         .sidebar-title { font-family: 'Ubuntu', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-accent); margin: 0; }
-        .sidebar-subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .sidebar-subtitle { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
         .sidebar-branding-footer { font-family: 'Ubuntu', sans-serif; text-align: center; font-size: 0.875rem; color: var(--text-muted); padding: 1.5rem; border-top: 1px solid var(--border-color); margin-top: auto; }
         .settings-panel { padding: 1.5rem; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
         .section-card { background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; }
