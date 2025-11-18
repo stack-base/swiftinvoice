@@ -1495,6 +1495,48 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadFile(decryptedData, true, passToUse);
     });
 
+    // RESET LOGIC START
+    ui.resetBtn.addEventListener('click', () => {
+        // Clear data
+        tempFileContent = null; 
+        decryptedData = null;   
+        currentInvoice = null;
+        activePassword = null;
+        currentFileName = "Unknown";
+        currentFileSize = "0 KB";
+        currentInvoiceIndex = 0;
+        productStats = []; 
+        currentChartData = {}; 
+        
+        // Clear inputs
+        ui.landingFileInput.value = '';
+        ui.landingPassword.value = '';
+        
+        // Clear UI parts
+        ui.invListContainer.innerHTML = '';
+        ui.mobInvScrollArea.innerHTML = '';
+        ui.jsonPre.textContent = "Waiting for file...";
+        ui.fileStatsCard.classList.add('hidden');
+        ui.activityList.innerHTML = ''; // Optional: clear history on new file
+        
+        // Reset toggle states
+        ui.acPlain.classList.remove('active');
+        ui.acEnc.classList.remove('active');
+        ui.encSettings.classList.add('hidden');
+
+        // Destroy charts to prevent artifacts
+        if(revenueChartInstance) revenueChartInstance.destroy();
+        if(qtyChartInstance) qtyChartInstance.destroy();
+        if(hourlyChartInstance) hourlyChartInstance.destroy();
+        if(weeklyChartInstance) weeklyChartInstance.destroy();
+        if(compositionChartInstance) compositionChartInstance.destroy();
+
+        // Switch View
+        toggleSidebar(false);
+        switchView('landing');
+    });
+    // RESET LOGIC END
+
     function downloadFile(dataObj, isEncrypted, password) {
         if (!dataObj) return;
         let contentStr, fileName;
@@ -1503,10 +1545,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const encrypted = CryptoJS.AES.encrypt(JSON.stringify(dataObj), password).toString();
             const fileObj = { encrypted: true, version: '1.0', data: encrypted, exportDate: date };
             contentStr = JSON.stringify(fileObj, null, 2);
-            fileName = `swiftinvoice_encrypted_${date}.json`;
+            fileName = `SwiftInvoice-Studio_encrypted_${date}.json`;
         } else {
             contentStr = JSON.stringify(dataObj, null, 2);
-            fileName = `swiftinvoice_raw_${date}.json`;
+            fileName = `SwiftInvoice-Studio_unencrypted_${date}.json`;
         }
         const blob = new Blob([contentStr], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
