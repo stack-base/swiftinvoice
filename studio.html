@@ -10,13 +10,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Light Mode (Default) */
             --bg-body: #f3f4f6;
             --bg-paper: #ffffff;
             --bg-sidebar: #ffffff;
@@ -48,7 +48,6 @@
         }
 
         [data-theme="dark"] {
-            /* Pure Black Dark Mode */
             --bg-body: #000000;
             --bg-paper: #09090b;
             --bg-sidebar: #000000;
@@ -79,7 +78,6 @@
             --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
         }
 
-        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
         ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; border: 2px solid var(--scrollbar-track); }
@@ -120,23 +118,19 @@
         #view-app { display: flex; height: 100vh; width: 100%; opacity: 0; transform: scale(1.02); transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; }
         #view-app.active { opacity: 1; transform: scale(1); }
 
-        /* SIDEBAR (Mobile Default - 100% Width) */
         .sidebar { width: 100%; max-width: none; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s ease; }
         .sidebar.sidebar-open { transform: translateX(0); }
         .sidebar-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
         
-        /* DESKTOP LAYOUT SETTINGS (Sidebar 20%) */
         @media (min-width: 1024px) { 
-            .sidebar { width: 20%; max-width: none; position: relative; transform: none; z-index: 20; }
+            .sidebar { width: 20%; min-width: 250px; max-width: 20vw; position: relative; transform: none; z-index: 20; }
             .sidebar-overlay { display: none; }
-            /* Hide mobile-only buttons on desktop */
             .menu-btn { display: none !important; }
         }
 
         .right-pane-wrapper { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-body); position: relative; width: 100%; min-width: 0; }
 
-        /* Header Padding Adjustment for 20% Pane + 20% Sidebar */
         .right-pane-header { position: absolute; top: 1.5rem; left: 0; width: 100%; z-index: 50; display: flex; justify-content: center; align-items: center; pointer-events: none; padding: 0 1rem; box-sizing: border-box; transition: opacity 0.2s ease; }
         @media (min-width: 1024px) { .right-pane-header { padding-left: calc(20% + 1rem); } }
         @media (max-width: 1023px) { body.mobile-menu-open .right-pane-header { display: none !important; } }
@@ -169,7 +163,6 @@
 
         .three-pane-body { display: flex; flex: 1; overflow: hidden; width: 100%; }
         
-        /* INVOICE PANE WIDTH (20%) */
         .pane-invoice-list { width: 20%; min-width: 220px; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; padding-top: 5rem; }
         
         .list-header { padding: 0 1rem 1rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; background: var(--bg-sidebar); }
@@ -217,14 +210,17 @@
         .data-table th { text-align: left; padding: 0.75rem; background: var(--bg-hover); color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
         .data-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
         .data-table tr:last-child td { border-bottom: none; }
-        .chart-box { position: relative; height: 320px; width: 100%; }
+        .chart-box { 
+            position: relative; 
+            height: 350px; 
+            width: 100%; 
+        }
 
         @media (max-width: 1023px) {
             .pane-invoice-list { display: none; } 
             .app-container { margin: 0; border-radius: 0; border: none; border-bottom: 1px solid var(--border-color); }
             .right-pane-header { top: 1rem; }
             .pane-content-area { padding-top: 0; } 
-            /* FIX: Reduced padding for mobile view to reclaim screen space */
             .main-content-container, .raw-data-container { 
                 padding-top: 5.5rem; 
                 padding-left: 1rem; 
@@ -298,7 +294,6 @@
 
         .app-container { background-color: var(--bg-paper); border-radius: 0.75rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden; }
         
-        /* INVOICE SPECIFIC: Keep white background for "paper" simulation unless desired otherwise */
         #invoice { width:100%; background:#fff; padding: 40px; box-sizing:border-box; color: #111827; font-family: 'Inter', Arial, sans-serif; min-height: 29.7cm; display: flex; flex-direction: column; justify-content: space-between; }
         .invoice-logo { max-height: 80px; width: 100%; max-width: 160px; object-fit: contain; border-radius: 6px; }
         .invoice-header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; margin-bottom: 24px; flex-direction: row; }
@@ -347,6 +342,8 @@
 
         #invoice-placeholder { padding: 4rem; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
         #json-preview { background-color: var(--bg-paper); color: var(--text-main); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 0.75rem; white-space: pre-wrap; word-wrap: break-word; font-size: 0.875rem; margin-top: 0; overflow: auto; height: 100%; }
+
+        .analysis-period { font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 1.5rem 0; display: block; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -605,7 +602,20 @@
 
                     <div id="content-analytics" class="main-content hidden">
                         <div class="main-content-container">
-                            <h2 class="section-title" style="border-bottom:none; margin-bottom:1rem;">Analytics Dashboard</h2>
+                            <h2 class="section-title" style="border-bottom:none; margin-bottom:0.5rem;">Analytics Dashboard</h2>
+                            <p id="analysis-period" class="analysis-period">Analysis Period: Loading...</p>
+                            
+                            <div class="analytics-section" style="border-left: 4px solid var(--primary); background: var(--bg-active); padding: 1.5rem;">
+                                <h3 class="section-title" style="margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem; margin-top:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem; height:1.25rem;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                                    </svg>
+                                    Summary
+                                </h3>
+                                <div id="executive-summary-text" style="line-height: 1.7; font-size: 0.95rem; color: var(--text-main);">
+                                    No data available to generate summary.
+                                </div>
+                            </div>
                             <div class="analytics-grid">
                                 <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">0.00</div><div id="stat-rev-trend" class="stat-trend"></div></div>
                                 <div class="stat-card"><div class="stat-label">Net Revenue (Excl. Tax)</div><div class="stat-value" id="stat-net-revenue">0.00</div></div>
@@ -617,13 +627,77 @@
                                 <div class="stat-card"><div class="stat-label">Average Invoice Value</div><div class="stat-value" id="stat-avg">0.00</div></div>
                             </div>
                             <div id="insights-container" class="insights-box hidden"><div class="insight-header">Key Findings</div><ul id="insight-list" class="insight-list"></ul></div>
-                            <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Revenue Trend</h3><div class="tab-group"><button id="btn-rev-line" class="tab-btn active">Line</button><button id="btn-rev-bar" class="tab-btn">Bar</button></div></div><div class="chart-box"><canvas id="chart-revenue"></canvas></div></div>
+                            
+                            <div class="analytics-section">
+                                <div class="section-header-row">
+                                    <h3 class="section-title" style="margin:0;">Cumulative Revenue</h3>
+                                    <div class="tab-group">
+                                        <button id="btn-cum-line" class="tab-btn active">Line</button>
+                                        <button id="btn-cum-bar" class="tab-btn">Bar</button>
+                                    </div>
+                                </div>
+                                <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
+                            </div>
+                            <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Daily Revenue Trend</h3><div class="tab-group"><button id="btn-rev-line" class="tab-btn active">Line</button><button id="btn-rev-bar" class="tab-btn">Bar</button></div></div><div class="chart-box"><canvas id="chart-revenue"></canvas></div></div>
                             <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Sales Volume</h3><div class="tab-group"><button id="btn-qty-line" class="tab-btn">Line</button><button id="btn-qty-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-qty"></canvas></div></div>
                             <div class="analytics-section"><div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Peak Trading Hours</h3><p class="section-caption">Distribution of sales by time of day</p></div><div class="tab-group"><button id="btn-hour-line" class="tab-btn">Line</button><button id="btn-hour-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-hourly"></canvas></div></div>
                             <div class="analytics-section"><div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Weekly Pattern</h3><p class="section-caption">Sales performance by day of the week</p></div><div class="tab-group"><button id="btn-week-line" class="tab-btn">Line</button><button id="btn-week-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-weekly"></canvas></div></div>
                             <div class="analytics-section"><h3 class="section-title">Revenue Composition</h3><div class="chart-box" style="display:flex; align-items:center; justify-content:center;"><div style="width: 100%; max-width: 320px;"><canvas id="chart-composition"></canvas></div></div></div>
+                            
                             <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Product Leaderboard</h3><div class="tab-group"><button id="btn-sort-qty" class="tab-btn active">By Vol</button><button id="btn-sort-rev" class="tab-btn">By Rev</button></div></div><div style="overflow-x:auto; max-height: 300px; overflow-y: auto;"><table class="data-table"><thead style="position: sticky; top: 0; z-index: 10;"><tr><th>Product</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rev</th></tr></thead><tbody id="product-leaderboard-body"><tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No data available</td></tr></tbody></table></div></div>
-                            <div class="analytics-section"><h3 class="section-title">Top Clients</h3><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Client Name</th><th style="text-align:center;">Invoices</th><th style="text-align:right;">Total Spend</th></tr></thead><tbody id="top-clients-body"><tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No data available</td></tr></tbody></table></div></div>
+
+                            <div class="analytics-section">
+                                <div class="section-header-row">
+                                    <div>
+                                        <h3 class="section-title" style="margin:0;">Ticket Size Distribution</h3>
+                                        <p class="section-caption">How invoice values are distributed across price ranges</p>
+                                    </div>
+                                    <div class="tab-group">
+                                        <button id="btn-dist-line" class="tab-btn">Line</button>
+                                        <button id="btn-dist-bar" class="tab-btn active">Bar</button>
+                                    </div>
+                                </div>
+                                <div class="chart-box">
+                                    <canvas id="chart-distribution"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="analytics-section">
+                                <div class="section-header-row">
+                                    <div>
+                                        <h3 class="section-title" style="margin:0;">Customer Loyalty Trend</h3>
+                                        <p class="section-caption">Revenue split by New vs. Returning customers</p>
+                                    </div>
+                                    <div class="tab-group">
+                                        <button id="btn-loy-line" class="tab-btn">Line</button>
+                                        <button id="btn-loy-bar" class="tab-btn active">Bar</button>
+                                    </div>
+                                </div>
+                                <div class="chart-box">
+                                    <canvas id="chart-loyalty"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="analytics-section">
+                                <h3 class="section-title">Top Clients</h3>
+                                <div style="overflow-x:auto;">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Client Name</th>
+                                                <th style="text-align:center;">Invoices</th>
+                                                <th style="text-align:right;">Avg Basket</th>
+                                                <th style="text-align:right;">Last Seen</th>
+                                                <th style="text-align:right;">Total Spend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="top-clients-body">
+                                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No data available</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                     
@@ -640,1099 +714,11 @@
         </div>
     </div> 
 
-<script type="module">
-document.addEventListener('DOMContentLoaded', () => {
-    let tempFileContent = null; 
-    let decryptedData = null;   
-    let currentInvoice = null;
-    let activePassword = null;
-    let currentFileName = "Unknown";
-    let currentFileSize = "0 KB";
-    let currentInvoiceIndex = 0;
-    let productStats = []; 
-    let currentChartData = {}; 
-    
-    let revenueChartInstance = null;
-    let qtyChartInstance = null;
-    let hourlyChartInstance = null;
-    let weeklyChartInstance = null;
-    let compositionChartInstance = null;
-
-    // THEME HANDLING
-    const themeToggleBtn = document.getElementById('header-theme-btn');
-    
-    function applyTheme(theme) {
-        if(theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            themeToggleBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`;
-        } else {
-            document.documentElement.removeAttribute('data-theme');
-            themeToggleBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>`;
-        }
-        // Update charts if they exist because chart.js colors don't update automatically via CSS vars well
-        if (currentChartData && currentChartData.labels) {
-            renderAllCharts();
-        }
-    }
-
-    themeToggleBtn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        localStorage.setItem('swiftinvoice_theme', next);
-    });
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('swiftinvoice_theme');
-    if (savedTheme) applyTheme(savedTheme);
-    else applyTheme('light');
-
-
-    const ui = {
-        viewLanding: document.getElementById('view-landing'),
-        viewApp: document.getElementById('view-app'),
-        
-        landingStateUpload: document.getElementById('landing-state-upload'),
-        landingStateAuth: document.getElementById('landing-state-auth'),
-        landingDropZone: document.getElementById('landing-drop-zone'),
-        landingFileInput: document.getElementById('landing-file-input'),
-        landingPassword: document.getElementById('landing-password'),
-        landingUnlockBtn: document.getElementById('landing-unlock-btn'),
-        landingBackBtn: document.getElementById('landing-back-btn'),
-        landingStatus: document.getElementById('landing-status'),
-        authFilenameDisplay: document.getElementById('auth-filename-display'),
-        
-        appSidebar: document.getElementById('app-sidebar'),
-        sidebarOverlay: document.getElementById('sidebar-overlay'),
-        mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-        closeSidebarBtn: document.getElementById('close-sidebar-btn'),
-        
-        dispName: document.getElementById('display-filename'),
-        dispSize: document.getElementById('display-filesize'),
-        activityList: document.getElementById('activity-list'),
-        fileStatsCard: document.getElementById('file-stats-card'),
-        metaDateRange: document.getElementById('meta-date-range'),
-        metaInvRange: document.getElementById('meta-inv-range'),
-        
-        acPlain: document.getElementById('ac-plain'),
-        acEnc: document.getElementById('ac-enc'),
-        encSettings: document.getElementById('enc-settings'),
-        passLogicContainer: document.getElementById('pass-logic-container'),
-        newPassGroup: document.getElementById('new-pass-field-group'),
-        newPassInput: document.getElementById('new-password-input'),
-        radioOptions: document.querySelectorAll('input[name="pass_pref"]'),
-        
-        finalSaveBtn: document.getElementById('final-save-btn'),
-        resetBtn: document.getElementById('reset-btn'),
-        pdfBtn: document.getElementById('download-pdf-btn'),
-        
-        jsonPre: document.getElementById('json-preview'),
-        invContent: document.getElementById('invoice-content'),
-        invPlaceholder: document.getElementById('invoice-placeholder'),
-        
-        invSelect: document.createElement('select'),
-        
-        mobileInvControls: document.getElementById('mobile-invoice-controls'),
-        mobInvTrigger: document.getElementById('mob-inv-trigger'),
-        mobInvSelectedText: document.getElementById('mob-inv-selected-text'),
-        mobInvListContainer: document.getElementById('mob-inv-list-container'),
-        mobInvScrollArea: document.getElementById('mob-inv-scroll-area'),
-        mobPrevBtn: document.getElementById('mob-prev-btn'),
-        mobNextBtn: document.getElementById('mob-next-btn'),
-
-        tabPreview: document.getElementById('tab-btn-preview'),
-        tabAnalytics: document.getElementById('tab-btn-analytics'),
-        tabRaw: document.getElementById('tab-btn-raw'),
-        viewPreview: document.getElementById('content-preview'),
-        viewAnalytics: document.getElementById('content-analytics'),
-        viewRaw: document.getElementById('content-raw'),
-        
-        invListContainer: document.getElementById('invoice-list-container'),
-        listCount: document.getElementById('list-count'),
-        searchInput: document.getElementById('list-search-input'),
-        
-        statRevenue: document.getElementById('stat-revenue'),
-        statNetRevenue: document.getElementById('stat-net-revenue'),
-        statTax: document.getElementById('stat-tax'),
-        statItemsSold: document.getElementById('stat-items-sold'),
-        statCustomers: document.getElementById('stat-customers'),
-        statTopProdRev: document.getElementById('stat-top-prod-rev'),
-        statTopProdVol: document.getElementById('stat-top-prod-vol'),
-        statAvg: document.getElementById('stat-avg'),
-        statRevTrend: document.getElementById('stat-rev-trend'),
-
-        insightsContainer: document.getElementById('insights-container'),
-        insightList: document.getElementById('insight-list'),
-        
-        topClientsBody: document.getElementById('top-clients-body'),
-        productLeaderboardBody: document.getElementById('product-leaderboard-body'),
-        btnSortQty: document.getElementById('btn-sort-qty'),
-        btnSortRev: document.getElementById('btn-sort-rev'),
-
-        btnRevLine: document.getElementById('btn-rev-line'),
-        btnRevBar: document.getElementById('btn-rev-bar'),
-        btnQtyLine: document.getElementById('btn-qty-line'),
-        btnQtyBar: document.getElementById('btn-qty-bar'),
-        btnHourLine: document.getElementById('btn-hour-line'),
-        btnHourBar: document.getElementById('btn-hour-bar'),
-        btnWeekLine: document.getElementById('btn-week-line'),
-        btnWeekBar: document.getElementById('btn-week-bar'),
-
-        ctxRevenue: document.getElementById('chart-revenue'),
-        ctxQty: document.getElementById('chart-qty'),
-        ctxHourly: document.getElementById('chart-hourly'),
-        ctxWeekly: document.getElementById('chart-weekly'),
-        ctxComposition: document.getElementById('chart-composition')
-    };
-
-    function toggleSidebar(show) {
-        if (show) {
-            ui.appSidebar.classList.add('sidebar-open');
-            ui.sidebarOverlay.classList.add('visible');
-            if (window.innerWidth < 1024) {
-                document.body.classList.add('mobile-menu-open');
-            }
-        } else {
-            ui.appSidebar.classList.remove('sidebar-open');
-            ui.sidebarOverlay.classList.remove('visible');
-            document.body.classList.remove('mobile-menu-open');
-        }
-    }
-    ui.mobileMenuBtn.addEventListener('click', () => toggleSidebar(true));
-    ui.closeSidebarBtn.addEventListener('click', () => toggleSidebar(false));
-    ui.sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
-
-    function toggleLandingState(state) {
-        ui.landingStatus.classList.add('hidden');
-        if (state === 'auth') {
-            ui.landingStateUpload.classList.remove('landing-state-active');
-            ui.landingStateUpload.classList.add('landing-state-inactive');
-            setTimeout(() => {
-                ui.landingStateAuth.classList.remove('landing-state-inactive');
-                ui.landingStateAuth.classList.add('landing-state-active');
-                ui.landingPassword.focus();
-            }, 100);
-        } else {
-            ui.landingStateAuth.classList.remove('landing-state-active');
-            ui.landingStateAuth.classList.add('landing-state-inactive');
-            ui.landingPassword.value = ''; 
-            setTimeout(() => {
-                ui.landingStateUpload.classList.remove('landing-state-inactive');
-                ui.landingStateUpload.classList.add('landing-state-active');
-            }, 100);
-        }
-    }
-
-    function switchView(viewName) {
-        if (viewName === 'app') {
-            ui.viewLanding.classList.add('fade-out');
-            setTimeout(() => {
-                ui.viewLanding.classList.add('hidden');
-                ui.viewApp.classList.remove('hidden');
-                setTimeout(() => ui.viewApp.classList.add('active'), 50);
-            }, 400);
-        } else {
-            ui.viewApp.classList.remove('active');
-            setTimeout(() => {
-                ui.viewApp.classList.add('hidden');
-                ui.viewLanding.classList.remove('hidden');
-                toggleLandingState('upload');
-                setTimeout(() => ui.viewLanding.classList.remove('fade-out'), 50);
-            }, 400);
-        }
-    }
-
-    ui.landingDropZone.addEventListener('click', () => ui.landingFileInput.click());
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        ui.landingDropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
-    });
-    ['dragenter', 'dragover'].forEach(eventName => {
-        ui.landingDropZone.addEventListener(eventName, () => ui.landingDropZone.classList.add('drag-active'), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        ui.landingDropZone.addEventListener(eventName, () => ui.landingDropZone.classList.remove('drag-active'), false);
-    });
-    ui.landingDropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        handleLandingFile(dt.files[0]);
-    });
-    ui.landingFileInput.addEventListener('change', (e) => handleLandingFile(e.target.files[0]));
-
-    function handleLandingFile(file) {
-        if (!file) return;
-        if (file.type && file.type !== "application/json" && !file.name.endsWith('.json')) {
-            showLandingStatus('Please upload a valid .json file');
-            return;
-        }
-        currentFileName = file.name;
-        currentFileSize = (file.size / 1024).toFixed(1) + " KB";
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            tempFileContent = event.target.result;
-            analyzeLandingFile(tempFileContent);
-        };
-        reader.onerror = () => showLandingStatus('Error reading file.');
-        reader.readAsText(file);
-    }
-
-    function analyzeLandingFile(jsonString) {
-        try {
-            const data = JSON.parse(jsonString);
-            activePassword = null; 
-            ui.landingStatus.classList.add('hidden');
-            if (data.encrypted) {
-                ui.authFilenameDisplay.textContent = currentFileName;
-                toggleLandingState('auth');
-            } else {
-                decryptedData = data;
-                loadSuccess();
-                addHistoryItem(`Loaded ${currentFileName}`, 'active');
-                switchView('app');
-            }
-        } catch (err) {
-            showLandingStatus('Invalid JSON file format.');
-            console.error(err);
-        }
-    }
-
-    ui.landingUnlockBtn.addEventListener('click', () => {
-        const pass = ui.landingPassword.value;
-        if (!pass) return showLandingStatus('Enter a password.');
-        try {
-            const raw = JSON.parse(tempFileContent);
-            const bytes = CryptoJS.AES.decrypt(raw.data, pass);
-            const str = bytes.toString(CryptoJS.enc.Utf8);
-            if (!str) throw new Error("Decryption failed");
-            decryptedData = JSON.parse(str);
-            activePassword = pass; 
-            loadSuccess();
-            addHistoryItem(`Unlocked ${currentFileName}`, 'active');
-            switchView('app');
-        } catch (e) {
-            showLandingStatus('Incorrect password or corrupted file.');
-            ui.landingPassword.value = '';
-            ui.landingPassword.focus();
-        }
-    });
-
-    ui.landingBackBtn.addEventListener('click', () => {
-        tempFileContent = null;
-        toggleLandingState('upload');
-    });
-
-    function showLandingStatus(msg) {
-        ui.landingStatus.textContent = msg;
-        ui.landingStatus.classList.remove('hidden');
-    }
-
-    function loadSuccess() {
-        ui.dispName.textContent = currentFileName;
-        ui.dispName.title = currentFileName; 
-        ui.dispSize.textContent = currentFileSize + " • " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        ui.acPlain.classList.remove('active');
-        ui.acEnc.classList.remove('active');
-        ui.encSettings.classList.add('hidden');
-        ui.jsonPre.textContent = JSON.stringify(decryptedData, null, 2);
-        
-        ui.invSelect.innerHTML = '';
-        ui.invListContainer.innerHTML = '';
-        
-        let invoices = [];
-        if (Array.isArray(decryptedData)) {
-             invoices = decryptedData;
-        } else if (decryptedData.invoices && Array.isArray(decryptedData.invoices)) {
-             invoices = decryptedData.invoices;
-        }
-
-        decryptedData.invoicesList = invoices; 
-        
-        updateFileStats(invoices);
-        calculateAnalytics(invoices);
-
-        if (invoices.length > 0) {
-            renderInvoiceList(invoices);
-            selectInvoice(0);
-        } else {
-            ui.invSelect.innerHTML = '<option>No invoices found</option>';
-            ui.mobInvSelectedText.textContent = "No invoices found";
-            ui.invListContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--text-muted);">No invoices found in file.</div>';
-            renderInvoice(null, "No invoice data found in this file.");
-        }
-    }
-
-    function updateFileStats(invoices) {
-        if (!invoices || invoices.length === 0) {
-            ui.fileStatsCard.classList.add('hidden');
-            return;
-        }
-        ui.fileStatsCard.classList.remove('hidden');
-
-        const dates = invoices.map(i => i.invoiceDate).filter(d => d).sort();
-        if (dates.length > 0) {
-            const first = dates[0];
-            const last = dates[dates.length - 1];
-            ui.metaDateRange.textContent = (first === last) ? first : `${first} to ${last}`;
-        } else {
-            ui.metaDateRange.textContent = "N/A";
-        }
-
-        const nums = invoices.map(i => i.invoiceNumber).filter(n => n).sort();
-        if (nums.length > 0) {
-            const first = nums[0];
-            const last = nums[nums.length - 1];
-            ui.metaInvRange.textContent = (first === last) ? first : `${first} to ${last}`;
-        } else {
-            ui.metaInvRange.textContent = "N/A";
-        }
-    }
-
-    const parseCurrency = (str) => {
-        if (!str) return 0;
-        return parseFloat(String(str).replace(/[^0-9.-]+/g,"")) || 0;
-    }
-    
-    const formatMoney = (num) => {
-        return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    
-    function calculateGrowth(current, previous) {
-        if (previous === 0) return current > 0 ? 100 : 0;
-        return ((current - previous) / previous) * 100;
-    }
-
-    function getTrendHtml(percent) {
-        if (percent > 0) return `<span class="trend-up">▲ ${percent.toFixed(1)}%</span> vs prev`;
-        if (percent < 0) return `<span class="trend-down">▼ ${Math.abs(percent).toFixed(1)}%</span> vs prev`;
-        return `<span class="trend-neutral">No change</span>`;
-    }
-
-    function calculateAnalytics(invoices) {
-        if (!invoices || invoices.length === 0) return;
-
-        invoices.sort((a, b) => new Date(a.invoiceDate) - new Date(b.invoiceDate));
-
-        const midIndex = Math.floor(invoices.length / 2);
-        const firstHalf = invoices.slice(0, midIndex);
-        const secondHalf = invoices.slice(midIndex);
-
-        let totalRevenue = 0, totalTax = 0, totalItems = 0;
-        let p1Revenue = 0, p2Revenue = 0;
-        
-        let clientMap = {};
-        let productMap = {};
-        let dailyStats = {}; 
-        let hourlyStats = new Array(24).fill(0); 
-        let weeklyStats = new Array(7).fill(0);
-
-        invoices.forEach((inv, index) => {
-            const grandTotal = parseCurrency(inv.grandTotal);
-            const taxVal = parseCurrency(inv.vatTotal);
-            
-            totalRevenue += grandTotal;
-            totalTax += taxVal;
-            
-            if (index < midIndex) p1Revenue += grandTotal;
-            else p2Revenue += grandTotal;
-
-            const dateKey = inv.invoiceDate || "Unknown Date";
-            if (!dailyStats[dateKey]) dailyStats[dateKey] = { rev: 0, qty: 0 };
-            dailyStats[dateKey].rev += grandTotal;
-
-            if (inv.invoiceTime) {
-                const hourPart = inv.invoiceTime.split(':')[0];
-                const hourInt = parseInt(hourPart, 10);
-                if (!isNaN(hourInt) && hourInt >= 0 && hourInt <= 23) hourlyStats[hourInt] += grandTotal;
-            }
-
-            if (inv.invoiceDate) {
-                const d = new Date(inv.invoiceDate);
-                if (!isNaN(d)) weeklyStats[d.getDay()] += grandTotal;
-            }
-
-            if (inv.items && Array.isArray(inv.items)) {
-                inv.items.forEach(item => {
-                    const qty = parseFloat(item.qty || 0);
-                    totalItems += qty;
-                    dailyStats[dateKey].qty += qty;
-
-                    const pKey = item.desc ? item.desc.trim() : (item.code || "Unknown Item");
-                    if (!productMap[pKey]) productMap[pKey] = { name: pKey, qty: 0, rev: 0 };
-                    productMap[pKey].qty += qty;
-                    const lineTotal = item.incl ? parseCurrency(item.incl) : (parseCurrency(item.excl) + parseCurrency(item.vat));
-                    productMap[pKey].rev += lineTotal;
-                });
-            }
-
-            const clientRaw = inv.buyer || 'Unknown Client';
-            const clientName = clientRaw.split('\n')[0].trim();
-            if (!clientMap[clientName]) clientMap[clientName] = { count: 0, spend: 0 };
-            clientMap[clientName].count++;
-            clientMap[clientName].spend += grandTotal;
-        });
-
-        ui.statRevenue.textContent = formatMoney(totalRevenue);
-        const revGrowth = calculateGrowth(p2Revenue, p1Revenue);
-        ui.statRevTrend.innerHTML = getTrendHtml(revGrowth);
-        
-        const netRevenue = totalRevenue - totalTax;
-        ui.statNetRevenue.textContent = formatMoney(netRevenue);
-
-        ui.statTax.textContent = formatMoney(totalTax);
-        ui.statItemsSold.textContent = totalItems; 
-        ui.statCustomers.textContent = Object.keys(clientMap).length; 
-
-        ui.statAvg.textContent = invoices.length > 0 ? formatMoney(totalRevenue / invoices.length) : '0.00';
-
-        productStats = Object.values(productMap);
-        const productStatsByRev = [...productStats].sort((a,b) => b.rev - a.rev);
-        ui.statTopProdRev.textContent = productStatsByRev.length > 0 ? productStatsByRev[0].name : '-';
-        
-        const productStatsByVol = [...productStats].sort((a,b) => b.qty - a.qty);
-        ui.statTopProdVol.textContent = productStatsByVol.length > 0 ? productStatsByVol[0].name : '-';
-
-        const sortedClients = Object.entries(clientMap).sort(([,a], [,b]) => b.spend - a.spend);
-        ui.topClientsBody.innerHTML = sortedClients.slice(0, 5).map(([name, data]) => `
-            <tr><td>${name}</td><td style="text-align:center;">${data.count}</td><td style="text-align:right;">${formatMoney(data.spend)}</td></tr>
-        `).join('');
-        
-        renderProductLeaderboard('qty');
-        generateSmartInsights(sortedClients, totalRevenue, weeklyStats, hourlyStats);
-
-        const sortedDates = Object.keys(dailyStats).sort();
-        currentChartData = {
-            labels: sortedDates,
-            revData: sortedDates.map(d => dailyStats[d].rev),
-            qtyData: sortedDates.map(d => dailyStats[d].qty),
-            hourlyData: hourlyStats,
-            weeklyData: weeklyStats,
-            totalRev: totalRevenue,
-            totalTax: totalTax
-        };
-        renderAllCharts();
-    }
-
-    function generateSmartInsights(sortedClients, totalRevenue, weeklyStats, hourlyStats) {
-        const insights = [];
-        
-        if (sortedClients.length > 0) {
-            const top20Count = Math.ceil(sortedClients.length * 0.2);
-            const top20Rev = sortedClients.slice(0, top20Count).reduce((sum, [,d]) => sum + d.spend, 0);
-            const concentration = (top20Rev / totalRevenue) * 100;
-            if (concentration > 60) {
-                insights.push(`<b>Pareto Principle:</b> The top ${top20Count} client(s) generate ${concentration.toFixed(0)}% of total revenue.`);
-            }
-        }
-
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const bestDayIndex = weeklyStats.indexOf(Math.max(...weeklyStats));
-        if (weeklyStats[bestDayIndex] > 0) {
-             insights.push(`<b>Peak Day:</b> ${days[bestDayIndex]} is your strongest performing day.`);
-        }
-
-        const weekendRev = weeklyStats[0] + weeklyStats[6];
-        const weekdayRev = totalRevenue - weekendRev;
-        if (weekendRev > weekdayRev) {
-            insights.push(`<b>Weekend Warrior:</b> Weekend sales (${formatMoney(weekendRev)}) outperform weekdays.`);
-        }
-
-        const morning = hourlyStats.slice(0, 12).reduce((a,b)=>a+b, 0);
-        const afternoon = hourlyStats.slice(12).reduce((a,b)=>a+b, 0);
-        if (afternoon > morning * 1.5) {
-             insights.push(`<b>Afternoon Rush:</b> Most revenue is generated after 12:00 PM.`);
-        }
-
-        ui.insightList.innerHTML = insights.map(t => `<li class="insight-li">${t}</li>`).join('');
-        ui.insightsContainer.classList.remove('hidden');
-        if(insights.length === 0) ui.insightsContainer.classList.add('hidden');
-    }
-
-    function getChartColors() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        return {
-            grid: isDark ? '#27272a' : '#f3f4f6',
-            text: isDark ? '#9ca3af' : '#6b7280',
-            primary: '#0d9488',
-            accent: '#6366f1',
-            weekly: '#f59e0b'
-        };
-    }
-
-    function renderAllCharts() {
-        if(revenueChartInstance) revenueChartInstance.destroy();
-        if(qtyChartInstance) qtyChartInstance.destroy();
-        if(hourlyChartInstance) hourlyChartInstance.destroy();
-        if(weeklyChartInstance) weeklyChartInstance.destroy();
-        if(compositionChartInstance) compositionChartInstance.destroy();
-        
-        const c = getChartColors();
-
-        revenueChartInstance = createChart(ui.ctxRevenue, 'line', currentChartData.labels, currentChartData.revData, 'Revenue', c.primary, c);
-        qtyChartInstance = createChart(ui.ctxQty, 'bar', currentChartData.labels, currentChartData.qtyData, 'Items Sold', c.accent, c);
-
-        const hourLabels = Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0') + ':00');
-        hourlyChartInstance = createChart(ui.ctxHourly, 'bar', hourLabels, currentChartData.hourlyData, 'Sales Volume', c.primary, c);
-
-        const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        weeklyChartInstance = createChart(ui.ctxWeekly, 'bar', dayLabels, currentChartData.weeklyData, 'Weekly Revenue', c.weekly, c);
-
-        const netRev = currentChartData.totalRev - currentChartData.totalTax;
-        compositionChartInstance = new Chart(ui.ctxComposition, {
-            type: 'doughnut',
-            data: {
-                labels: ['Net Revenue', 'Tax Collected'],
-                datasets: [{
-                    data: [netRev, currentChartData.totalTax],
-                    backgroundColor: ['#0d9488', '#f43f5e'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, color: c.text } } 
-                },
-                cutout: '70%'
-            }
-        });
-    }
-
-    function createChart(ctx, type, labels, data, label, color, themeColors) {
-        const isLine = type === 'line';
-        return new Chart(ctx, {
-            type: type,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: label,
-                    data: data,
-                    borderColor: color,
-                    backgroundColor: isLine ? color + '1A' : color, 
-                    borderWidth: isLine ? 2 : 0,
-                    fill: isLine,
-                    tension: isLine ? 0.3 : 0,
-                    borderRadius: isLine ? 0 : 4,
-                    pointRadius: isLine ? 3 : 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: themeColors.grid },
-                        ticks: { color: themeColors.text }
-                    },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: themeColors.text }
-                    }
-                }
-            }
-        });
-    }
-
-    function setupToggle(btnLine, btnBar, chartKey, label, color) {
-        const c = getChartColors();
-        btnLine.addEventListener('click', () => {
-            btnLine.classList.add('active');
-            btnBar.classList.remove('active');
-            updateSingleChart(chartKey, 'line', label, color);
-        });
-        btnBar.addEventListener('click', () => {
-            btnBar.classList.add('active');
-            btnLine.classList.remove('active');
-            updateSingleChart(chartKey, 'bar', label, color);
-        });
-    }
-
-    function updateSingleChart(key, type, label, color) {
-        const c = getChartColors();
-        if (key === 'revenue') {
-            if(revenueChartInstance) revenueChartInstance.destroy();
-            revenueChartInstance = createChart(ui.ctxRevenue, type, currentChartData.labels, currentChartData.revData, label, color, c);
-        } else if (key === 'qty') {
-            if(qtyChartInstance) qtyChartInstance.destroy();
-            qtyChartInstance = createChart(ui.ctxQty, type, currentChartData.labels, currentChartData.qtyData, label, color, c);
-        } else if (key === 'hourly') {
-            if(hourlyChartInstance) hourlyChartInstance.destroy();
-            const hourLabels = Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0') + ':00');
-            hourlyChartInstance = createChart(ui.ctxHourly, type, hourLabels, currentChartData.hourlyData, label, color, c);
-        } else if (key === 'weekly') {
-            if(weeklyChartInstance) weeklyChartInstance.destroy();
-            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            weeklyChartInstance = createChart(ui.ctxWeekly, type, dayLabels, currentChartData.weeklyData, label, color, c);
-        }
-    }
-
-    // Initialize toggles with colors that are theme-aware
-    // Note: These specific colors (teal, indigo, etc) look okay on dark mode too
-    setupToggle(ui.btnRevLine, ui.btnRevBar, 'revenue', 'Revenue', '#0d9488');
-    setupToggle(ui.btnQtyLine, ui.btnQtyBar, 'qty', 'Items Sold', '#6366f1');
-    setupToggle(ui.btnHourLine, ui.btnHourBar, 'hourly', 'Sales Volume', '#0f766e');
-    setupToggle(ui.btnWeekLine, ui.btnWeekBar, 'weekly', 'Weekly Revenue', '#f59e0b');
-
-
-    function renderProductLeaderboard(sortBy) {
-        if (sortBy === 'qty') {
-            productStats.sort((a, b) => b.qty - a.qty);
-            ui.btnSortQty.classList.add('active');
-            ui.btnSortRev.classList.remove('active');
-        } else {
-            productStats.sort((a, b) => b.rev - a.rev);
-            ui.btnSortRev.classList.add('active');
-            ui.btnSortQty.classList.remove('active');
-        }
-
-        if (productStats.length === 0) {
-            ui.productLeaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No data available</td></tr>';
-            return;
-        }
-
-        ui.productLeaderboardBody.innerHTML = productStats.map(p => `
-            <tr>
-                <td style="font-weight:500; color:var(--text-secondary);">${p.name}</td>
-                <td style="text-align:right;">${p.qty}</td>
-                <td style="text-align:right; font-family:'Roboto', sans-serif;">${formatMoney(p.rev)}</td>
-            </tr>
-        `).join('');
-    }
-
-    ui.btnSortQty.addEventListener('click', () => renderProductLeaderboard('qty'));
-    ui.btnSortRev.addEventListener('click', () => renderProductLeaderboard('rev'));
-
-
-    function renderInvoiceList(invoices) {
-        ui.invSelect.innerHTML = ''; 
-        ui.invListContainer.innerHTML = '';
-        ui.mobInvScrollArea.innerHTML = ''; 
-        
-        ui.listCount.textContent = invoices.length;
-
-        if (invoices.length === 0) {
-             ui.invListContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--text-muted);">No matches found.</div>';
-             ui.mobInvScrollArea.innerHTML = '<div style="padding:0.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem;">No matches</div>';
-             return;
-        }
-
-        invoices.forEach((inv) => {
-            const originalIdx = decryptedData.invoicesList.indexOf(inv);
-            const invNum = inv.invoiceNumber || 'No Num';
-            const buyerName = inv.buyer?.split('\n')[0] || 'Client';
-
-            const div = document.createElement('div');
-            div.className = 'invoice-list-item';
-            div.dataset.idx = originalIdx;
-            const grandTotal = inv.grandTotal || '0.00';
-            div.innerHTML = `
-                <div class="inv-item-top">
-                    <div class="inv-number">${invNum}</div>
-                    <div class="inv-date">${inv.invoiceDate || ''}</div>
-                </div>
-                <div class="inv-buyer">${buyerName}</div>
-                <div class="inv-total">${grandTotal}</div>
-            `;
-            div.addEventListener('click', () => {
-                selectInvoice(originalIdx);
-            });
-            ui.invListContainer.appendChild(div);
-            
-            const mobItem = document.createElement('div');
-            mobItem.className = 'mob-list-item';
-            mobItem.dataset.idx = originalIdx;
-            mobItem.innerHTML = `
-                <div class="mob-li-info">
-                    <div class="mob-li-num">${invNum}</div>
-                    <div class="mob-li-client">${buyerName}</div>
-                </div>
-                <svg class="mob-li-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 1rem; height: 1rem;">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-            `;
-            mobItem.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                selectInvoice(originalIdx);
-                closeMobileDropdown();
-            });
-            ui.mobInvScrollArea.appendChild(mobItem);
-        });
-    }
-
-    ui.searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        if (!decryptedData || !decryptedData.invoicesList) return;
-        const filtered = decryptedData.invoicesList.filter(inv => {
-            const num = (inv.invoiceNumber || '').toLowerCase();
-            const buyer = (inv.buyer || '').toLowerCase();
-            const date = (inv.invoiceDate || '').toLowerCase();
-            return num.includes(term) || buyer.includes(term) || date.includes(term);
-        });
-        renderInvoiceList(filtered);
-    });
-    
-    function selectInvoice(idx) {
-        idx = parseInt(idx);
-        currentInvoiceIndex = idx;
-
-        const items = ui.invListContainer.querySelectorAll('.invoice-list-item');
-        items.forEach(item => {
-            if (parseInt(item.dataset.idx) === currentInvoiceIndex) {
-                item.classList.add('active');
-                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                item.classList.remove('active');
-            }
-        });
-
-        const mobItems = ui.mobInvScrollArea.querySelectorAll('.mob-list-item');
-        mobItems.forEach(item => {
-            if (parseInt(item.dataset.idx) === currentInvoiceIndex) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-
-        if (decryptedData.invoicesList && decryptedData.invoicesList[idx]) {
-            const data = decryptedData.invoicesList[idx];
-            renderInvoice(data);
-            
-            const invNum = data.invoiceNumber || 'No Num';
-            const buyer = data.buyer?.split('\n')[0] || 'Client';
-            ui.mobInvSelectedText.textContent = `${invNum} - ${buyer}`;
-        }
-    }
-
-    function toggleMobileDropdown() {
-        const isOpen = ui.mobInvListContainer.classList.contains('open');
-        if (isOpen) {
-            closeMobileDropdown();
-        } else {
-            openMobileDropdown();
-        }
-    }
-    function openMobileDropdown() {
-        ui.mobInvListContainer.classList.add('open');
-    }
-    function closeMobileDropdown() {
-        ui.mobInvListContainer.classList.remove('open');
-    }
-    
-    ui.mobInvTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMobileDropdown();
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!ui.mobileInvControls.contains(e.target)) {
-            closeMobileDropdown();
-        }
-    });
-
-
-    ui.mobPrevBtn.addEventListener('click', () => {
-        if (decryptedData && decryptedData.invoicesList) {
-            let newIdx = currentInvoiceIndex - 1;
-            if (newIdx < 0) newIdx = decryptedData.invoicesList.length - 1; 
-            selectInvoice(newIdx);
-        }
-    });
-
-    ui.mobNextBtn.addEventListener('click', () => {
-        if (decryptedData && decryptedData.invoicesList) {
-            let newIdx = currentInvoiceIndex + 1;
-            if (newIdx >= decryptedData.invoicesList.length) newIdx = 0; 
-            selectInvoice(newIdx);
-        }
-    });
-
-    ui.acPlain.addEventListener('click', () => {
-        ui.acPlain.classList.add('active');
-        ui.acEnc.classList.remove('active');
-        ui.encSettings.classList.add('hidden');
-        downloadFile(decryptedData, false, null);
-    });
-
-    ui.acEnc.addEventListener('click', () => {
-        ui.acEnc.classList.add('active');
-        ui.acPlain.classList.remove('active');
-        ui.encSettings.classList.remove('hidden');
-        if (activePassword) {
-            ui.passLogicContainer.classList.remove('hidden');
-            document.querySelector('input[value="same"]').checked = true;
-            ui.newPassGroup.classList.add('hidden');
-        } else {
-            ui.passLogicContainer.classList.add('hidden'); 
-            ui.newPassGroup.classList.remove('hidden');    
-            ui.newPassInput.focus();
-        }
-    });
-
-    ui.radioOptions.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.value === 'new') {
-                ui.newPassGroup.classList.remove('hidden');
-                ui.newPassInput.focus();
-            } else {
-                ui.newPassGroup.classList.add('hidden');
-            }
-        });
-    });
-
-    ui.finalSaveBtn.addEventListener('click', () => {
-        let passToUse = null;
-        if (activePassword && document.querySelector('input[value="same"]').checked) {
-            passToUse = activePassword;
-        } else {
-            passToUse = ui.newPassInput.value.trim();
-        }
-        if (!passToUse) {
-            alert("Please enter a password to encrypt the file.");
-            return;
-        }
-        downloadFile(decryptedData, true, passToUse);
-    });
-
-    // RESET LOGIC START
-    ui.resetBtn.addEventListener('click', () => {
-        // Clear data
-        tempFileContent = null; 
-        decryptedData = null;   
-        currentInvoice = null;
-        activePassword = null;
-        currentFileName = "Unknown";
-        currentFileSize = "0 KB";
-        currentInvoiceIndex = 0;
-        productStats = []; 
-        currentChartData = {}; 
-        
-        // Clear inputs
-        ui.landingFileInput.value = '';
-        ui.landingPassword.value = '';
-        
-        // Clear UI parts
-        ui.invListContainer.innerHTML = '';
-        ui.mobInvScrollArea.innerHTML = '';
-        ui.jsonPre.textContent = "Waiting for file...";
-        ui.fileStatsCard.classList.add('hidden');
-        ui.activityList.innerHTML = ''; // Optional: clear history on new file
-        
-        // Reset toggle states
-        ui.acPlain.classList.remove('active');
-        ui.acEnc.classList.remove('active');
-        ui.encSettings.classList.add('hidden');
-
-        // Destroy charts to prevent artifacts
-        if(revenueChartInstance) revenueChartInstance.destroy();
-        if(qtyChartInstance) qtyChartInstance.destroy();
-        if(hourlyChartInstance) hourlyChartInstance.destroy();
-        if(weeklyChartInstance) weeklyChartInstance.destroy();
-        if(compositionChartInstance) compositionChartInstance.destroy();
-
-        // Switch View
-        toggleSidebar(false);
-        switchView('landing');
-    });
-    // RESET LOGIC END
-
-    function downloadFile(dataObj, isEncrypted, password) {
-        if (!dataObj) return;
-        let contentStr, fileName;
-        const date = new Date().toISOString().split('T')[0];
-        if (isEncrypted) {
-            const encrypted = CryptoJS.AES.encrypt(JSON.stringify(dataObj), password).toString();
-            const fileObj = { encrypted: true, version: '1.0', data: encrypted, exportDate: date };
-            contentStr = JSON.stringify(fileObj, null, 2);
-            fileName = `SwiftInvoice-Studio_encrypted_${date}.json`;
-        } else {
-            contentStr = JSON.stringify(dataObj, null, 2);
-            fileName = `SwiftInvoice-Studio_unencrypted_${date}.json`;
-        }
-        const blob = new Blob([contentStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        addHistoryItem(`Exported ${isEncrypted ? 'Encrypted' : 'Raw'} File`);
-    }
-
-    function addHistoryItem(msg, type) {
-        const li = document.createElement('li');
-        li.className = `log-item ${type || ''}`;
-        li.innerHTML = `<span class="log-highlight">${msg}</span><span class="log-time">${new Date().toLocaleTimeString()}</span>`;
-        ui.activityList.insertBefore(li, ui.activityList.firstChild);
-    }
-
-    function renderInvoice(data, msg) {
-        if (!data) {
-            ui.invContent.classList.add('hidden');
-            ui.invPlaceholder.classList.remove('hidden');
-            ui.invPlaceholder.innerHTML = `<p>${msg || 'Select an invoice'}</p>`;
-            ui.pdfBtn.disabled = true;
-            return;
-        }
-        
-        currentInvoice = data;
-        ui.invPlaceholder.classList.add('hidden');
-        ui.invContent.classList.remove('hidden');
-        ui.pdfBtn.disabled = false;
-        
-        const itemsHtml = (data.items || []).map(item => `
-            <tr>
-                <td style="text-align: center;">${item.line || '-'}</td>
-                <td>${item.code || ''}</td>
-                <td>
-                    <div class="desc">${(item.desc || '').replace(/\n/g, '<br>')}</div>
-                    <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
-                        Tax: ${item.taxCategory || 'N/A'}
-                    </div>
-                </td>
-                <td style="text-align: center;">${item.qty || 1}</td>
-                <td style="text-align: right;">${item.excl || '0.00'}</td>
-                <td style="text-align: right;">${item.rate || '0%'}</td>
-                <td style="text-align: right;">${item.vat || '0.00'}</td>
-                <td style="text-align: right;">${item.incl || '0.00'}</td>
-            </tr>
-        `).join('');
-
-        let chargesHtml = '';
-        if (data.charges && Array.isArray(data.charges)) {
-            chargesHtml = data.charges.map(charge => `
-                <tr>
-                    <td class="label">${charge.name}</td>
-                    <td class="value">${charge.value}</td>
-                </tr>
-            `).join('');
-        }
-
-        let logoHtml = '';
-        if (data.logoOption === 'atikle') {
-            logoHtml = '<img src="https://atikle.github.io/resource/atikle-logo_multicolor.png" class="invoice-logo" alt="Logo" crossorigin="anonymous">';
-        } else if (data.logoOption === 'upload' && data.logoSrc) {
-            logoHtml = `<img src="${data.logoSrc}" class="invoice-logo" alt="Logo">`;
-        }
-
-        ui.invContent.innerHTML = `
-            <div class="invoice-header-row">
-                <div class="header-left">
-                    <h1 class="title">Invoice</h1>
-                    <table class="meta-table">
-                        <tbody>
-                            <tr><td class="label">Invoice Nr</td><td>${data.invoiceNumber || ''}</td></tr>
-                            <tr><td class="label">Invoice Date</td><td>${data.invoiceDate || ''}</td></tr>
-                            <tr><td class="label">Invoice Time</td><td>${data.invoiceTime || ''}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="header-right">
-                    ${logoHtml}
-                </div>
-            </div>
-
-            <div class="party-row">
-                <div class="party">
-                    <h2>Seller</h2>
-                    <div class="address">${(data.seller || '').replace(/\n/g, '<br>')}</div>
-                </div>
-                <div class="party">
-                    <h2>Buyer</h2>
-                    <div class="address">${(data.buyer || '').replace(/\n/g, '<br>')}</div>
-                </div>
-            </div>
-
-            <div class="table-wrap">
-                <table id="items">
-                    <thead>
-                        <tr>
-                            <th>Line Nr</th>
-                            <th>Product Code</th>
-                            <th>Description</th>
-                            <th>Qty</th>
-                            <th>Price excl<br/>VAT</th>
-                            <th>VAT<br/>rate</th>
-                            <th>VAT<br/>amount</th>
-                            <th>Price incl<br/>VAT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemsHtml}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="totals">
-                <div class="box">
-                    <div class="currency">${data.region ? (data.region === 'US' ? 'USD' : data.region === 'GB' ? 'GBP' : data.region === 'DE' || data.region === 'FR' ? 'EUR' : 'AED') : 'Currency'}</div>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td class="label">Subtotal</td>
-                                <td class="value">${data.subtotal || '0.00'}</td>
-                            </tr>
-                            ${chargesHtml}
-                            <tr> 
-                                <td class="label">VAT</td>
-                                <td class="value">${data.vatTotal || '0.00'}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Total</td>
-                                <td class="value">${data.grandTotal || '0.00'}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="invoice-footer">
-                <span class="invoice-footer-brand">SwiftInvoice</span> | StackBase
-            </div>
-        `;
-    }
-
-    ui.pdfBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const el = document.getElementById('invoice');
-        await html2canvas(el, { scale: 2 }).then(canvas => {
-            const img = canvas.toDataURL('image/png');
-            pdf.addImage(img, 'PNG', 0, 0, 210, (canvas.height * 210) / canvas.width);
-            pdf.save('invoice.pdf');
-        });
-    });
-
-    const switchTab = (view) => {
-        ui.viewPreview.classList.add('hidden');
-        ui.viewAnalytics.classList.add('hidden');
-        ui.viewRaw.classList.add('hidden');
-        ui.tabPreview.classList.remove('active');
-        ui.tabAnalytics.classList.remove('active');
-        ui.tabRaw.classList.remove('active');
-
-        if(view === 'preview') {
-            ui.viewPreview.classList.remove('hidden');
-            ui.tabPreview.classList.add('active');
-            ui.mobileInvControls.classList.add('active'); 
-        } else {
-            ui.mobileInvControls.classList.remove('active'); 
-            if(view === 'raw') {
-                ui.viewRaw.classList.remove('hidden');
-                ui.tabRaw.classList.add('active');
-            } else if (view === 'analytics') {
-                ui.viewAnalytics.classList.remove('hidden');
-                ui.tabAnalytics.classList.add('active');
-            }
-        }
-    };
-    ui.tabPreview.onclick = () => switchTab('preview');
-    ui.tabAnalytics.onclick = () => switchTab('analytics');
-    ui.tabRaw.onclick = () => switchTab('raw');
-});
-</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script type="module" src="studio-script.js"></script>
 </body>
 </html>
