@@ -245,7 +245,7 @@
         .tab-btn:hover { color: var(--text-main); }
         .tab-btn.active { background-color: var(--bg-paper); color: var(--text-accent); font-weight: 600; box-shadow: var(--shadow-sm); }
 
-        .sidebar-header { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header { padding: 1.5rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header-branding { display: flex; align-items: center; gap: 0.75rem; }
         .sidebar-logo-bg { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background-color: var(--primary); border-radius: 0.5rem; flex-shrink: 0; }
         .sidebar-logo-icon { width: 1.5rem; height: 1.5rem; color: #ffffff; }
@@ -331,7 +331,7 @@
         .totals table tr:last-child { background-color: #f9fafb; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
         .totals table tr:last-child td { font-size: 14px; padding-top: 12px; padding-bottom: 12px; }
         .invoice-footer { font-family: 'Ubuntu', sans-serif; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #9ca3af; font-weight: 400; }
-        .invoice-footer-brand { font-family: 'Roboto', sans-serif; font-weight: 500; }
+        .invoice-footer-brand { font-family: 'Roboto', sans-serif; font-weight: 400; }
         
         @media (max-width: 768px) {
             .invoice-header-row, .party-row { flex-direction: column; gap: 20px; }
@@ -472,7 +472,7 @@
                     </div>
                 </div>
 
-                <label class="form-label">Export Options</label>
+                <label class="form-label">Data Export Options</label>
                 
                 <div class="action-cards-container">
                     <button id="ac-plain" class="action-card">
@@ -527,7 +527,7 @@
                     <ul class="log-list" id="activity-list"></ul>
                 </div>
             </div>
-            <div class="sidebar-branding-footer">SwiftInvoice | StackBase</div>
+            <div class="sidebar-branding-footer">SwiftInvoice | <strong>StackBase</strong></div>
         </aside> 
 
         <div class="right-pane-wrapper">

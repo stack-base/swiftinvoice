@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const USER_PROFILE_KEY = 'swiftInvoiceUser'; 
     const SETUP_COMPLETE_KEY = 'swiftInvoiceSetupComplete'; 
     const ENCRYPTED_EXPORT_VERSION = '1.0'; // Marker for encrypted file format
+    const THEME_KEY = 'swiftInvoiceTheme'; // NEW: Theme Storage Key
     
     let currentRegion = 'IN'; 
     let currentLogoOption = 'none';
@@ -20,6 +21,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingDefaultRegion = globalConfig.defaultRegion;
     let pendingDefaultLogoOption = globalConfig.defaultLogoOption;
     let pendingDefaultLogoSrc = globalConfig.defaultLogoSrc;
+
+    // --- THEME HANDLING (NEW) ---
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const html = document.documentElement;
+
+    // Icons
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`;
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>`;
+
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+            if (themeBtn) themeBtn.innerHTML = sunIcon;
+            localStorage.setItem(THEME_KEY, 'dark');
+        } else {
+            html.removeAttribute('data-theme');
+            if (themeBtn) themeBtn.innerHTML = moonIcon;
+            localStorage.setItem(THEME_KEY, 'light');
+        }
+    }
+    
+    // Check if the theme button exists before adding the listener
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    }
+
+    // Initialize Theme (Run on script load)
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) {
+        setTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+    } else {
+        setTheme('light');
+    }
+    // --- END THEME HANDLING ---
 
     // --- Setup Screen Elements --- 
     const setupScreen = document.getElementById('setup-screen');
@@ -996,6 +1036,8 @@ document.addEventListener('DOMContentLoaded', () => {
     resetAllDataBtn.addEventListener('click', () => {
         if (confirm("WARNING: This will permanently delete ALL saved invoices and ALL application settings. Are you sure you want to proceed?")) {
             localStorage.clear();
+            // Preserve theme preference
+            localStorage.setItem(THEME_KEY, html.getAttribute('data-theme') || 'light'); 
             alert("Application data reset complete. The application will now reload.");
             window.location.reload();
         }

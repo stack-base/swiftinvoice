@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // 2. Define the loading logic
                     ui.btnLocalLoad.onclick = () => {
-                        currentFileName = "Browser Session Data";
-                        currentFileSize = "Local Memory";
+                        currentFileName = "SwiftInvoice Data";
+                        currentFileSize = "LocalStorage";
 
                         // Package the raw array data into a JSON string
                         const wrappedData = JSON.stringify({ invoices: data, encrypted: false, source: 'local_storage' }); 
@@ -406,6 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderInvoice(null, "No invoice data found in this file.");
             ui.pdfBtn.disabled = true;
         }
+
+        // Switch to Analytics tab by default upon successful load
+        switchTab('analytics');
     }
 
     function updateFileStats(invoices) {
@@ -1609,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="invoice-footer">
-                <span class="invoice-footer-brand">SwiftInvoice</span> | StackBase
+                <span class="invoice-footer-brand">SwiftInvoice  | <strong>StackBase</strong></span>
             </div>
         `;
     }
