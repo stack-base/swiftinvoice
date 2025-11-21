@@ -160,8 +160,73 @@ document.addEventListener('DOMContentLoaded', () => {
         ctxComposition: document.getElementById('chart-composition'),
         ctxCumulative: document.getElementById('chart-cumulative'),
         ctxDistribution: document.getElementById('chart-distribution'), // NEW
-        ctxLoyalty: document.getElementById('chart-loyalty')          // NEW
+        ctxLoyalty: document.getElementById('chart-loyalty'),          // NEW
+
+        // NEW Local Storage Pane Elements
+        btnLocalLoad: document.getElementById('local-storage-card'),
+        txtLocalStatus: document.getElementById('local-storage-status')
     };
+
+    // ----------------------------------------------------------------------
+    // --- NEW: Local Storage Integration Logic (Passive App Data Load) ---
+    // ----------------------------------------------------------------------
+    const SWIFT_APP_KEY = 'swiftInvoices'; // The key used by the SwiftInvoice application
+
+    function checkLocalData() {
+        // Read raw string from LocalStorage
+        const localRaw = localStorage.getItem(SWIFT_APP_KEY);
+        
+        if (localRaw) {
+            try {
+                // Parse the data
+                const data = JSON.parse(localRaw);
+                // Check if it's a valid array of objects
+                const count = Array.isArray(data) ? data.length : 0;
+                
+                if (count > 0) {
+                    // 1. Activate the card visually
+                    ui.btnLocalLoad.style.opacity = '1';
+                    ui.btnLocalLoad.style.pointerEvents = 'auto';
+                    ui.btnLocalLoad.style.borderStyle = 'solid';
+                    ui.btnLocalLoad.style.borderColor = 'var(--primary)';
+                    ui.btnLocalLoad.classList.add('active'); 
+                    
+                    ui.txtLocalStatus.textContent = `Found ${count} invoice(s) in this browser`;
+                    
+                    // 2. Define the loading logic
+                    ui.btnLocalLoad.onclick = () => {
+                        currentFileName = "Browser Session Data";
+                        currentFileSize = "Local Memory";
+
+                        // Package the raw array data into a JSON string
+                        const wrappedData = JSON.stringify({ invoices: data, encrypted: false, source: 'local_storage' }); 
+                        
+                        // Pass the wrapped JSON string to the existing analysis flow
+                        analyzeLandingFile(wrappedData);
+                        addHistoryItem(`Loaded ${count} invoices from SwiftInvoice App storage`, 'active');
+                        
+                        // Clear the URL parameter so refreshing doesn't get stuck in a loop (optional, but good UX)
+                        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                        window.history.replaceState({path:newUrl},'',newUrl);
+                    };
+
+                    // 3. API URL Check: Auto-load if ?load=local is present
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('load') === 'local') {
+                        console.log("Auto-loading from LocalStorage via URL parameter...");
+                        ui.btnLocalLoad.click();
+                    }
+                }
+            } catch (e) {
+                console.error("Error parsing local data", e);
+                ui.txtLocalStatus.textContent = "Error parsing local data. Try uploading a file.";
+            }
+        }
+    }
+    // ----------------------------------------------------------------------
+    // --- END NEW LOCAL STORAGE LOGIC ---
+    // ----------------------------------------------------------------------
+
 
     function toggleSidebar(show) {
         if (show) {
@@ -262,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ui.authFilenameDisplay.textContent = currentFileName;
                 toggleLandingState('auth');
             } else {
-                decryptedData = data.data || data; 
+                decryptedData = data.data || data.invoices || data; 
                 loadSuccess();
                 addHistoryItem(`Loaded ${currentFileName}`, 'active');
                 switchView('app');
@@ -281,7 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const bytes = CryptoJS.AES.decrypt(raw.data, pass);
             const str = bytes.toString(CryptoJS.enc.Utf8);
             if (!str) throw new Error("Decryption failed");
-            decryptedData = JSON.parse(str);
+            // The decrypted string should be the internal JSON structure (e.g., {invoices: [...]})
+            decryptedData = JSON.parse(str); 
             activePassword = pass; 
             loadSuccess();
             addHistoryItem(`Unlocked ${currentFileName}`, 'active');
@@ -296,6 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.landingBackBtn.addEventListener('click', () => {
         tempFileContent = null;
         toggleLandingState('upload');
+        // Re-check local data availability when returning to upload screen
+        checkLocalData(); 
     });
 
     function showLandingStatus(msg) {
@@ -1348,6 +1416,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ui.executiveSummary.innerHTML = "No data available to generate summary.";
 
+        // Re-run checkLocalData to ensure the load pane is correctly activated
+        checkLocalData(); 
+
         toggleSidebar(false);
         switchView('landing');
     });
@@ -1667,4 +1738,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.tabPreview.onclick = () => switchTab('preview');
     ui.tabAnalytics.onclick = () => switchTab('analytics');
     ui.tabRaw.onclick = () => switchTab('raw');
+
+    // Run the Local Storage check immediately on load to activate the button if data is present.
+    checkLocalData(); 
 });
