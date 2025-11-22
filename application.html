@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>SwiftInvoice | StackBase</title>
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg-body: #f3f4f6;
@@ -25,29 +22,22 @@
             --bg-input: #ffffff;
             --bg-hover: #f9fafb;
             --bg-active: #f0fdfa;
-            
             --text-main: #111827;
             --text-secondary: #4b5563;
             --text-muted: #9ca3af;
             --text-accent: #0d9488;
-            
             --border-color: #e5e7eb;
             --border-active: #ccfbf1;
-            
             --primary: #0d9488;
             --primary-hover: #0f766e;
-            
             --chart-grid: #f3f4f6;
             --chart-text: #6b7280;
-            
             --scrollbar-track: #f3f4f6;
             --scrollbar-thumb: #d1d5db;
             --scrollbar-thumb-hover: #9ca3af;
-
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
-
         [data-theme="dark"] {
             --bg-body: #000000;
             --bg-paper: #09090b;
@@ -56,47 +46,29 @@
             --bg-input: #000000;
             --bg-hover: #18181b;
             --bg-active: #112825;
-            
             --text-main: #f9fafb;
             --text-secondary: #d1d5db;
             --text-muted: #6b7280;
             --text-accent: #2dd4bf;
-            
             --border-color: #27272a;
             --border-active: #115e59;
-            
             --primary: #14b8a6;
             --primary-hover: #0d9488;
-            
             --chart-grid: #27272a;
             --chart-text: #9ca3af;
-
             --scrollbar-track: #000000;
             --scrollbar-thumb: #27272a;
             --scrollbar-thumb-hover: #52525b;
-            
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
             --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
         }
-
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
         ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; border: 2px solid var(--scrollbar-track); }
         ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
-
-        * { -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: 'Inter', Arial, Helvetica, sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            height: 100vh; 
-            overflow: hidden; 
-            margin: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', Arial, Helvetica, sans-serif; background-color: var(--bg-body); color: var(--text-main); height: 100vh; overflow: hidden; margin: 0; transition: background-color 0.3s ease, color 0.3s ease; }
         .hidden { display: none !important; }
-
         .sidebar, .settings-column-wrapper { background-color: var(--bg-sidebar); border-color: var(--border-color); }
         .sidebar-header, .settings-section-title, .user-profile-container, .settings-column-header { border-color: var(--border-color); }
         .sidebar-menu { background-color: var(--bg-body); }
@@ -105,23 +77,13 @@
         .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); }
         .sidebar-logo-bg { background-color: var(--primary); }
         .sidebar-title { color: var(--text-accent); }
-        
         .app-container { background-color: var(--bg-paper); border: 1px solid var(--border-color); }
-        
-        #invoice { background: #fff; color: #111827; border: none; } 
-        
-        .setup-input, .search-input, .form-textarea, .dropdown-trigger, #invoice-list .list-item-content, .dropdown-options-panel { 
-            background-color: var(--bg-input); 
-            color: var(--text-main); 
-            border-color: var(--border-color); 
-        }
+        .setup-input, .search-input, .form-textarea, .dropdown-trigger, #invoice-list .list-item-content, .dropdown-options-panel { background-color: var(--bg-input); color: var(--text-main); border-color: var(--border-color); }
         .dropdown-trigger:hover { border-color: var(--text-muted); }
         .dropdown-option { color: var(--text-main); }
         .dropdown-option:hover { background-color: var(--bg-active); color: var(--text-accent); }
-        
         h1, h2, h3, h4, strong, .form-label, .settings-section-title { color: var(--text-main); }
         p, span, .form-helper-text, .sidebar-branding a { color: var(--text-secondary); }
-        
         #setup-modal { background-color: var(--bg-paper); }
         #setup-screen { background-color: rgb(0 0 0 / 0.75); }
         .setup-header, .setup-section-header, .setup-footer { border-color: var(--border-color); }
@@ -130,244 +92,75 @@
         .setup-footer { background-color: var(--bg-hover); }
         .setup-header h2 { color: var(--text-main); }
         .setup-header-icon { background-color: var(--bg-active); color: var(--primary); }
-
         .btn-icon-only { color: var(--text-secondary); }
         .btn-icon-only:hover { background-color: var(--bg-hover); color: var(--text-main); }
         .btn-primary { background-color: var(--primary); }
         .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
         .btn-secondary { background-color: var(--bg-input); color: var(--text-main); border-color: var(--border-color); }
         .btn-secondary:hover:not(:disabled) { background-color: var(--bg-hover); }
-
         #invoice-list .list-item-content strong { color: var(--text-main); }
         #invoice-list .list-item-content:hover { background-color: var(--bg-hover); border-color: var(--text-muted); }
         #invoice-list .list-item-content.active { background-color: var(--bg-active); border-color: var(--primary); }
         #invoice-list .list-btn { border-color: var(--border-color); }
-        
         #storage-usage-display-wrapper { background-color: var(--bg-active); border: 1px solid var(--border-color); }
         #storage-usage-label { color: var(--primary); }
         #storage-usage-value { color: var(--text-main); }
-
-        #invoice [contenteditable] { color: #111827; }
-        
         .sidebar-header { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .sidebar-header-branding { display: flex; align-items: center; gap: 0.75rem; }
         .sidebar-logo-bg { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background-color: var(--primary); border-radius: 0.5rem; flex-shrink: 0; }
         .sidebar-logo-icon { width: 1.5rem; height: 1.5rem; color: #ffffff; }
         .sidebar-title { font-family: 'Ubuntu', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-accent); margin: 0; }
         .sidebar-subtitle { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
-        
         .header-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 999px; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; transition: all 0.2s; }
         .header-icon-btn:hover { background-color: var(--bg-hover); color: var(--text-main); }
-
-
-        #setup-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background-color: rgb(0 0 0 / 0.75);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-        #setup-modal {
-            background-color: var(--bg-paper);
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            width: 100%;
-            max-width: 42rem;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .setup-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .setup-header-icon {
-            flex-shrink: 0;
-            width: 3rem;
-            height: 3rem;
-            border-radius: 9999px;
-            background-color: var(--bg-active);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .setup-header-icon svg {
-            width: 1.75rem;
-            height: 1.75rem;
-        }
-        .setup-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
-        }
-        .setup-header p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin: 0.125rem 0 0 0;
-        }
-        
-        #setup-form-content {
-            padding: 2rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-        .setup-section {
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            background-color: var(--bg-hover);
-        }
-        .setup-section-header {
-            padding: 0.75rem 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-paper);
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-        }
-        .setup-section-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-accent);
-            margin: 0;
-        }
-         .setup-section-header p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin: 0.125rem 0 0 0;
-        }
-        .setup-section-content {
-            padding: 1.5rem;
-        }
-        .setup-grid {
-            display: grid;
-            grid-template-columns: repeat(1, minmax(0, 1fr));
-            gap: 1.5rem;
-        }
-        @media (min-width: 640px) {
-            .setup-grid-2-col {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-        .setup-input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .setup-input-group .form-label {
-            margin-bottom: 0.25rem;
-        }
-        .setup-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-input);
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            color: var(--text-main);
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            box-sizing: border-box;
-        }
-        .setup-input:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            border-color: var(--text-accent);
-            box-shadow: 0 0 0 2px var(--text-accent);
-        }
-        #setup-global-settings .settings-grid {
-            margin-top: 0;
-        }
-        #setup-global-settings .form-helper-text {
-            color: var(--text-secondary);
-        }
-        
-        .setup-footer {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--bg-hover);
-            display: flex;
-            justify-content: flex-end;
-        }
-        #setup-finish-btn {
-            width: 100%;
-        }
-        @media (min-width: 640px) {
-            #setup-finish-btn {
-                width: auto;
-            }
-        }
-
-        .user-profile-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .user-profile-pic {
-            width: 2.5rem; 
-            height: 2.5rem;
-            border-radius: 9999px;
-            background-color: var(--bg-body);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            flex-shrink: 0;
-        }
-        .user-profile-pic svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-        .user-profile-info {
-            min-width: 0;
-        }
-        .user-profile-info h3 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .user-profile-info p {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        #invoice { width:100%; background:#fff; padding: 40px 40px 24px 40px; box-sizing:border-box; color: #111827; font-family: 'Inter', Arial, sans-serif; min-height: 29.7cm; display: flex; flex-direction: column; justify-content: space-between; }
-        #invoice [contenteditable] { color: #111827; } 
+        #setup-screen { position: fixed; inset: 0; z-index: 100; background-color: rgb(0 0 0 / 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
+        #setup-modal { background-color: var(--bg-paper); border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); width: 100%; max-width: 42rem; max-height: 90vh; display: flex; flex-direction: column; }
+        .setup-header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem; }
+        .setup-header-icon { flex-shrink: 0; width: 3rem; height: 3rem; border-radius: 9999px; background-color: var(--bg-active); color: var(--primary); display: flex; align-items: center; justify-content: center; }
+        .setup-header-icon svg { width: 1.75rem; height: 1.75rem; }
+        .setup-header h2 { font-size: 1.25rem; font-weight: 600; color: var(--text-main); margin: 0; }
+        .setup-header p { font-size: 0.875rem; color: var(--text-secondary); margin: 0.125rem 0 0 0; }
+        #setup-form-content { padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; }
+        .setup-section { border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: var(--bg-hover); }
+        .setup-section-header { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background-color: var(--bg-paper); border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; }
+        .setup-section-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-accent); margin: 0; }
+        .setup-section-header p { font-size: 0.875rem; color: var(--text-secondary); margin: 0.125rem 0 0 0; }
+        .setup-section-content { padding: 1.5rem; }
+        .setup-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
+        @media (min-width: 640px) { .setup-grid-2-col { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .setup-input-group { display: flex; flex-direction: column; }
+        .setup-input-group .form-label { margin-bottom: 0.25rem; }
+        .setup-input { width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-input); font-size: 0.875rem; line-height: 1.25rem; color: var(--text-main); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); box-sizing: border-box; }
+        .setup-input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--text-accent); box-shadow: 0 0 0 2px var(--text-accent); }
+        #setup-global-settings .settings-grid { margin-top: 0; }
+        #setup-global-settings .form-helper-text { color: var(--text-secondary); }
+        .setup-footer { padding: 1.5rem 2rem; border-top: 1px solid var(--border-color); background-color: var(--bg-hover); display: flex; justify-content: flex-end; }
+        #setup-finish-btn { width: 100%; }
+        @media (min-width: 640px) { #setup-finish-btn { width: auto; } }
+        .user-profile-container { display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .user-profile-pic { width: 2.5rem; height: 2.5rem; border-radius: 9999px; background-color: var(--bg-body); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); flex-shrink: 0; }
+        .user-profile-pic svg { width: 1.5rem; height: 1.5rem; }
+        .user-profile-info { min-width: 0; }
+        .user-profile-info h3 { font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-profile-info p { font-size: 0.75rem; color: var(--text-secondary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #invoice { width: 100%; background: #fff; padding: 40px 40px 24px 40px; box-sizing: border-box; color: #111827; font-family: 'Inter', Arial, sans-serif; min-height: 29.7cm; display: flex; flex-direction: column; justify-content: space-between; --bg-body: #f3f4f6; --bg-paper: #ffffff; --bg-sidebar: #ffffff; --bg-header-pill: rgba(255, 255, 255, 0.75); --bg-input: #ffffff; --bg-hover: #f9fafb; --bg-active: #f0fdfa; --text-main: #111827; --text-secondary: #4b5563; --text-muted: #9ca3af; --text-accent: #0d9488; --border-color: #e5e7eb; --border-active: #ccfbf1; --primary: #0d9488; --primary-hover: #0f766e; background-color: #ffffff !important; color: #111827 !important; border: none; }
+        #invoice [contenteditable] { color: #111827; }
+        #invoice [contenteditable="true"]:focus { background-color: var(--bg-hover) !important; color: var(--text-main) !important; outline-color: var(--text-muted) !important; outline: 1px dashed var(--text-muted); }
         .invoice-logo { max-height: 80px; width: 100%; max-width: 160px; object-fit: contain; border-radius: 6px; }
         .invoice-header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; margin-bottom: 24px; }
         .header-left { width: 58%; }
         .header-right { width: 40%; display: flex; justify-content: flex-end; align-items: flex-start; }
         .party-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 32px; }
         h1.title { font-size: 32px; margin: 0 0 16px 0; font-weight: 700; letter-spacing: -0.02em; color: #111827; text-transform: uppercase; }
-        .meta-table { font-size:12px; border-collapse:collapse; }
-        .meta-table td { padding: 4px 0; vertical-align:top; }
-        .meta-table td.label { width:120px; font-weight: 600; color: #4b5563; }
-        .party { width:48%; }
+        .meta-table { font-size: 12px; border-collapse: collapse; }
+        .meta-table td { padding: 4px 0; vertical-align: top; }
+        .meta-table td.label { width: 120px; font-weight: 600; color: #4b5563; }
+        .party { width: 48%; }
         .party h2 { font-size: 14px; margin: 0 0 8px 0; font-weight: 600; color: #111827; }
-        .address { font-size: 12px; white-space:pre-wrap; line-height: 1.6; min-height:72px; padding:4px; border:none; color: #4b5563; }
-        .table-wrap { margin-top: 0; width:100%; overflow-x:auto; }
-        #items { width:100%; border-collapse:collapse; font-size: 12px; }
-        #items th, #items td { padding: 12px 8px; vertical-align:top; font-family:'Inter', Arial, sans-serif; border:none; text-align: left; vertical-align: middle; }
+        .address { font-size: 12px; white-space: pre-wrap; line-height: 1.6; min-height: 72px; padding: 4px; border: none; color: #4b5563; }
+        .table-wrap { margin-top: 0; width: 100%; overflow-x: auto; }
+        #items { width: 100%; border-collapse: collapse; font-size: 12px; }
+        #items th, #items td { padding: 12px 8px; vertical-align: top; font-family: 'Inter', Arial, sans-serif; border: none; text-align: left; vertical-align: middle; }
         #items td:nth-child(1), #items th:nth-child(1) { text-align: center; }
         #items td:nth-child(2), #items th:nth-child(2) { text-align: left; }
         #items td:nth-child(3), #items th:nth-child(3) { text-align: left; }
@@ -377,98 +170,55 @@
         #items td:nth-child(7), #items th:nth-child(7) { text-align: right; }
         #items td:nth-child(8), #items th:nth-child(8) { text-align: right; }
         #items th:last-child, #items td:last-child { text-align: center; }
-        #items thead th { background: #f9fafb; font-weight: 600; font-size: 11px; vertical-align:middle; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 8px; }
-        #items th:nth-child(1) { width:40px; }
-        #items th:nth-child(2) { width:80px; }
-        #items th:nth-child(3) { }
-        #items th:nth-child(4) { width:40px; }
-        #items th:nth-child(5) { width:90px; }
-        #items th:nth-child(6) { width:60px; }
-        #items th:nth-child(7) { width:80px; }
-        #items th:nth-child(8) { width:90px; }
+        #items thead th { background: #f9fafb; font-weight: 600; font-size: 11px; vertical-align: middle; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 8px; }
+        #items th:nth-child(1) { width: 40px; }
+        #items th:nth-child(2) { width: 80px; }
+        #items th:nth-child(4) { width: 40px; }
+        #items th:nth-child(5) { width: 90px; }
+        #items th:nth-child(6) { width: 60px; }
+        #items th:nth-child(7) { width: 80px; }
+        #items th:nth-child(8) { width: 90px; }
         #items th:last-child { width: 40px; }
-        #items tbody tr { border-bottom:1px solid #f3f4f6; }
-        .desc { white-space:pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
+        #items tbody tr { border-bottom: 1px solid #f3f4f6; }
+        .desc { white-space: pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
         .tax-category-wrapper { position: relative; margin-top: 8px; max-width: 200px; }
         .table-dropdown-trigger { width: 100%; padding: 0.5rem 0.75rem; font-size: 12px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--bg-input); font-family: 'Inter', Arial, sans-serif; text-align: left; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.5'%3e%3cpath d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px 16px; color: var(--text-main); }
         .table-dropdown-trigger:hover { background-color: var(--bg-hover); }
-        .table-dropdown-trigger:focus { outline:1px dashed var(--text-muted); border-color: var(--text-muted); background-color: var(--bg-paper); }
-        .table-dropdown-panel { 
-            position: absolute; 
-            z-index: 1000; 
-            top: 100%; 
-            margin-top: 4px; 
-            width: 180px; 
-            max-height: 15rem; 
-            overflow: auto; 
-            border-radius: 0.375rem; 
-            background-color: var(--bg-paper); 
-            padding-top: 0.25rem; 
-            padding-bottom: 0.25rem; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); 
-            border: 1px solid var(--border-color); 
-        }
+        .table-dropdown-trigger:focus { outline: 1px dashed var(--text-muted); border-color: var(--text-muted); background-color: var(--bg-paper); }
+        .table-dropdown-panel { position: absolute; z-index: 1000; top: 100%; margin-top: 4px; width: 180px; max-height: 15rem; overflow: auto; border-radius: 0.375rem; background-color: var(--bg-paper); padding-top: 0.25rem; padding-bottom: 0.25rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: 1px solid var(--border-color); }
         .table-dropdown-option { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; font-size: 12px; line-height: 1.25; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
         .table-dropdown-option:hover { background-color: var(--bg-active); color: var(--text-accent); }
         .table-dropdown-option:focus { outline: 2px solid transparent; outline-offset: 2px; }
+        #invoice .table-dropdown-trigger, #invoice .table-dropdown-panel { background-color: #ffffff !important; color: #111827 !important; border-color: #e5e7eb !important; }
+        #invoice .table-dropdown-option { color: #4b5563 !important; }
+        #invoice .table-dropdown-option:hover, #invoice .table-dropdown-trigger:hover { background-color: #f9fafb !important; color: #111827 !important; }
+        #invoice input { background-color: #ffffff !important; color: #111827 !important; border-color: #e5e7eb !important; }
         .rate-display { text-align: right !important; color: #4b5563; font-size: 12px; padding-right: 8px; }
-        .totals { display:flex; justify-content:flex-end; margin-top: 32px; }
+        .totals { display: flex; justify-content: flex-end; margin-top: 32px; }
         .totals .box { width: 380px; font-size: 12px; }
-        .totals .currency { text-align:right; padding-right:10px; margin-bottom:6px; color: #4b5563; font-size: 12px; }
-        .totals table { width:100%; border-collapse:collapse; font-size: 12px; }
+        .totals .currency { text-align: right; padding-right: 10px; margin-bottom: 6px; color: #4b5563; font-size: 12px; }
+        .totals table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .totals td { padding: 8px; }
-        .totals td.label { text-align:left; width:100px; font-weight: 500; color: #4b5563; }
-        .totals td.value { text-align:right; font-weight: 700; width:140px; color: #111827; }
+        .totals td.label { text-align: left; width: 100px; font-weight: 500; color: #4b5563; }
+        .totals td.value { text-align: right; font-weight: 700; width: 140px; color: #111827; }
         .totals table tr:last-child { background-color: #f9fafb; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
         .totals table tr:last-child td { font-size: 14px; padding-top: 12px; padding-bottom: 12px; }
         .delete-btn { background: transparent; border: none; cursor: pointer; padding: 2px; border-radius: 4px; }
         .delete-btn svg { color: #dc2626; width: 1rem; height: 1rem; }
         .delete-btn:hover svg { stroke: #b91c1c; }
-        [contenteditable="true"]:focus { outline:1px dashed var(--text-muted); background:var(--bg-hover); }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
         @media (min-width: 640px) { .sm\:inline { display: inline; } }
         @media (min-width: 1024px) { .lg\:hidden { display: none !important; } .lg\:block { display: block; } .lg\:relative { position: relative; } .lg\:translate-x-0 { transform: translateX(0); } }
-        
         .app-layout { }
-        @media (min-width: 1024px) { .app-layout { display: flex; height: 100vh; } } 
-        
-        .sidebar { 
-            width: 100%; 
-            max-width: 24rem; 
-            background-color: var(--bg-sidebar); 
-            border-right: 1px solid var(--border-color); 
-            flex-shrink: 0; 
-            position: fixed; 
-            inset-y: 0; 
-            left: 0; 
-            z-index: 20; 
-            transform: translateX(-100%); 
-            transition-property: transform; 
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
-            transition-duration: 300ms; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-        }
+        @media (min-width: 1024px) { .app-layout { display: flex; height: 100vh; } }
+        .sidebar { width: 100%; max-width: 24rem; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; position: fixed; inset-y: 0; left: 0; z-index: 20; transform: translateX(-100%); transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; display: flex; flex-direction: column; height: 100vh; }
         .sidebar.mobile-sidebar-open { transform: translateX(0); }
         @media (min-width: 1024px) { .sidebar { width: 20%; max-width: none; position: fixed; transform: translateX(0); } }
-        
         .sidebar-overlay { position: fixed; inset: 0; z-index: 10; background-color: rgb(0 0 0 / 0.5); }
-        
-        .settings-panel { 
-            padding: 0 1rem 1.5rem 1rem; 
-            flex-grow: 1; 
-            overflow-y: auto; 
-        }
+        .settings-panel { padding: 0 1rem 1.5rem 1rem; flex-grow: 1; overflow-y: auto; }
         @media (min-width: 768px) { .settings-panel { padding: 0 1.5rem 2.5rem 1.5rem; } }
-        
         @media (min-width: 768px) { .sidebar-header { padding-left: 1.5rem; padding-right: 1.5rem; } }
-
-        .user-profile-container {
-            padding-top: 1.5rem; 
-            margin-top: 0; 
-        }
-
+        .user-profile-container { padding-top: 1.5rem; margin-top: 0; }
         .sidebar-panel:not([hidden]) ~ .sidebar-panel:not([hidden]) { margin-top: 2rem; }
         .settings-panel > .sidebar-header:not([hidden]) ~ *:not([hidden]) { margin-top: 1.5rem; }
         .sidebar-menu:not([hidden]) ~ .sidebar-panel:not([hidden]) { margin-top: 1.5rem; }
@@ -478,67 +228,18 @@
         .settings-column-wrapper .settings-panel > .settings-column-header:not([hidden]) ~ *:not([hidden]) { margin-top: 2rem; }
         .settings-column-wrapper .settings-panel > section:not([hidden]) ~ section:not([hidden]) { margin-top: 2rem; }
         @media (min-width: 1024px) { 
-            .settings-column-wrapper { width: 20%; position: fixed; left: 20%; top: 0; height: 100vh; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); } 
-            .settings-column-wrapper .settings-panel { overflow-y: auto; height: 100%; padding: 2rem; padding-top: 0; } 
-            .settings-column-wrapper .settings-panel .user-profile-container { padding-top: 2rem; } 
-            .settings-column-wrapper .settings-panel > section:first-child { 
-                padding-top: 2rem; 
-            }
+            .settings-column-wrapper { width: 20%; position: fixed; left: 20%; top: 0; height: 100vh; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); }
+            .settings-column-wrapper .settings-panel { overflow-y: auto; height: 100%; padding: 2rem; padding-top: 0; }
+            .settings-column-wrapper .settings-panel .user-profile-container { padding-top: 2rem; }
+            .settings-column-wrapper .settings-panel > section:first-child { padding-top: 2rem; }
         }
-
-        .sidebar-menu { 
-            display: flex; 
-            gap: 10px;
-            background-color: rgba(128, 128, 128, 0.1); 
-            padding: 4px; 
-            border-radius: 9999px; 
-            width: 100%; 
-            box-sizing: border-box;
-            border: 1px solid transparent;
-        }
-        
-        [data-theme="dark"] .sidebar-menu { 
-            background-color: rgba(255, 255, 255, 0.1); 
-            border-color: transparent;
-        }
-
-        .sidebar-menu-btn { 
-            flex: 1; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 0.5rem 0.75rem; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            color: var(--text-secondary); 
-            background-color: transparent; 
-            border: none; 
-            border-radius: 9999px;
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-        }
-        
-        .sidebar-menu-btn:hover { 
-            color: var(--text-main); 
-        }
-        
-        .sidebar-menu-btn:focus { 
-            outline: 2px solid transparent; 
-            outline-offset: 2px; 
-        }
-        
-        .sidebar-menu-btn.active { 
-            background-color: var(--bg-paper); 
-            color: var(--text-accent); 
-            font-weight: 600; 
-            box-shadow: var(--shadow-sm); 
-        }
-        
-        [data-theme="dark"] .sidebar-menu-btn.active { 
-            background-color: var(--bg-paper); 
-            color: var(--text-accent); 
-        }
-        
+        .sidebar-menu { display: flex; gap: 10px; background-color: rgba(128, 128, 128, 0.1); padding: 4px; border-radius: 9999px; width: 100%; box-sizing: border-box; border: 1px solid transparent; }
+        [data-theme="dark"] .sidebar-menu { background-color: rgba(255, 255, 255, 0.1); border-color: transparent; }
+        .sidebar-menu-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.75rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); background-color: transparent; border: none; border-radius: 9999px; cursor: pointer; transition: all 0.2s ease; }
+        .sidebar-menu-btn:hover { color: var(--text-main); }
+        .sidebar-menu-btn:focus { outline: 2px solid transparent; outline-offset: 2px; }
+        .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+        [data-theme="dark"] .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); }
         .sidebar-menu-btn svg { width: 1.2rem; height: 1.2rem; margin-right: 0.5rem; }
         .settings-section-title { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: var(--text-main); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
         .settings-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
@@ -593,7 +294,7 @@
         @media (min-width: 1024px) { .main-header { padding-left: 2rem; padding-right: 2rem; margin-left: 40%; width: 60%; position: fixed; } }
         .main-content-container { max-width: 56rem; margin-left: auto; margin-right: auto; padding: 1.5rem 1rem; }
         @media (min-width: 640px) { .main-content-container { padding: 2.5rem 1.5rem; } }
-        @media (min-width: 1024px) { .main-content-container { padding: 0 2rem 2.5rem 2rem; } } 
+        @media (min-width: 1024px) { .main-content-container { padding: 0 2rem 2.5rem 2rem; } }
         .invoice-toolbar { display: flex; gap: 0.75rem; flex-wrap: nowrap; overflow-x: auto; }
         .invoice-toolbar::-webkit-scrollbar { height: 6px; }
         .invoice-toolbar::-webkit-scrollbar-track { background: var(--bg-body); border-radius: 3px; }
@@ -617,10 +318,6 @@
         #invoice-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; }
         #invoice-list li { padding: 0; border: none; display: flex; align-items: stretch; gap: 0.25rem; border-radius: 0.375rem; overflow: hidden; }
         #invoice-list .list-item-content { flex-grow: 1; padding: 0.75rem 1rem; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-paper); text-align: left; cursor: pointer; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); display: block; width: 100%; color: var(--text-secondary); }
-        #invoice-list .list-item-content:hover { background-color: var(--bg-hover); border-color: var(--text-muted); }
-        #invoice-list .list-item-content:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
-        #invoice-list .list-item-content.active { border-color: var(--primary); background-color: var(--bg-active); box-shadow: 0 0 0 1px var(--primary); }
-        #invoice-list .list-item-content.active:hover { background-color: var(--border-active); }
         #invoice-list .list-item-content strong { font-size: 0.875rem; font-weight: 600; color: var(--text-main); display: block; }
         #invoice-list .list-item-content span { font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 2px; }
         #invoice-list .list-item-actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
@@ -631,7 +328,6 @@
         .list-btn-delete:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #f87171; box-shadow: 0 0 0 2px #f87171; }
         #invoice-list .list-placeholder { padding: 1.5rem 1rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary); font-style: italic; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; min-height: 100px; justify-content: center; }
         #invoice-list .list-placeholder-icon { width: 2rem; height: 2rem; color: var(--text-muted); }
-        
         .form-textarea { width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-input); font-size: 0.875rem; line-height: 1.25rem; color: var(--text-main); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
         .form-textarea:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
         .default-fee-row { display: flex; gap: 0.5rem; align-items: center; }
@@ -639,160 +335,66 @@
         .default-fee-row input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
         .default-fee-row .delete-btn { flex-shrink: 0; }
         #default-logo-preview { max-height: 40px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 6px; }
-
-        #storage-usage-display-wrapper {
-            margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            background-color: var(--bg-active); 
-            border: 1px solid var(--border-color); 
-            border-radius: 0.375rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem; 
-            line-height: 1.25rem;
-            color: var(--primary-hover); 
+        #storage-usage-display-wrapper { margin-top: 1rem; padding: 0.75rem 1rem; background-color: var(--bg-active); border: 1px solid var(--border-color); border-radius: 0.375rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; line-height: 1.25rem; color: var(--primary-hover); }
+        #storage-usage-label { font-weight: 500; margin-right: 1rem; color: var(--primary); }
+        #storage-usage-value { font-weight: 600; white-space: nowrap; color: var(--text-main); }
+        #storage-usage-display-wrapper #storage-usage-display { margin-top: 0 !important; font-style: normal !important; color: inherit !important; }
+        @media (max-width: 1023px) {
+            body { overflow: auto; }
+            .settings-column-wrapper { background-color: transparent; border-bottom: none; }
+            .settings-column-wrapper .settings-panel { padding-top: 0; }
+            .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; }
+            #invoice { padding: 20px; min-height: 0; }
+            .invoice-header-row { flex-direction: column; gap: 16px; margin-bottom: 24px; }
+            .header-left, .header-right { width: 100%; }
+            .header-right { align-items: flex-start; }
+            .party-row { flex-direction: column; gap: 20px; }
+            .party { width: 100%; }
+            h1.title { font-size: 28px; }
+            .table-wrap { overflow-x: hidden; }
+            #items { border-collapse: separate; border-spacing: 0; }
+            #items thead { display: none; }
+            #items tr.item { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); padding: 0; }
+            #items td { display: block; width: 100% !important; box-sizing: border-box; text-align: right !important; padding: 0.75rem 1rem; padding-left: 9rem; position: relative; border: none; border-bottom: 1px solid #f3f4f6; }
+            #items tr.item td:last-child { border-bottom: none; }
+            #items td::before { content: attr(data-label); position: absolute; left: 1rem; top: 0.75rem; padding-right: 0.5rem; font-weight: 600; color: #4b5563; text-align: left; white-space: nowrap; }
+            #items td[data-label="Description"] { padding-top: 1rem; padding-bottom: 1rem; }
+            .desc { text-align: right; padding: 0; }
+            .tax-category-wrapper { max-width: none; }
+            .table-dropdown-trigger { padding-top: 8px; padding-bottom: 8px; }
+            .table-dropdown-panel { bottom: auto; top: 100%; margin-bottom: 0; margin-top: 4px; width: 100%; left: 0; z-index: 1000; }
+            .rate-display { padding-top: 1rem; padding-bottom: 1rem; }
+            #items td[data-label="Action"] { padding: 0; height: 3.5rem; }
+            .delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem; background-color: #fef2f2; }
+            .delete-btn:hover { background-color: #fee2e2; }
+            .delete-btn svg { width: 1.25rem; height: 1.25rem; }
+            .totals { margin-top: 24px; }
+            .totals .box { width: 100%; }
         }
-        
-        #storage-usage-label {
-            font-weight: 500;
-            margin-right: 1rem;
-            color: var(--primary); 
+        @media print {
+            .hide-on-print { display: none; }
+            body { background: #fff; padding: 0; margin: 0; height: auto; overflow: visible; }
+            .app-layout { display: block; }
+            main.main-content { display: block; width: 100%; height: auto; overflow: visible; padding: 0; margin: 0; margin-left: 0; }
+            main .main-content-container { max-width: none; padding: 0; margin: 0; }
+            .app-container { box-shadow: none; border-radius: 0; margin: 0; border: none; }
+            #invoice { border: none; border-radius: 0; padding: 0; }
+            .main-header { display: none; }
+            .table-dropdown-trigger { display: none; }
+            .table-dropdown-panel { display: none; }
+            .tax-category-wrapper::after { content: attr(data-category-print); font-size: 12px; color: #111827; white-space: nowrap; padding-left: 8px; }
+            .tax-category-wrapper::before { content: "Tax Category:"; font-size: 12px; font-weight: 600; color: #4b5563; }
         }
-        
-        #storage-usage-value {
-            font-weight: 600;
-            white-space: nowrap; 
-            color: var(--text-main);
-        }
-        
-        #storage-usage-display-wrapper #storage-usage-display {
-            margin-top: 0 !important; 
-            font-style: normal !important;
-            color: inherit !important;
-        }
-
-
-        @media (max-width: 1023px) { 
-            body { overflow: auto; } 
-            .settings-column-wrapper { background-color: transparent; border-bottom: none; } 
-            .settings-column-wrapper .settings-panel { padding-top: 0; } 
-            .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; } 
-            #invoice { padding: 20px; min-height: 0; } 
-            .invoice-header-row { flex-direction: column; gap: 16px; margin-bottom: 24px; } 
-            .header-left, .header-right { width: 100%; } 
-            .header-right { align-items: flex-start; } 
-            .party-row { flex-direction: column; gap: 20px; } 
-            .party { width: 100%; } 
-            h1.title { font-size: 28px; } 
-            .table-wrap { overflow-x: hidden; } 
-            #items { border-collapse: separate; border-spacing: 0; } 
-            #items thead { display: none; } 
-            #items tr.item { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 0.375rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); padding: 0; } 
-            #items td { display: block; width: 100% !important; box-sizing: border-box; text-align: right !important; padding: 0.75rem 1rem; padding-left: 9rem; position: relative; border: none; border-bottom: 1px solid #f3f4f6; } 
-            #items tr.item td:last-child { border-bottom: none; } 
-            #items td::before { content: attr(data-label); position: absolute; left: 1rem; top: 0.75rem; padding-right: 0.5rem; font-weight: 600; color: #4b5563; text-align: left; white-space: nowrap; } 
-            #items td[data-label="Description"] { padding-top: 1rem; padding-bottom: 1rem; } 
-            .desc { text-align: right; padding: 0; } 
-            .tax-category-wrapper { max-width: none; } 
-            .table-dropdown-trigger { padding-top: 8px; padding-bottom: 8px; } 
-            .table-dropdown-panel { 
-                bottom: auto; 
-                top: 100%; 
-                margin-bottom: 0; 
-                margin-top: 4px; 
-                width: 100%; 
-                left: 0; 
-                z-index: 1000; 
-            } 
-            .rate-display { padding-top: 1rem; padding-bottom: 1rem; } 
-            #items td[data-label="Action"] { padding: 0; height: 3.5rem; } 
-            .delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem; background-color: #fef2f2; } 
-            .delete-btn:hover { background-color: #fee2e2; } 
-            .delete-btn svg { width: 1.25rem; height: 1.25rem; } 
-            .totals { margin-top: 24px; } 
-            .totals .box { width: 100%; } 
-        }
-        @media print { 
-            .hide-on-print { display:none; } 
-            body { background:#fff; padding:0; margin: 0; height: auto; overflow: visible; } 
-            .app-layout { display: block; } 
-            main.main-content { display: block; width: 100%; height: auto; overflow: visible; padding: 0; margin: 0; margin-left: 0; } 
-            main .main-content-container { max-width: none; padding: 0; margin: 0; } 
-            .app-container { box-shadow: none; border-radius: 0; margin: 0; border: none; } 
-            #invoice { border: none; border-radius: 0; padding: 0; } 
-            .main-header { display: none; } 
-            .table-dropdown-trigger { display: none; } 
-            .table-dropdown-panel { display: none; } 
-            .tax-category-wrapper::after { content: attr(data-category-print); font-size: 12px; color: #111827; white-space: nowrap; padding-left: 8px; } 
-            .tax-category-wrapper::before { content: "Tax Category:"; font-size: 12px; font-weight: 600; color: #4b5563; } 
-        }
-
-        .btn-ai-gradient {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem; 
-            font-weight: 600;
-            color: #ffffff !important; 
-            text-decoration: none;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed, #d946ef, #f97316);
-            background-size: 300% 300%;
-            animation: ai-gradient-shift 8s ease infinite; 
-            box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.25), 0 2px 4px -1px rgba(124, 58, 237, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: 0.01em;
-        }
-
-        .btn-ai-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.7s ease;
-        }
-
-        .btn-ai-gradient:hover::before {
-            left: 100%; 
-        }
-
-        .btn-ai-gradient:hover {
-            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.35), 0 4px 6px -2px rgba(124, 58, 237, 0.1);
-            transform: translateY(-1px); 
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-ai-gradient:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px -1px rgba(124, 58, 237, 0.25);
-        }
-
-        .btn-ai-gradient svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.5rem;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-        }
-
-        @keyframes ai-gradient-shift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        .btn-ai-gradient { display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; font-weight: 600; color: #ffffff !important; text-decoration: none; background: linear-gradient(135deg, #4f46e5, #7c3aed, #d946ef, #f97316); background-size: 300% 300%; animation: ai-gradient-shift 8s ease infinite; box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.25), 0 2px 4px -1px rgba(124, 58, 237, 0.1); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255, 255, 255, 0.15); position: relative; overflow: hidden; box-sizing: border-box; text-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.01em; }
+        .btn-ai-gradient::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: left 0.7s ease; }
+        .btn-ai-gradient:hover::before { left: 100%; }
+        .btn-ai-gradient:hover { box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.35), 0 4px 6px -2px rgba(124, 58, 237, 0.1); transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.3); }
+        .btn-ai-gradient:active { transform: translateY(0); box-shadow: 0 2px 4px -1px rgba(124, 58, 237, 0.25); }
+        .btn-ai-gradient svg { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+        @keyframes ai-gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
 <body>
-
     <div id="setup-screen" class="hidden">
         <div id="setup-modal">
             <div class="setup-header">
@@ -806,7 +408,6 @@
                     <p>Let's get your account set up first.</p>
                 </div>
             </div>
-            
             <div id="setup-form-content">
                 <div class="setup-section">
                     <div class="setup-section-header">
@@ -826,16 +427,13 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="setup-section">
                     <div class="setup-section-header">
                         <h3>Step 2: Global Defaults</h3>
                         <p>Set your default seller info, region, logo, and fees for all new invoices.</p>
                     </div>
-                    <div class="setup-section-content" id="setup-global-settings">
-                        </div>
+                    <div class="setup-section-content" id="setup-global-settings"></div>
                 </div>
-
                 <div class="setup-section">
                     <div class="setup-section-header">
                         <h3>Step 3: Import Data (Optional)</h3>
@@ -860,18 +458,14 @@
                     </div>
                 </div>
             </div>
-
             <div class="setup-footer">
-                <button id="setup-finish-btn" class="btn btn-primary">
-                    Get Started
-                </button>
+                <button id="setup-finish-btn" class="btn btn-primary">Get Started</button>
             </div>
         </div>
     </div>
     <div id="sidebar-overlay" class="sidebar-overlay hidden lg:hidden"></div>
     <div class="app-layout">
         <aside id="history-sidebar" class="sidebar hide-on-print">
-            
             <div class="sidebar-header">
                 <div class="sidebar-header-branding">
                     <span class="sidebar-logo-bg">
@@ -884,8 +478,7 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
-                    <button id="theme-toggle-btn" class="header-icon-btn" title="Toggle Theme">
-                        </button>
+                    <button id="theme-toggle-btn" class="header-icon-btn" title="Toggle Theme"></button>
                     <button type="button" id="sidebar-close-btn" class="btn-icon-only lg:hidden">
                         <span class="sr-only">Close menu</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -894,7 +487,6 @@
                     </button>
                 </div>
             </div>
-
             <div class="settings-panel">
                 <div class="user-profile-container">
                     <div class="user-profile-pic">
@@ -907,7 +499,6 @@
                         <p id="user-profile-email">...</p>
                     </div>
                 </div>
-
                 <div class="sidebar-menu">
                     <button type="button" id="btn-show-invoices" class="sidebar-menu-btn active">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -930,11 +521,8 @@
                         </svg>
                         <input type="text" id="invoice-search" class="search-input" placeholder="Search by name or number...">
                     </div>
-                    
                     <div style="margin-top: 0.75rem;">
-                        <label for="sort-select-trigger" class="form-label">
-                            Sort by
-                        </label>
+                        <label for="sort-select-trigger" class="form-label">Sort by</label>
                         <div class="dropdown-container" id="sort-dropdown-container">
                             <button type="button" id="sort-select-trigger" class="dropdown-trigger">
                                 <span class="dropdown-label" id="sort-select-label">Sort by Date (Newest)</span>
@@ -953,7 +541,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div id="invoice-list-container">
                         <ul id="invoice-list">
                             <li class="list-placeholder">No saved invoices.</li>
@@ -961,7 +548,6 @@
                     </div>
                 </section>
                 <section id="app-settings-section" class="sidebar-panel hidden">
-                    
                     <section id="global-settings-section">
                         <h2 class="settings-section-title">Global Defaults</h2>
                         <div class="settings-grid">
@@ -970,7 +556,6 @@
                                 <textarea id="default-seller" class="form-textarea" style="height: 100px; margin-top: 0.25rem;" rows="4"></textarea>
                                 <p class="form-helper-text">This content will be used as the default seller on all new invoices.</p>
                             </div>
-
                             <div>
                                 <label for="default-region-select-trigger" class="form-label">Default Region</label>
                                 <div class="dropdown-container" id="default-region-dropdown-container">
@@ -982,12 +567,10 @@
                                             </svg>
                                         </span>
                                     </button>
-                                    <div id="default-region-select-options" class="dropdown-options-panel hidden">
-                                    </div>
+                                    <div id="default-region-select-options" class="dropdown-options-panel hidden"></div>
                                 </div>
                                 <p class="form-helper-text">Sets the default currency and tax for new invoices.</p>
                             </div>
-
                             <div>
                                 <label for="default-logo-select-trigger" class="form-label">Default Logo</label>
                                 <div class="dropdown-container" id="default-logo-dropdown-container">
@@ -1007,16 +590,12 @@
                                 </div>
                                 <input type="file" id="default-logo-upload" accept="image/*" class="form-file-input hidden">
                                 <img id="default-logo-preview" src="" alt="Default Logo Preview" class="invoice-logo hidden" style="max-height: 40px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 6px;" />
-                                <button id="remove-default-logo-btn" class="btn btn-danger hidden">
-                                    Remove Custom Logo
-                                </button>
+                                <button id="remove-default-logo-btn" class="btn btn-danger hidden">Remove Custom Logo</button>
                                 <p class="form-helper-text">This logo will be used on all new invoices.</p>
                             </div>
-
                             <div>
                                 <label class="form-label">Default Fees / Charges</label>
-                                <div id="default-fees-list" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;">
-                                </div>
+                                <div id="default-fees-list" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;"></div>
                                 <button id="add-default-fee-btn" type="button" class="btn btn-secondary" style="margin-top: 0.75rem; width: 100%; justify-content: center;">
                                     <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="margin-left: -0.25rem; margin-right: 0.5rem; width: 1.25rem; height: 1.25rem;">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -1025,13 +604,9 @@
                                 </button>
                                 <p class="form-helper-text">These fees will be added to all new invoices.</p>
                             </div>
-
-                            <button id="save-global-settings-btn" class="btn btn-primary btn-full" style="margin-top: 1rem;">
-                                Save Global Settings
-                            </button>
+                            <button id="save-global-settings-btn" class="btn btn-primary btn-full" style="margin-top: 1rem;">Save Global Settings</button>
                         </div>
                     </section>
-                    
                     <section id="user-profile-settings" style="margin-top: 2rem;">
                         <h2 class="settings-section-title">User Profile</h2>
                         <div class="settings-grid">
@@ -1043,15 +618,10 @@
                                 <label for="edit-user-email" class="form-label">Your Email</label>
                                 <input type="email" id="edit-user-email" class="setup-input" placeholder="e.g. jane.doe@example.com">
                             </div>
-                            <button id="save-user-profile-btn" class="btn btn-primary btn-full">
-                                Save Profile
-                            </button>
-                            <button id="rerun-setup-btn" class="btn btn-secondary btn-full">
-                                Re-run Welcome Setup
-                            </button>
+                            <button id="save-user-profile-btn" class="btn btn-primary btn-full">Save Profile</button>
+                            <button id="rerun-setup-btn" class="btn btn-secondary btn-full">Re-run Welcome Setup</button>
                         </div>
                     </section>
-
                     <section id="data-studio-section" style="margin-top: 2rem;">
                         <h2 class="settings-section-title">SwiftInvoice Data Studio</h2>
                         <div class="settings-grid">
@@ -1062,13 +632,10 @@
                                     </svg>
                                     Launch Data Studio
                                 </a>
-                                <p class="form-helper-text" style="margin-top: 0.75rem;">
-                                    Import invoice data to view detailed analytics, preview invoices, and manage encryption or decryption of your .json backup files.
-                                </p>
+                                <p class="form-helper-text" style="margin-top: 0.75rem;">Import invoice data to view detailed analytics, preview invoices, and manage encryption or decryption of your .json backup files.</p>
                             </div>
                         </div>
                     </section>
-                    
                     <section id="app-data-section" style="margin-top: 2rem;">
                         <h2 class="settings-section-title">App Data</h2>
                         <div class="settings-grid">
@@ -1090,7 +657,6 @@
                                 </div>
                                 <input type="file" id="import-invoices-input" accept=".json,application/json" class="hidden">
                             </div>
-
                             <div>
                                 <label class="form-label">App Settings</label>
                                 <div class="data-actions-wrapper" style="display: flex; gap: 0.5rem;">
@@ -1109,32 +675,25 @@
                                 </div>
                                 <input type="file" id="import-settings-input" accept=".json,application/json" class="hidden">
                             </div>
-
                             <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
                                 <p id="import-export-timestamp-display" class="form-helper-text" style="margin-top: 0.25rem; font-style: italic;">Export all app settings (defaults, etc.) to a file. Importing will overwrite all existing settings.</p>
-                                
                                 <div id="storage-usage-display-wrapper">
                                     <span id="storage-usage-label">Storage Used:</span>
                                     <span id="storage-usage-display" style="margin-top: 0; font-style: normal; color: inherit;"></span>
                                 </div>
-
                             </div>
-                            
                             <button id="reset-all-data-btn" class="btn btn-danger btn-full" style="margin-top: 1rem;">
                                 <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
-</svg>
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                                </svg>
                                 Clear App Data
                             </button>
                         </div>
                     </section>
                 </section>
-            </div> 
-            <div class="sidebar-branding hide-on-print">
-                Powered by <strong><a href="https://stack-base.github.io/home" style="text-decoration: none; color: var(--text-secondary);">StackBase</a></strong>
             </div>
-        </aside> 
-
+            <div class="sidebar-branding hide-on-print">Powered by <strong><a href="https://stack-base.github.io/home" style="text-decoration: none; color: var(--text-secondary);">StackBase</a></strong></div>
+        </aside>
         <header class="main-header hide-on-print">
             <button type="button" id="sidebar-open-btn" class="btn-icon-only lg:hidden">
                 <span class="sr-only">Open menu</span>
@@ -1170,23 +729,21 @@
                     </svg>
                     <span class="btn-label sm:inline">Print</span>
                 </button>
-                <button id="generate-pdf-btn" class="btn btn-secondary"> <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <button id="generate-pdf-btn" class="btn btn-secondary">
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
                     <span class="btn-label sm:inline">Download</span>
                 </button>
             </div>
         </header>
-
         <aside id="settings-column" class="settings-column-wrapper hide-on-print">
-            <div class="settings-panel"> 
+            <div class="settings-panel">
                 <section>
                     <h2 class="settings-section-title">Invoice Settings</h2>
                     <div class="settings-grid">
                         <div>
-                            <label for="region-select-trigger" class="form-label">
-                                Currency & Tax
-                            </label>
+                            <label for="region-select-trigger" class="form-label">Currency & Tax</label>
                             <div class="dropdown-container" id="region-dropdown-container">
                                 <button type="button" id="region-select-trigger" class="dropdown-trigger">
                                     <span class="dropdown-label" id="region-select-label">Select Region</span>
@@ -1196,8 +753,7 @@
                                         </svg>
                                     </span>
                                 </button>
-                                <div id="region-select-options" class="dropdown-options-panel hidden">
-                                </div>
+                                <div id="region-select-options" class="dropdown-options-panel hidden"></div>
                             </div>
                             <p class="form-helper-text">Sets the default currency and tax categories for all items.</p>
                         </div>
@@ -1209,16 +765,13 @@
                                 </svg>
                             </button>
                         </div>
-                        
                     </div>
                 </section>
                 <section>
                     <h2 class="settings-section-title">Branding</h2>
                     <div class="settings-grid">
                         <div>
-                            <label for="logo-select-trigger" class="form-label">
-                                Logo
-                            </label>
+                            <label for="logo-select-trigger" class="form-label">Logo</label>
                             <div class="dropdown-container" id="logo-dropdown-container">
                                 <button type="button" id="logo-select-trigger" class="dropdown-trigger">
                                     <span class="dropdown-label" id="logo-select-label">No Logo</span>
@@ -1235,25 +788,18 @@
                                 </div>
                             </div>
                             <input type="file" id="logo-upload" accept="image/*" class="form-file-input hidden">
-                            <button id="remove-logo" class="btn btn-danger hidden">
-                                Remove Logo
-                            </button>
+                            <button id="remove-logo" class="btn btn-danger hidden">Remove Logo</button>
                         </div>
                     </div>
                 </section>
-                
                 <section>
                      <div id="tax-slabs-container" class="tax-slabs-display hidden" style="margin-top: 0;">
-                        <h3 id="tax-slabs-title" class="settings-section-title" style="font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: var(--text-main); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
-                            Tax Slabs
-                        </h3>
-                        <ul id="tax-slabs-list" class="tax-slabs-list" style="list-style-type: none; padding: 0; margin: 0; font-size: 0.875rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.25rem;">
-                        </ul>
+                        <h3 id="tax-slabs-title" class="settings-section-title" style="font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: var(--text-main); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">Tax Slabs</h3>
+                        <ul id="tax-slabs-list" class="tax-slabs-list" style="list-style-type: none; padding: 0; margin: 0; font-size: 0.875rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.25rem;"></ul>
                     </div>
                 </section>
             </div>
-        </aside> 
-
+        </aside>
         <main class="main-content">
             <div class="main-content-container">
                 <div class="app-container">
@@ -1263,131 +809,117 @@
                                 <div class="header-left">
                                     <h1 class="title">Invoice</h1>
                                     <table class="meta-table">
-                                    <tbody>
-                                        <tr><td class="label">Invoice Nr</td><td contenteditable="true" id="invoice-number">P72381-IAGI000528</td></tr>
-                                        <tr><td class="label">Invoice Date</td><td contenteditable="true" id="invoice-date">2024-11-20</td></tr>
-                                        <tr><td class="label">Invoice Time</td><td contenteditable="true" id="invoice-time">08:14 PM</td></tr>
-                                    </tbody>
-                                </table>
+                                        <tbody>
+                                            <tr><td class="label">Invoice Nr</td><td contenteditable="true" id="invoice-number">P72381-IAGI000528</td></tr>
+                                            <tr><td class="label">Invoice Date</td><td contenteditable="true" id="invoice-date">2024-11-20</td></tr>
+                                            <tr><td class="label">Invoice Time</td><td contenteditable="true" id="invoice-time">08:14 PM</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="header-right">
+                                    <img id="invoice-logo" src="" alt="Company Logo" class="invoice-logo hidden"/>
+                                </div>
                             </div>
-                            <div class="header-right">
-                                <img id="invoice-logo" src="" alt="Company Logo" class="invoice-logo hidden"/>
-                            </div>
-                        </div>
-                        <div class="party-row">
-                            <div class="party">
-                                <h2>Seller</h2>
-                                <div contenteditable="true" class="address" id="seller">
-Seller Name
+                            <div class="party-row">
+                                <div class="party">
+                                    <h2>Seller</h2>
+                                    <div contenteditable="true" class="address" id="seller">Seller Name
 123 Main Street
-City, State 12345
+City, State 12345</div>
                                 </div>
-                            </div>
-                            <div class="party">
-                                <h2>Buyer</h2>
-                                <div contenteditable="true" class="address" id="buyer">
-Recipient Name
+                                <div class="party">
+                                    <h2>Buyer</h2>
+                                    <div contenteditable="true" class="address" id="buyer">Recipient Name
 456 Client Ave
-City, State 67890
+City, State 67890</div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="table-wrap">
-                            <table id="items" aria-label="items table">
-                                <thead>
-                                    <tr>
-                                        <th>Line Nr</th>
-                                        <th>Product Code</th>
-                                        <th>Description</th>
-                                        <th>Qty</th>
-                                        <th>Price excl<br/>VAT</th>
-                                        <th>VAT<br/>rate</th>
-                                        <th>VAT<br/>amount</th>
-                                        <th>Price incl<br/>VAT</th>
-                                        <th class="hide-on-print">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="items-body">
-                                    <tr class="item">
-                                        <td contenteditable="true" class="line" data-label="Line Nr">1</td>
-                                        <td contenteditable="true" class="code" data-label="Product Code">ASSI12MS</td>
-                                        <td data-label="Description">
-                                            <div contenteditable="true" class="desc">
-StackBase SwiftInvoice Subscription- 1year
-
-Product Serial Nr   N/A
-                                            </div>
-                                            <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="">
-                                                <button type="button" class="table-dropdown-trigger">
-                                                    </button>
-                                                <div class="table-dropdown-panel hidden">
-                                                    </div>
-                                            </div>
-                                        </td>
-                                        <td contenteditable="true" class="qty" data-label="Qty">1</td>
-                                        <td contenteditable="true" class="excl" data-label="Price excl VAT">66.62</td>
-                                        <td contenteditable="false" class="rate-display" data-label="VAT rate">5.00%</td>
-                                        <td contenteditable="true" class="vat" data-label="VAT amount">3.33</td>
-                                        <td contenteditable="true" class="incl" data-label="Price incl VAT">69.95</td>
-                                        <td class="hide-on-print" data-label="Action">
-                                            <button class="delete-btn" title="Delete row">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div style="margin-top:8px;">
-                        </div>
-                        <div class="totals">
-                            <div class="box">
-                                <div class="currency">AED</div>
-                                <table id="totals-table">
-                                    <tbody id="totals-body">
+                            <div class="table-wrap">
+                                <table id="items" aria-label="items table">
+                                    <thead>
                                         <tr>
-                                            <td class="label">Subtotal</td>
-                                            <td contenteditable="false" id="subtotal" class="value">66.62</td>
-                                            <td class="hide-on-print" style="width: 40px;"></td> 
+                                            <th>Line Nr</th>
+                                            <th>Product Code</th>
+                                            <th>Description</th>
+                                            <th>Qty</th>
+                                            <th>Price excl<br/>VAT</th>
+                                            <th>VAT<br/>rate</th>
+                                            <th>VAT<br/>amount</th>
+                                            <th>Price incl<br/>VAT</th>
+                                            <th class="hide-on-print">Action</th>
                                         </tr>
-                                        
-                                        
+                                    </thead>
+                                    <tbody id="items-body">
+                                        <tr class="item">
+                                            <td contenteditable="true" class="line" data-label="Line Nr">1</td>
+                                            <td contenteditable="true" class="code" data-label="Product Code">ASSI12MS</td>
+                                            <td data-label="Description">
+                                                <div contenteditable="true" class="desc">StackBase SwiftInvoice Subscription- 1year
 
-                                        <tr id="vat-row"> 
-                                            <td class="label">VAT</td>
-                                            <td contenteditable="false" id="vat-total" class="value">3.33</td>
-                                            <td class="hide-on-print"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Total</td>
-                                            <td contenteditable="false" id="grand" class="value">69.95</td>
-                                            <td class="hide-on-print"></td>
+Product Serial Nr   N/A</div>
+                                                <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="">
+                                                    <button type="button" class="table-dropdown-trigger"></button>
+                                                    <div class="table-dropdown-panel hidden"></div>
+                                                </div>
+                                            </td>
+                                            <td contenteditable="true" class="qty" data-label="Qty">1</td>
+                                            <td contenteditable="true" class="excl" data-label="Price excl VAT">66.62</td>
+                                            <td contenteditable="false" class="rate-display" data-label="VAT rate">5.00%</td>
+                                            <td contenteditable="true" class="vat" data-label="VAT amount">3.33</td>
+                                            <td contenteditable="true" class="incl" data-label="Price incl VAT">69.95</td>
+                                            <td class="hide-on-print" data-label="Action">
+                                                <button class="delete-btn" title="Delete row">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <button type="button" id="add-fee-btn" class="btn btn-secondary btn-full hide-on-print" style="margin-top: 12px; justify-content: center; padding: 0.5rem 1rem;">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="margin-left: -0.25rem; margin-right: 0.5rem; width: 1.25rem; height: 1.25rem;">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                    Add Fee / Charge
-                                </button>
+                            </div>
+                            <div style="margin-top:8px;"></div>
+                            <div class="totals">
+                                <div class="box">
+                                    <div class="currency">AED</div>
+                                    <table id="totals-table">
+                                        <tbody id="totals-body">
+                                            <tr>
+                                                <td class="label">Subtotal</td>
+                                                <td contenteditable="false" id="subtotal" class="value">66.62</td>
+                                                <td class="hide-on-print" style="width: 40px;"></td> 
+                                            </tr>
+                                            <tr id="vat-row"> 
+                                                <td class="label">VAT</td>
+                                                <td contenteditable="false" id="vat-total" class="value">3.33</td>
+                                                <td class="hide-on-print"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="label">Total</td>
+                                                <td contenteditable="false" id="grand" class="value">69.95</td>
+                                                <td class="hide-on-print"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" id="add-fee-btn" class="btn btn-secondary btn-full hide-on-print" style="margin-top: 12px; justify-content: center; padding: 0.5rem 1rem;">
+                                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="margin-left: -0.25rem; margin-right: 0.5rem; width: 1.25rem; height: 1.25rem;">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+                                        Add Fee / Charge
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        </div> <div class="invoice-footer">
+                        <div class="invoice-footer">
                             <span class="invoice-footer-brand">SwiftInvoice</span> | StackBase
                         </div>
                     </div>
-                </div> 
-            </div> 
-        </main> 
-    </div> 
-
+                </div>
+            </div>
+        </main>
+    </div>
     <input type="file" id="import-settings-input-setup" accept=".json,application/json" class="hidden">
     <input type="file" id="import-invoices-input-setup" accept=".json,application/json" class="hidden">
-    
-<script type="module" src="application.js"></script>
-
+    <script type="module" src="application.js"></script>
 </body>
 </html>

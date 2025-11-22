@@ -194,6 +194,145 @@
         .trend-down { color: #ef4444; }
         .trend-neutral { color: var(--text-muted); }
         
+        .ai-gradient-box {
+            position: relative;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .ai-gradient-box {
+            border: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        [data-theme="dark"] .ai-header {
+            border-bottom: 1px solid gray;
+        }
+
+        .ai-title {
+            font-family: 'Ubuntu', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF2D92, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .ai-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        [data-theme="dark"] .ai-badge {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        .ai-content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .ai-content-grid { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        .ai-insight-col { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .ai-subhead {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .ai-subhead svg { width: 1rem; height: 1rem; color: #6366f1; }
+
+        .ai-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .ai-highlight {
+            font-weight: 600;
+            color: var(--text-main);
+            background-color: rgba(99, 102, 241, 0.08);
+            padding: 0 4px;
+            border-radius: 4px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .ai-bg-deco {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+        }
+        
+        .ai-loading-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            font-style: italic;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: var(--bg-hover);
+        }
+        
+        .shimmer-line {
+            width: 100%;
+            height: 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, var(--bg-hover) 8%, var(--border-color) 18%, var(--bg-hover) 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+
+        .shimmer-line:nth-child(2) { width: 90%; }
+        .shimmer-line:nth-child(3) { width: 95%; }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
         .insights-box { background: var(--bg-active); border: 1px solid var(--border-active); border-radius: 0.75rem; padding: 1rem 1.5rem; margin-bottom: 2rem; }
         .insight-header { font-size: 0.85rem; font-weight: 700; color: var(--text-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
         .insight-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
@@ -622,16 +761,14 @@
                             <h2 class="section-title" style="border-bottom:none; margin-bottom:0.5rem;">Analytics Dashboard</h2>
                             <p id="analysis-period" class="analysis-period">Analysis Period: Loading...</p>
                             
-                            <div class="analytics-section" style="border-left: 4px solid var(--primary); background: var(--bg-active); padding: 1.5rem;">
-                                <h3 class="section-title" style="margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem; margin-top:0;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem; height:1.25rem;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
-                                    </svg>
-                                    Summary
-                                    <span style="background:var(--primary); color:#fff; font-size:0.65rem; padding:2px 8px; border-radius:12px; margin-left:0.5rem; letter-spacing:0.05em;">BETA</span>
-                                </h3>
-                                <div id="executive-summary-text" style="line-height: 1.7; font-size: 0.95rem; color: var(--text-main);">
-                                    No data available to generate summary.
+                            <div id="ai-summary-container" class="ai-gradient-box">
+                                <div class="ai-bg-deco"></div>
+                                <div class="ai-header">
+                                    <h3 class="ai-title">Summary</h3>
+                                    <span class="ai-badge">BETA</span>
+                                </div>
+                                <div id="executive-summary-text" class="ai-content-grid ai-loading-placeholder">
+                                    <div style="width:100%;"><div class="shimmer-line"></div><div class="shimmer-line"></div><div class="shimmer-line"></div></div>
                                 </div>
                             </div>
                             <div class="analytics-grid">
