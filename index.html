@@ -3,1025 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Page title updated for SwiftInvoice -->
     <title>SwiftInvoice | StackBase</title>
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" type="image/x-icon">
     
-    <!-- Google Font: Roboto (Copied from index.html) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display.swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- 
-      This <style> block is copied directly from index.html
-      to ensure the designs match perfectly.
-    -->
     <style>
         /* --- 1. Global & Reset Styles --- */
-        
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Roboto', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-color: #f9fafb; /* brand-light */
-            color: #1f2937; /* text-gray-800 */
-            margin: 0;
-            padding: 0;
-            font-size: 16px;
-            line-height: 1.5;
+            background-color: #f9fafb;
+            color: #1f2937;
+            margin: 0; padding: 0;
+            font-size: 16px; line-height: 1.6;
         }
         
         .container {
-            width: 90%;
-            max-width: 1280px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            width: 90%; max-width: 1280px;
+            margin-left: auto; margin-right: auto;
+            padding-left: 1rem; padding-right: 1rem;
         }
         
-        a {
-            text-decoration: none;
-            color: inherit;
-            transition: color 0.2s ease-in-out;
-        }
-        
-        button {
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            background: none;
-        }
-        
+        a { text-decoration: none; color: inherit; transition: color 0.2s ease-in-out; }
+        button { cursor: pointer; font-family: inherit; border: none; background: none; }
+        h1, h2, h3, h4 { font-family: 'Ubuntu', sans-serif; }
+
         /* --- 2. Header & Navigation --- */
-        
         header {
-            background-color: #111827; /* brand-dark */
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            background-color: #111827;
+            position: sticky; top: 0; z-index: 50;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+        header nav { display: flex; align-items: center; justify-content: space-between; height: 4rem; }
         
-        header nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 4rem;
-        }
+        .logo-container { display: flex; align-items: center; flex-shrink: 0; }
+        .logo-container img { height: 2rem; width: 2rem; }
+        .logo-container span { color: white; font-size: 1.5rem; font-weight: 700; margin-left: 0.75rem; }
         
-        .logo-container {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .logo-container img {
-            height: 2rem; /* 32px */
-            width: 2rem; /* 32px */
-        }
-        
-        .logo-container span {
-            color: white;
-            font-size: 1.5rem; /* 24px */
-            font-weight: 700; /* bold */
-            margin-left: 0.75rem; /* 12px */
-        }
-        
-        /* Desktop Navigation Links */
-        .nav-desktop {
-            display: none; /* Hidden on mobile by default */
-        }
-        
+        .nav-desktop { display: none; }
         .nav-desktop a {
-            color: #d1d5db; /* text-gray-300 */
-            font-size: 0.875rem; /* 14px */
-            font-weight: 500; /* medium */
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem; /* 6px */
-            margin-left: 0.5rem;
+            color: #d1d5db; font-size: 0.875rem; font-weight: 500;
+            padding: 0.5rem 0.75rem; border-radius: 0.375rem; margin-left: 0.5rem;
             transition: color 0.2s;
         }
+        .nav-desktop a:hover { color: white; }
         
-        .nav-desktop a:hover {
-            color: white;
-        }
-        
-        /* Desktop Sign In / Get Started Buttons */
-        .nav-desktop-cta {
-            display: none; /* Hidden on mobile by default */
-            align-items: center;
-        }
-
-        .nav-cta-signin {
-            color: #d1d5db;
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            transition: color 0.2s;
-        }
-
-        .nav-cta-signin:hover {
-            color: white;
-        }
+        .nav-desktop-cta { display: none; align-items: center; }
+        .nav-cta-signin { color: #d1d5db; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.75rem; transition: color 0.2s; }
+        .nav-cta-signin:hover { color: white; }
         
         .nav-cta-signup {
-            background-image: linear-gradient(to right, #3b82f6, #14b8a6); /* Blue to Teal */
-            color: white;
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem; /* 8px */
-            margin-left: 1rem;
-            transition: all 0.2s;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            background-image: linear-gradient(to right, #3b82f6, #14b8a6);
+            color: white; font-size: 0.875rem; font-weight: 500;
+            padding: 0.5rem 1rem; border-radius: 0.5rem; margin-left: 1rem;
+            transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
+        .nav-cta-signup:hover { background-image: linear-gradient(to right, #2563eb, #0d9488); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1); }
         
-        .nav-cta-signup:hover {
-            background-image: linear-gradient(to right, #2563eb, #0d9488); /* Darker gradient */
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
-        }
+        .mobile-menu-button { display: block; color: #d1d5db; padding: 0.5rem; }
+        .mobile-menu-button svg { height: 1.5rem; width: 1.5rem; }
         
-        /* Mobile Menu (Hamburger Button) */
-        .mobile-menu-button {
-            display: block; /* Visible on mobile */
-            color: #d1d5db;
-            padding: 0.5rem;
-        }
-        
-        .mobile-menu-button svg {
-            height: 1.5rem; /* 24px */
-            width: 1.5rem; /* 24px */
-        }
-        
-        /* Mobile Menu Panel (links) */
-        .mobile-menu {
-            display: none; /* Hidden by default */
-            padding-bottom: 1rem;
-        }
-        
-        .mobile-menu.open {
-            display: block;
-        }
-        
-        .mobile-menu a {
-            display: block;
-            color: #d1d5db;
-            padding: 0.75rem 0.5rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-        }
-        
-        .mobile-menu a:hover {
-            color: white;
-        }
-        
-        .mobile-menu .nav-cta-signup {
-            width: 100%;
-            text-align: left;
-            margin-top: 0.5rem;
-        }
+        .mobile-menu { display: none; padding-bottom: 1rem; }
+        .mobile-menu.open { display: block; }
+        .mobile-menu a { display: block; color: #d1d5db; padding: 0.75rem 0.5rem; font-weight: 500; }
+        .mobile-menu a:hover { color: white; }
+        .mobile-menu .nav-cta-signup { width: 100%; text-align: left; margin-top: 0.5rem; }
         
         /* --- 3. Hero Section --- */
-        
         .hero-section {
-            color: white;
-            padding-top: 6rem; /* 96px */
-            padding-bottom: 8rem; /* 128px */
-            text-align: center;
-            
-            /* Background from index.html */
+            color: white; padding-top: 6rem; padding-bottom: 6rem; text-align: center;
             background-image: linear-gradient(rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.95)), 
                               url('https://placehold.co/1920x1080/1f2937/3b82f6?text=SwiftInvoice');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
         }
+        .hero-section h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.025em; margin: 0 auto 1.5rem auto; }
+        .hero-section p { font-size: 1.25rem; color: #d1d5db; max-width: 48rem; margin: 0 auto 2.5rem auto; }
         
-        .hero-section h1 {
-            font-size: 2.5rem; /* 40px */
-            font-weight: 900; /* black */
-            letter-spacing: -0.025em; /* tracking-tight */
-            margin: 0 auto 1.5rem auto;
-        }
-        
-        .hero-section p {
-            font-size: 1.25rem; /* 20px */
-            color: #d1d5db; /* text-gray-300 */
-            max-width: 48rem; /* 768px */
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 2.5rem; /* 40px */
-        }
-        
-        .hero-cta-container {
-            display: flex;
-            flex-direction: column; /* Stack buttons on mobile */
-            justify-content: center;
-            gap: 1rem; /* 16px */
-        }
-        
+        .hero-cta-container { display: flex; flex-direction: column; justify-content: center; gap: 1rem; margin-bottom: 4rem; }
         .hero-cta-container a {
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-size: 1.125rem; /* 18px */
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 2rem; border-radius: 0.5rem; font-size: 1.125rem; font-weight: 500;
+            transition: all 0.2s ease-in-out; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
-        .hero-cta-primary {
-            background-image: linear-gradient(to right, #3b82f6, #14b8a6); /* Blue to Teal */
-            color: white;
+        .hero-cta-primary { background-image: linear-gradient(to right, #3b82f6, #14b8a6); color: white; }
+        .hero-cta-primary:hover { transform: scale(1.05); }
+        .hero-cta-secondary { background-color: #4b5563; color: #d1d5db; }
+        .hero-cta-secondary:hover { background-color: #374151; }
+
+        /* Hero Screenshot Frame */
+        .hero-visual-wrapper {
+            /* background: rgba(255, 255, 255, 0.05); */
+            /* border: 1px solid rgba(255, 255, 255, 0.1); */
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+            /* box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5); */
         }
-        
-        .hero-cta-primary:hover {
-            background-image: linear-gradient(to right, #2563eb, #0d9488); /* Darker gradient */
-            transform: scale(1.05);
+        .screenshot-frame {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #111827;
+            position: relative;
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio */
         }
-        
-        .hero-cta-secondary {
-            background-color: #4b5563; /* text-gray-700 */
-            color: #d1d5db;
-        }
-        
-        .hero-cta-secondary:hover {
-            background-color: #374151; /* text-gray-600 */
+        .screenshot-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: top;
         }
         
         /* --- 4. Features Section --- */
+        .features-section { padding-top: 6rem; padding-bottom: 6rem; background-color: white; }
+        .features-header { text-align: center; margin-bottom: 4rem; }
+        .features-header .tagline { color: #14b8a6; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; }
+        .features-header h2 { font-size: 2.25rem; font-weight: 700; color: #111827; margin-top: 0.5rem; }
+        .features-header p { font-size: 1.125rem; color: #4b5563; margin-top: 1rem; max-width: 42rem; margin-left: auto; margin-right: auto; }
         
-        .features-section {
+        .features-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .feature-card {
+            background-color: #f9fafb; padding: 2rem; border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: box-shadow 0.3s ease-in-out;
+            display: flex; flex-direction: column; border: 1px solid #e5e7eb;
+        }
+        .feature-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #14b8a6; }
+        .feature-icon-container {
+            background-color: #ccfbf1; color: #0d9488; border-radius: 9999px;
+            height: 3rem; width: 3rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+        }
+        .feature-icon-container svg { height: 1.5rem; width: 1.5rem; }
+        .feature-card h3 { font-size: 1.5rem; font-weight: 600; color: #111827; margin: 0 0 0.75rem 0; }
+        .feature-card p { color: #4b5563; margin: 0; flex-grow: 1; }
+
+        /* --- 5. DATA STUDIO DEEP DIVE (Zig Zag Layout) --- */
+        .studio-section {
+            background-color: #111827; /* Dark Brand */
+            color: #fff;
             padding-top: 6rem;
             padding-bottom: 6rem;
-            background-color: white;
-        }
-        
-        .features-header {
-            text-align: center;
-            margin-bottom: 4rem; /* 64px */
-        }
-        
-        .features-header .tagline {
-            color: #14b8a6; /* Teal */
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-        }
-        
-        .features-header h2 {
-            font-size: 2.25rem; /* 36px */
-            font-weight: 700;
-            color: #111827;
-            margin-top: 0.5rem;
-        }
-        
-        .features-header p {
-            font-size: 1.125rem;
-            color: #4b5563;
-            margin-top: 1rem;
-            max-width: 42rem; /* 672px */
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: 1fr; /* Single column on mobile */
-            gap: 2rem; /* 32px */
-        }
-        
-        .feature-card {
-            background-color: #f9fafb;
-            padding: 2rem;
-            border-radius: 0.75rem; /* 12px */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: box-shadow 0.3s ease-in-out;
-        }
-        
-        .feature-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .feature-icon-container {
-            background-color: #ccfbf1; /* teal-100 */
-            color: #0d9488; /* teal-600 */
-            border-radius: 9999px; /* full */
-            height: 3rem; /* 48px */
-            width: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .feature-icon-container svg {
-            height: 1.5rem;
-            width: 1.5rem;
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #111827;
-            margin-top: 0;
-            margin-bottom: 0.75rem;
-        }
-        
-        .feature-card p {
-            color: #4b5563;
-            margin: 0;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* --- 5. "See in Action" Section (Adapted from Dev-First) --- */
-        
-        .app-first-section {
-            padding-top: 6rem;
-            padding-bottom: 6rem;
-            background-color: #f9fafb; /* brand-light */
+        /* Decorative blob background */
+        .studio-section::before {
+            content: '';
+            position: absolute;
+            top: -10%; right: -10%;
+            width: 60%; height: 80%;
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.1) 0%, rgba(17, 24, 39, 0) 70%);
+            z-index: 0;
         }
-        
-        .app-first-container {
+
+        .studio-intro { text-align: center; margin-bottom: 5rem; position: relative; z-index: 1; }
+        .studio-intro .tagline { color: #2dd4bf; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .studio-intro h2 { 
+            font-size: 2.5rem; font-weight: 800; margin-top: 0.5rem; 
+            background: linear-gradient(to right, #fff, #99f6e4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .studio-intro p { font-size: 1.25rem; color: #9ca3af; max-width: 48rem; margin: 1rem auto 0 auto; }
+
+        /* Feature Row (Zig Zag) */
+        .feature-row {
             display: flex;
-            flex-direction: column; /* Stack on mobile */
+            flex-direction: column;
+            gap: 3rem;
+            margin-bottom: 6rem;
+            position: relative;
+            z-index: 1;
             align-items: center;
-            gap: 3rem; /* 48px */
         }
         
-        .app-first-text {
+        .feature-row:last-child { margin-bottom: 0; }
+
+        .feature-text { flex: 1; }
+        .feature-text h3 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: white; }
+        .feature-text p { font-size: 1.1rem; color: #d1d5db; margin-bottom: 1.5rem; }
+        .feature-list { list-style: none; padding: 0; margin: 0; }
+        .feature-list li { display: flex; align-items: start; gap: 0.75rem; margin-bottom: 0.75rem; color: #9ca3af; }
+        .feature-list svg { width: 1.25rem; height: 1.25rem; color: #2dd4bf; flex-shrink: 0; margin-top: 4px; }
+
+        .feature-visual { flex: 1; width: 100%; }
+        
+        /* Screenshot Container Styling */
+        .studio-screenshot-container {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* The actual image or placeholder */
+        .screenshot-placeholder {
+            background-color: #0f172a;
             width: 100%;
-        }
-        
-        .app-first-text .tagline {
-            color: #14b8a6; /* Teal */
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-        }
-        
-        .app-first-text h2 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: #111827;
-            margin-top: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .app-first-text p {
-            font-size: 1.125rem;
-            color: #4b5563;
-            margin-bottom: 1.5rem;
-        }
-        
-        .app-first-list {
-            list-style: none;
-            padding-left: 0;
-            margin: 0;
-        }
-        
-        .app-first-list li {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-        
-        .app-first-list li:last-child {
-            margin-bottom: 0;
-        }
-        
-        .app-first-list .icon-check {
-            flex-shrink: 0;
-            background-color: #d1fae5; /* green-100 */
-            color: #065f46; /* green-600 */
-            border-radius: 9999px;
-            height: 1.5rem;
-            width: 1.5rem;
+            /* Aspect ratio trick */
+            aspect-ratio: 16/10;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
-            margin-top: 0.25rem;
+            color: #475569;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow: hidden;
         }
         
-        .app-first-list .icon-check svg {
-            height: 1rem;
-            width: 1rem;
-        }
-        
-        .app-first-list li span strong {
-            color: #111827;
-        }
-        
-        .app-first-graphic {
+        .screenshot-placeholder img {
             width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
         }
-        
-        /* This is the placeholder for the app preview image */
-        .app-preview-block {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            padding: 1.5rem;
-            border: 1px solid #e5e7eb;
+
+        @media (min-width: 1024px) {
+            .feature-row { flex-direction: row; gap: 5rem; }
+            .feature-row.reverse { flex-direction: row-reverse; }
         }
+
+        /* --- 6. "See in Action" Section --- */
+        .app-first-section { padding-top: 6rem; padding-bottom: 6rem; background-color: #f9fafb; }
+        .app-first-container { display: flex; flex-direction: column; align-items: center; gap: 3rem; }
+        .app-first-text { width: 100%; }
+        .app-first-text .tagline { color: #14b8a6; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; }
+        .app-first-text h2 { font-size: 2.25rem; font-weight: 700; color: #111827; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+        .app-first-text p { font-size: 1.125rem; color: #4b5563; margin-bottom: 1.5rem; }
+        .app-first-list { list-style: none; padding-left: 0; margin: 0; }
+        .app-first-list li { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+        .app-first-list .icon-check { flex-shrink: 0; background-color: #d1fae5; color: #065f46; border-radius: 9999px; height: 1.5rem; width: 1.5rem; display: flex; align-items: center; justify-content: center; margin-right: 1rem; margin-top: 0.25rem; }
+        .app-first-list .icon-check svg { height: 1rem; width: 1rem; }
+        .app-first-list li span strong { color: #111827; }
+        .app-first-graphic { width: 100%; }
         
-        .app-window-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .app-window-controls div {
-            height: 0.75rem;
-            width: 0.75rem;
-            border-radius: 9999px;
-        }
-        
+        .app-preview-block { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); padding: 1.5rem; border: 1px solid #e5e7eb; }
+        .app-window-controls { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .app-window-controls div { height: 0.75rem; width: 0.75rem; border-radius: 9999px; }
         .app-window-controls .red { background-color: #ef4444; }
         .app-window-controls .yellow { background-color: #f59e0b; }
         .app-window-controls .green { background-color: #10b981; }
-        
-        .app-preview-placeholder {
-            background-color: #f9fafb; /* brand-light */
-            border: 2px dashed #d1d5db; /* gray-300 */
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            height: 300px; /* Placeholder height */
-            color: #6b7280; /* gray-500 */
-        }
 
-        .app-preview-placeholder svg {
-            width: 3rem;
-            height: 3rem;
-            color: #9ca3af; /* gray-400 */
-            margin-bottom: 1rem;
-        }
-        
-        .app-preview-placeholder span {
-            font-weight: 500;
-            color: #4b5563; /* gray-600 */
-        }
-
-
-        /* --- 6. Final CTA Section --- */
-        
+        /* --- 7. CTA Section --- */
         .cta-section {
-            background-image: linear-gradient(to right, #3b82f6, #14b8a6); /* Blue to Teal */
-            color: white;
-            padding-top: 5rem;
-            padding-bottom: 5rem;
-            text-align: center;
+            background-image: linear-gradient(to right, #3b82f6, #14b8a6); color: white;
+            padding-top: 5rem; padding-bottom: 5rem; text-align: center;
         }
-        
-        .cta-section h2 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 1rem;
-        }
-        
-        .cta-section p {
-            font-size: 1.25rem;
-            color: #dbeafe; /* blue-100 */
-            max-width: 42rem;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 2rem;
-        }
-        
+        .cta-section h2 { font-size: 2.25rem; font-weight: 700; margin-top: 0; margin-bottom: 1rem; }
+        .cta-section p { font-size: 1.25rem; color: #dbeafe; max-width: 42rem; margin: 0 auto 2rem auto; }
         .cta-section a {
-            background-color: white;
-            color: #0d9488; /* Darker teal for contrast */
-            padding: 0.75rem 2.5rem;
-            border-radius: 0.5rem;
-            font-size: 1.125rem;
-            font-weight: 700;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            display: inline-block;
+            background-color: white; color: #0d9488; padding: 0.75rem 2.5rem;
+            border-radius: 0.5rem; font-size: 1.125rem; font-weight: 700;
+            transition: all 0.2s ease-in-out; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); display: inline-block;
         }
-        
-        .cta-section a:hover {
-            background-color: #f3f4f6; /* gray-100 */
-            transform: scale(1.05);
-        }
+        .cta-section a:hover { background-color: #f3f4f6; transform: scale(1.05); }
 
-        /* --- 7. Footer --- */
-        
-        footer {
-            background-color: #111827;
-            color: #9ca3af; /* text-gray-400 */
-            padding-top: 4rem;
-            padding-bottom: 4rem;
-        }
-        
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 columns on mobile */
-            gap: 2rem;
-        }
-        
-        .footer-brand {
-            grid-column: span 2 / span 2; /* Full width on mobile */
-            margin-bottom: 1rem;
-        }
-        
-        .footer-brand .logo-container {
-            margin-bottom: 1rem;
-        }
-        
-        .footer-brand p {
-            font-size: 0.875rem;
-            margin: 0;
-        }
+        /* --- 8. Footer --- */
+        footer { background-color: #111827; color: #9ca3af; padding-top: 4rem; padding-bottom: 4rem; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .footer-brand { grid-column: span 2; margin-bottom: 1rem; }
+        .footer-brand .logo-container { margin-bottom: 1rem; }
+        .footer-brand p { font-size: 0.875rem; margin: 0; }
+        .footer-brand .copyright { margin-top: 1rem; }
+        .footer-links-group h4 { color: white; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; margin-bottom: 1rem; margin-top: 0; }
+        .footer-links-group ul { list-style: none; padding-left: 0; margin: 0; }
+        .footer-links-group li { margin-bottom: 0.75rem; }
+        .footer-links-group a { font-size: 0.875rem; }
+        .footer-links-group a:hover { color: white; }
+        .footer-bottom { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #374151; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 1rem; }
+        .footer-bottom p { font-size: 0.875rem; margin: 0; }
+        .footer-socials { display: flex; gap: 1.5rem; align-items: center; }
+        .footer-socials a { color: #9ca3af; display: flex; align-items: center; }
+        .footer-socials a:hover { color: white; }
+        .footer-socials svg { height: 1.5rem; width: 1.5rem; }
 
-        .footer-brand .copyright {
-             margin-top: 1rem;
-        }
-        
-        .footer-links-group h4 {
-            color: white;
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            margin-top: 0;
-        }
-        
-        .footer-links-group ul {
-            list-style: none;
-            padding-left: 0;
-            margin: 0;
-        }
-        
-        .footer-links-group li {
-            margin-bottom: 0.75rem;
-        }
-        
-        .footer-links-group a {
-            font-size: 0.875rem;
-        }
-        
-        .footer-links-group a:hover {
-            color: white;
-        }
-        
-        .footer-bottom {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #374151; /* gray-700 */
-            display: flex;
-            flex-direction: column; /* Stack on mobile */
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .footer-bottom p {
-            font-size: 0.875rem;
-            margin: 0;
-        }
-        
-        .footer-socials {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-        
-        .footer-socials a {
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-        }
-        
-        .footer-socials a:hover {
-            color: white;
-        }
-        
-        .footer-socials svg {
-            height: 1.5rem;
-            width: 1.5rem;
-        }
-
-        /* --- Dark Mode Toggle Button --- */
-        #darkModeToggle {
-            background: none;
-            border: none;
-            color: #9ca3af;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s ease-in-out;
-        }
-
-        #darkModeToggle:hover {
-            color: white;
-        }
-
-        #darkModeToggle svg {
-            height: 1.5rem;
-            width: 1.5rem;
-        }
-
-        #darkModeToggle .icon-sun {
-            display: none;
-        }
-        #darkModeToggle .icon-moon {
-            display: block;
-        }
-
-        body.dark-mode #darkModeToggle .icon-sun {
-            display: block;
-        }
-        body.dark-mode #darkModeToggle .icon-moon {
-            display: none;
-        }
-
+        /* --- Dark Mode Toggle --- */
+        #darkModeToggle { background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+        #darkModeToggle:hover { color: white; }
+        #darkModeToggle svg { height: 1.5rem; width: 1.5rem; }
+        #darkModeToggle .icon-sun { display: none; }
+        #darkModeToggle .icon-moon { display: block; }
+        body.dark-mode #darkModeToggle .icon-sun { display: block; }
+        body.dark-mode #darkModeToggle .icon-moon { display: none; }
 
         /* --- 9. Dark Mode Styles --- */
-        
-        body.dark-mode {
-            background-color: #111827; /* brand-dark */
-            color: #d1d5db; /* text-gray-300 */
-        }
-        
-        /* Features Section */
-        body.dark-mode .features-section {
-            background-color: #1f2937; /* Lighter dark */
-        }
-        
-        body.dark-mode .features-header h2 {
-            color: white;
-        }
-        
-        body.dark-mode .features-header p {
-            color: #d1d5db;
-        }
-        
-        body.dark-mode .feature-card {
-            background-color: #111827; /* brand-dark */
-            box-shadow: none; /* Remove shadow */
-            border: 1px solid #374151; /* Add a subtle border */
-        }
-        
-        body.dark-mode .feature-card h3 {
-            color: white;
-        }
-        
-        body.dark-mode .feature-card p {
-            color: #d1d5db;
-        }
+        body.dark-mode { background-color: #111827; color: #d1d5db; }
+        body.dark-mode .features-section { background-color: #1f2937; }
+        body.dark-mode .features-header h2 { color: white; }
+        body.dark-mode .features-header p { color: #d1d5db; }
+        body.dark-mode .feature-card { background-color: #111827; box-shadow: none; border: 1px solid #374151; }
+        body.dark-mode .feature-card h3 { color: white; }
+        body.dark-mode .feature-card p { color: #d1d5db; }
+        body.dark-mode .app-first-section { background-color: #1f2937; }
+        body.dark-mode .app-first-text h2 { color: white; }
+        body.dark-mode .app-first-text p { color: #d1d5db; }
+        body.dark-mode .app-first-list li span { color: #d1d5db; }
+        body.dark-mode .app-first-list li span strong { color: white; }
+        body.dark-mode .app-preview-block { background-color: #111827; border-color: #374151; }
+        body.dark-mode .screenshot-placeholder { background-color: #1f2937; color: #94a3b8; }
 
-        /* "App First" Section */
-        body.dark-mode .app-first-section {
-            background-color: #1f2937; /* Lighter dark */
-        }
-        
-        body.dark-mode .app-first-text h2 {
-            color: white;
-        }
-        
-        body.dark-mode .app-first-text p {
-            color: #d1d5db;
-        }
-        
-        body.dark-mode .app-first-list li span {
-            color: #d1d5db;
-        }
-        
-        body.dark-mode .app-first-list li span strong {
-            color: white;
-        }
-        
-        body.dark-mode .app-preview-block {
-             background-color: #111827;
-             border-color: #374151;
-        }
-
-        body.dark-mode .app-preview-placeholder {
-            background-color: #1f2937;
-            border-color: #4b5563;
-        }
-
-        /* --- 8. Responsive Media Queries --- */
-        
-        /* Small screens and up (e.g., large phones) */
+        /* Media Queries */
         @media (min-width: 640px) {
-            .hero-section h1 {
-                font-size: 3rem; /* 48px */
-            }
-            .hero-section p {
-                font-size: 1.5rem; /* 24px */
-            }
-            .hero-cta-container {
-                flex-direction: row; /* Buttons side-by-side */
-            }
-            .features-header h2,
-            .app-first-text h2,
-            .cta-section h2 {
-                font-size: 2.5rem; /* 40px */
-            }
-            .footer-bottom {
-                flex-direction: row; /* Side-by-side */
-            }
+            .hero-section h1 { font-size: 3rem; }
+            .hero-section p { font-size: 1.5rem; }
+            .hero-cta-container { flex-direction: row; }
+            .features-header h2, .app-first-text h2, .cta-section h2 { font-size: 2.5rem; }
+            .footer-bottom { flex-direction: row; }
         }
-        
-        /* Medium screens and up (e.g., tablets) */
         @media (min-width: 768px) {
-            /* Show desktop nav, hide mobile button */
-            .nav-desktop,
-            .nav-desktop-cta {
-                display: flex;
-            }
-            .mobile-menu-button {
-                display: none;
-            }
-            .mobile-menu {
-                display: none !important; /* Ensure it stays hidden */
-            }
-            
-            /* Use 3-column grid for features */
-            .features-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            /* Adjust footer grid */
-            .footer-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            .footer-brand {
-                grid-column: span 2 / span 2;
-            }
-            .footer-links-group {
-                grid-column: span 1 / span 1;
-            }
+            .nav-desktop, .nav-desktop-cta { display: flex; }
+            .mobile-menu-button { display: none; }
+            .mobile-menu { display: none !important; }
+            .features-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-grid { grid-template-columns: repeat(4, 1fr); }
+            .footer-brand { grid-column: span 2; }
+            .footer-links-group { grid-column: span 1; }
         }
-        
-        /* Large screens and up (e.g., desktops) */
         @media (min-width: 1024px) {
-            .hero-section h1 {
-                font-size: 3.75rem; /* 60px */
-            }
-            
-            /* Side-by-side layout for app-first section */
-            .app-first-container {
-                flex-direction: row;
-                gap: 4rem;
-            }
-            .app-first-text,
-            .app-first-graphic {
-                width: 50%;
-            }
-            
-            /* 5-column footer layout */
-            .footer-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
+            .hero-section h1 { font-size: 3.75rem; }
+            .app-first-container { flex-direction: row; gap: 4rem; }
+            .app-first-text, .app-first-graphic { width: 50%; }
+            .footer-grid { grid-template-columns: repeat(5, 1fr); }
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Header / Navigation -->
     <header>
         <nav class="container">
-            <!-- Logo and Brand Name - UPDATED -->
             <div class="logo-container">
-                <img 
-                    src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" 
-                    alt="StackBase Logo"
-                    onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';"
-                >
-                <!-- Brand name UPDATED -->
+                <img src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" alt="StackBase Logo" onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';">
                 <span>StackBase</span>
             </div>
-            
-            <!-- Desktop Navigation - UPDATED -->
             <div class="nav-desktop">
                 <a href="#features">Features</a>
+                <a href="#studio">Data Studio</a>
                 <a href="#pricing">Pricing</a>
-                <!-- Link to the actual app. For this demo, just an anchor. -->
                 <a href="#docs">Docs</a>
-                <a href="#contact">Contact</a>
             </div>
-            
-            <!-- Desktop CTA - UPDATED -->
             <div class="nav-desktop-cta">
                 <a href="#login" class="nav-cta-signin">Sign In</a>
-                <!-- Link to the actual app -->
                 <a href="https://stack-base.github.io/swiftinvoice/application" class="nav-cta-signup">Get Started</a>
             </div>
-            
-            <!-- Mobile Menu Button -->
             <button id="mobile-menu-button" class="mobile-menu-button" aria-label="Toggle menu">
                 <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
         </nav>
-        
-        <!-- Mobile Menu (Hidden by default) - UPDATED -->
         <div id="mobile-menu" class="mobile-menu container">
             <a href="#features">Features</a>
+            <a href="#studio">Data Studio</a>
             <a href="#pricing">Pricing</a>
-            <a href="#docs">Docs</a>
-            <a href="#contact">Contact</a>
             <a href="#login" class="nav-cta-signin">Sign In</a>
-            <!-- Link to the actual app -->
             <a href="https://stack-base.github.io/swiftinvoice/application" class="nav-cta-signup">Get Started</a>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main>
         
-        <!-- Hero Section - UPDATED -->
         <section class="hero-section">
             <div class="container">
-                <h1>Seamless Invoicing for Modern Business</h1>
+                <h1>Local-First Invoicing for Modern Business</h1>
                 <p>
-                    Create, manage, and send professional invoices in seconds. SwiftInvoice is a free, open-source tool designed for freelancers and small businesses.
+                    Create professional invoices in seconds. No login required—SwiftInvoice runs entirely in your browser, keeping your financial data private and secure on your device.
                 </p>
                 <div class="hero-cta-container">
-                    <!-- Link to the app -->
-                    <a href="https://stack-base.github.io/swiftinvoice/application" class="hero-cta-primary">
-                        Launch SwiftInvoice
-                    </a>
-                    <a href="#features" class="hero-cta-secondary">
-                        Learn More
-                    </a>
+                    <a href="https://stack-base.github.io/swiftinvoice/application" class="hero-cta-primary">Launch SwiftInvoice</a>
+                    <a href="#features" class="hero-cta-secondary">Learn More</a>
+                </div>
+                
+                <div class="hero-visual-wrapper">
+                    <div class="screenshot-frame">
+                        <div class="screenshot-placeholder" style="position: absolute; top:0; left:0; height:100%; width:100%;">
+                            <div style="text-align:center;">
+                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width: 4rem; height: 4rem; margin-bottom:1rem; color: #4b5563;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p>+ Add "Main App Interface" Screenshot Here</p> -->
+                                <img src="https://stack-base.github.io/media/swiftinvoice/img1.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
         
-        <!-- Features Section - UPDATED -->
         <section id="features" class="features-section">
             <div class="container">
                 <div class="features-header">
-                    <span class="tagline">Why SwiftInvoice</span>
+                    <span class="tagline">Core Essentials</span>
                     <h2>Everything You Need to Get Paid</h2>
-                    <p>
-                        A powerful, yet simple toolset to manage your billing without the monthly fees.
-                    </p>
+                    <p>A full suite of invoicing tools that puts you in control.</p>
                 </div>
                 
                 <div class="features-grid">
-                    <!-- Feature 1: Easy Invoice Creation -->
                     <div class="feature-card">
                         <div class="feature-icon-container">
-                            <!-- Icon: Document Add -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m9.15 0H18c1.38 0 2.5 1.12 2.5 2.5v11.25c0 1.38-1.12 2.5-2.5 2.5h-9.75c-1.38 0-2.5-1.12-2.5-2.5V4.75c0-1.38 1.12-2.5 2.5-2.5H8.25m9.15 0H8.25m0 0H5.625c-1.38 0-2.5 1.12-2.5 2.5v11.25c0 1.38 1.12 2.5 2.5 2.5h9.75c1.38 0 2.5-1.12 2.5-2.5V4.75c0-1.38-1.12-2.5-2.5-2.5H12M8.25 15h7.5" />
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m9.15 0H18c1.38 0 2.5 1.12 2.5 2.5v11.25c0 1.38-1.12 2.5-2.5 2.5h-9.75c-1.38 0-2.5-1.12-2.5-2.5V4.75c0-1.38 1.12-2.5 2.5-2.5H8.25m9.15 0H8.25m0 0H5.625c-1.38 0-2.5 1.12-2.5 2.5v11.25c0 1.38 1.12 2.5 2.5 2.5h9.75c1.38 0 2.5-1.12 2.5-2.5V4.75c0-1.38-1.12-2.5-2.5-2.5H12M8.25 15h7.5" /></svg>
                         </div>
-                        <h3>Easy Invoice Creation</h3>
-                        <p>
-                            A simple, editable interface lets you add items, set quantities, and adjust pricing in real-time. What you see is what you get.
-                        </p>
+                        <h3>Smart Editor</h3>
+                        <p>Live calculation interface. Add items, quantities, and discounts instantly. Supports custom fees and auto-updates totals.</p>
                     </div>
                     
-                    <!-- Feature 2: Global Ready -->
                     <div class="feature-card">
                         <div class="feature-icon-container">
-                            <!-- Icon: Globe Alt -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21V3M12 3a9.004 9.004 0 00-8.716 6.747M12 3a9.004 9.004 0 018.716 6.747M12 3c-4.82 0-8.716 3.91-8.716 8.747C3.284 17.09 7.18 21 12 21c4.82 0 8.716-3.91 8.716-8.747C20.716 6.91 16.82 3 12 3z" />
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21V3M12 3a9.004 9.004 0 00-8.716 6.747M12 3a9.004 9.004 0 018.716 6.747M12 3c-4.82 0-8.716 3.91-8.716 8.747C3.284 17.09 7.18 21 12 21c4.82 0 8.716-3.91 8.716-8.747C20.716 6.91 16.82 3 12 3z" /></svg>
                         </div>
-                        <h3>Global Ready</h3>
-                        <p>
-                            Switch between currencies and local tax regions (VAT, GST, etc.) with a single click. Tax rates are automatically applied.
-                        </p>
+                        <h3>Global Tax Engine</h3>
+                        <p>Switch regions instantly (US, UK, EU, IN, AE). Built-in support for Tax Slabs (VAT/GST) specific to individual line items.</p>
                     </div>
                     
-                    <!-- Feature 3: Save & Download -->
                     <div class="feature-card">
                         <div class="feature-icon-container">
-                            <!-- Icon: Arrow Down Tray -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>
                         </div>
-                        <h3>Save & Download</h3>
-                        <p>
-                            Generate a professional, print-ready PDF of your invoice. Your data is saved securely in your browser for next time.
-                        </p>
+                        <h3>Brand Control</h3>
+                        <p>Set a default seller profile and upload your custom company logo. Your PDFs look strictly professional every time.</p>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- "See in Action" Section - UPDATED -->
+
+        <section id="studio" class="studio-section">
+            <div class="container">
+                <div class="studio-intro">
+                    <span class="tagline">The Powerhouse</span>
+                    <h2>SwiftInvoice Data Studio</h2>
+                    <p>
+                        Invoicing software usually stops at the PDF. We don't. 
+                        Data Studio is a powerful analytics dashboard built directly into the app—no monthly fees, no data uploads.
+                    </p>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <h3>Bank-Grade Encryption</h3>
+                        <p>
+                            Your financial data is sensitive. That's why SwiftInvoice allows you to lock your backups with <strong>AES-256 encryption</strong> before they ever leave your browser.
+                        </p>
+                        <ul class="feature-list">
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Client-side cryptography using <code>crypto-js</code>.</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Password-derived keys ensure only you can access your history.</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Decrypt files locally to restore your workspace instantly.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-visual">
+                        <div class="studio-screenshot-container">
+                            <div class="screenshot-placeholder">
+                                <!-- <span>+ Screenshot: Encryption / Unlock Screen</span> -->
+                                <img src="https://stack-base.github.io/media/swiftinvoice/img2.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-row reverse">
+                    <div class="feature-text">
+                        <h3>Algorithmic Executive Summaries</h3>
+                        <p>
+                            You don't need a data scientist. SwiftInvoice generates a plain-English summary of your business performance automatically.
+                        </p>
+                        <ul class="feature-list">
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Financial Velocity:</strong> Tracks revenue growth vs. previous periods.</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Market Dynamics:</strong> Analyzes client concentration and effective tax rates.</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Operational Rhythm:</strong> Identifies your busiest hours and days.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-visual">
+                        <div class="studio-screenshot-container">
+                            <div class="screenshot-placeholder">
+                                <!-- <span>+ Screenshot: AI Executive Summary Box</span> -->
+                                <img src="https://stack-base.github.io/media/swiftinvoice/img3.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <h3>Deep Visual Analytics</h3>
+                        <p>
+                            Move beyond spreadsheets. Visualize your revenue streams with interactive charts powered by <code>Chart.js</code>.
+                        </p>
+                        <ul class="feature-list">
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Loyalty Tracking:</strong> Distinguish revenue from New vs. Returning clients.</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Heatmaps:</strong> See exactly when your business makes money (Hourly/Weekly).</li>
+                            <li><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <strong>Raw Data Access:</strong> Inspect the full JSON structure of your backups.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-visual">
+                        <div class="studio-screenshot-container">
+                            <div class="screenshot-placeholder">
+                                <!-- <span>+ Screenshot: Analytics & Charts</span> -->
+                                <img src="https://stack-base.github.io/media/swiftinvoice/img4.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin-top: 3rem;">
+                    <a href="https://stack-base.github.io/swiftinvoice/studio.html" target="_blank" style="color: #2dd4bf; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+                        Try the Data Studio Demo 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <section class="app-first-section">
             <div class="container app-first-container">
-                <!-- Text Content -->
                 <div class="app-first-text">
                     <span class="tagline">Simple & Powerful</span>
                     <h2>An Interface Built for Speed</h2>
-                    <p>
-                        No complex menus or hidden settings. SwiftInvoice puts all essential controls at your fingertips, letting you build an invoice as fast as you can type.
-                    </p>
+                    <p>No complex menus or hidden settings. SwiftInvoice puts all essential controls at your fingertips.</p>
                     <ul class="app-first-list">
                         <li>
-                            <div class="icon-check">
-                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                            </div>
-                            <span><strong>Live Calculations:</strong> Totals, subtotals, and taxes update instantly with every change.</span>
+                            <div class="icon-check"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>
+                            <span><strong>Live Calculations:</strong> Totals, subtotals, and taxes update instantly.</span>
                         </li>
                         <li>
-                            <div class="icon-check">
-                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                            </div>
-                            <span><strong>Persistent Storage:</strong> All your invoices are saved locally in your browser. No account needed.</span>
+                            <div class="icon-check"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>
+                            <span><strong>Persistent Defaults:</strong> Set your region, logo, and terms once.</span>
                         </li>
                         <li>
-                            <div class="icon-check">
-                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                            </div>
-                            <span><strong>Your Branding:</strong> Add your own company logo for a professional touch on every PDF.</span>
+                            <div class="icon-check"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>
+                            <span><strong>Saved Invoices:</strong> Access your history instantly from the sidebar without needing a server.</span>
                         </li>
                     </ul>
                 </div>
                 
-                <!-- App Preview Graphic -->
                 <div class="app-first-graphic">
                     <div class="app-preview-block">
-                        <div class="app-window-controls">
-                            <div class="red"></div>
-                            <div class="yellow"></div>
-                            <div class="green"></div>
-                        </div>
-                        <div class="app-preview-placeholder">
-                            <!-- Icon: Document Text -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.093 18l.02-1.551a3.75 3.75 0 00-3.483-3.84L4.69 16.5M21.75 12a9.75 9.75 0 11-19.5 0 9.75 9.75 0 0119.5 0z" />
-                            </svg>
-                            <span>App Preview Screenshot</span>
+                        <div class="app-window-controls"><div class="red"></div><div class="yellow"></div><div class="green"></div></div>
+                        <div class="screenshot-placeholder" style="aspect-ratio: 5/3; background: #f3f4f6; color: #9ca3af;">
+                            <!-- <span>+ Screenshot: Editor / Sidebar Interface</span> -->
+                            <img src="https://stack-base.github.io/media/swiftinvoice/img2.jpg" alt="">
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Final Call to Action (CTA) - UPDATED -->
         <section class="cta-section">
             <div class="container">
                 <h2>Ready to Simplify Your Billing?</h2>
-                <p>
-                    Launch SwiftInvoice and send your first invoice in minutes. No sign-up required, and it's completely free.
-                </p>
-                <!-- Link to the app -->
+                <p>Launch SwiftInvoice and send your first invoice in minutes. No sign-up required, and it's completely free.</p>
                 <a href="https://stack-base.github.io/swiftinvoice/application">Start Invoicing for Free</a>
             </div>
         </section>
 
     </main>
 
-    <!-- Footer - UPDATED -->
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <!-- Brand Info -->
                 <div class="footer-brand">
                     <div class="logo-container">
-                        <img 
-                            src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" 
-                            alt="StackBase Logo"
-                            onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';"
-                        >
+                        <img src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" alt="StackBase Logo" onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';">
                         <span>StackBase</span>
                     </div>
-                    <p>
-                        The modern platform for web development, forms, and invoicing.
-                    </p>
+                    <p>The modern platform for web development, forms, and invoicing.</p>
                     <p class="copyright">&copy; 2025 StackBase, Inc. All rights reserved.</p>
                 </div>
-                
-                <!-- Product Links -->
                 <div class="footer-links-group">
                     <h4>Product</h4>
                     <ul>
                         <li><a href="#features">Website Development</a></li>
                         <li><a href="#features">Web Forms</a></li>
-                        <li><a href="#features">Invoicing</a></li>
+                        <li><a href="#studio">Data Studio</a></li>
                         <li><a href="#pricing">Pricing</a></li>
-                        <li><a href="#changelog">Changelog</a></li>
                     </ul>
                 </div>
-                
-                <!-- Resources -->
                 <div class="footer-links-group">
                     <h4>Resources</h4>
                     <ul>
@@ -1031,8 +592,6 @@
                         <li><a href="#support">Support</a></li>
                     </ul>
                 </div>
-                
-                <!-- Company -->
                 <div class="footer-links-group">
                     <h4>Company</h4>
                     <ul>
@@ -1042,78 +601,43 @@
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
-
-                <!-- Empty column for 5-col layout spacing on desktop -->
-                <div class="footer-links-group"></div>
             </div>
-            
-            <!-- Social Media Icons -->
             <div class="footer-bottom">
                 <p>A new way to build the web.</p>
                 <div class="footer-socials">
-                    <!-- Dark Mode Toggle Button -->
                     <button id="darkModeToggle" aria-label="Toggle dark mode">
-                        <!-- Moon Icon (for switching to dark) -->
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                        <!-- Sun Icon (for switching to light) -->
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     </button>
-
-                    <a href="#" aria-label="Twitter">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.93.55-1.95.94-3.027 1.15a4.93 4.93 0 00-8.38 4.482A13.97 13.97 0 011.67 3.149a4.93 4.93 0 001.524 6.57c-.8-.02-1.55-.24-2.2-.6a4.93 4.93 0 003.9 4.828 4.93 4.93 0 01-2.22.08A4.93 4.93 0 007.4 15.6a9.9 9.9 0 01-6.11 2.1 9.78 9.78 0 01-1.17-.07A13.95 13.95 0 008.28 21c10.07 0 15.58-8.35 15.58-15.58 0-.24-.005-.47-.015-.7A11.1 11.1 0 0024 4.59z"/></svg>
-    
-                    </a>
-                    <a href="#" aria-label="GitHub">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.488.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.602-3.369-1.34-3.369-1.34-.454-1.157-1.11-1.468-1.11-1.468-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.527 2.338 1.085 2.91.83.092-.645.35-1.085.635-1.334-2.22-.25-4.555-1.11-4.555-4.943 0-1.09.39-1.988 1.03-2.685-.103-.254-.447-1.27.096-2.647 0 0 .84-.27 2.75 1.026.798-.22 1.648-.33 2.498-.33.85 0 1.7.11 2.498.33 1.91-1.296 2.748-1.026 2.748-1.026.545 1.377.2 2.393.1 2.647.64.697 1.03 1.595 1.03 2.685 0 3.843-2.337 4.687-4.565 4.935.359.305.678.915.678 1.846 0 1.334-.012 2.41-.012 2.737 0 .267.18.577.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg>
-    
-                    </a>
+                    <a href="#" aria-label="Twitter"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.93.55-1.95.94-3.027 1.15a4.93 4.93 0 00-8.38 4.482A13.97 13.97 0 011.67 3.149a4.93 4.93 0 001.524 6.57c-.8-.02-1.55-.24-2.2-.6a4.93 4.93 0 003.9 4.828 4.93 4.93 0 01-2.22.08A4.93 4.93 0 007.4 15.6a9.9 9.9 0 01-6.11 2.1 9.78 9.78 0 01-1.17-.07A13.95 13.95 0 008.28 21c10.07 0 15.58-8.35 15.58-15.58 0-.24-.005-.47-.015-.7A11.1 11.1 0 0024 4.59z"/></svg></a>
+                    <a href="#" aria-label="GitHub"><svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.488.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.602-3.369-1.34-3.369-1.34-.454-1.157-1.11-1.468-1.11-1.468-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.527 2.338 1.085 2.91.83.092-.645.35-1.085.635-1.334-2.22-.25-4.555-1.11-4.555-4.943 0-1.09.39-1.988 1.03-2.685-.103-.254-.447-1.27.096-2.647 0 0 .84-.27 2.75 1.026.798-.22 1.648-.33 2.498-.33.85 0 1.7.11 2.498.33 1.91-1.296 2.748-1.026 2.748-1.026.545 1.377.2 2.393.1 2.647.64.697 1.03 1.595 1.03 2.685 0 3.843-2.337 4.687-4.565 4.935.359.305.678.915.678 1.846 0 1.334-.012 2.41-.012 2.737 0 .267.18.577.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg></a>
                 </div>
             </div>
         </div>
     </footer>
     
-    <!-- Mobile Menu Toggle Script (Copied from index.html) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
-            // --- Mobile Menu Logic ---
             var menuButton = document.getElementById('mobile-menu-button');
             var mobileMenu = document.getElementById('mobile-menu');
-            var icon = menuButton.querySelector('svg');
-
             menuButton.addEventListener('click', function() {
                 if (mobileMenu.classList.contains('open')) {
                     mobileMenu.classList.remove('open');
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />';
                 } else {
                     mobileMenu.classList.add('open');
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />';
                 }
             });
 
-            // --- Dark Mode Logic ---
             var toggleButton = document.getElementById('darkModeToggle');
             var body = document.body;
-
             function applyTheme() {
                 var isDarkMode = localStorage.getItem('darkMode') === 'true';
-                if (isDarkMode) {
-                    body.classList.add('dark-mode');
-                } else {
-                    body.classList.remove('dark-mode');
-                }
+                if (isDarkMode) { body.classList.add('dark-mode'); } else { body.classList.remove('dark-mode'); }
             }
-
             applyTheme();
-
             toggleButton.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
-                var isDarkMode = body.classList.contains('dark-mode');
-                localStorage.setItem('darkMode', isDarkMode);
+                localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
             });
         });
     </script>
