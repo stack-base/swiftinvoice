@@ -1,4 +1,3 @@
-// studio-script.js
 document.addEventListener('DOMContentLoaded', () => {
     let tempFileContent = null; 
     let decryptedData = null;   
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentChartData = {}; 
     let activeTab = 'preview'; 
     
-    // Chart Instances
     let revenueChartInstance = null;
     let qtyChartInstance = null;
     let hourlyChartInstance = null;
@@ -123,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         analysisPeriod: document.getElementById('analysis-period'), 
         
         executiveSummary: document.getElementById('executive-summary-text'),
-        aiSummaryContainer: document.getElementById('ai-summary-container'), // Added this reference
+        aiSummaryContainer: document.getElementById('ai-summary-container'), 
         
         insightsContainer: document.getElementById('insights-container'),
         insightList: document.getElementById('insight-list'),
@@ -131,11 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
         topClientsBody: document.getElementById('top-clients-body'),
         productLeaderboardBody: document.getElementById('product-leaderboard-body'),
         
-        // Sort Buttons
         btnSortQty: document.getElementById('btn-sort-qty'),
         btnSortRev: document.getElementById('btn-sort-rev'),
 
-        // Chart Toggle Buttons
         btnRevLine: document.getElementById('btn-rev-line'),
         btnRevBar: document.getElementById('btn-rev-bar'),
         btnQtyLine: document.getElementById('btn-qty-line'),
@@ -147,13 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCumLine: document.getElementById('btn-cum-line'),
         btnCumBar: document.getElementById('btn-cum-bar'),
         
-        // NEW Chart Toggle Buttons
         btnDistLine: document.getElementById('btn-dist-line'),
         btnDistBar: document.getElementById('btn-dist-bar'),
         btnLoyLine: document.getElementById('btn-loy-line'),
         btnLoyBar: document.getElementById('btn-loy-bar'),
 
-        // Canvas Contexts
         ctxRevenue: document.getElementById('chart-revenue'),
         ctxQty: document.getElementById('chart-qty'),
         ctxHourly: document.getElementById('chart-hourly'),
@@ -163,29 +157,27 @@ document.addEventListener('DOMContentLoaded', () => {
         ctxDistribution: document.getElementById('chart-distribution'), 
         ctxLoyalty: document.getElementById('chart-loyalty'),          
 
-        // NEW Local Storage Pane Elements
         btnLocalLoad: document.getElementById('local-storage-card'),
         txtLocalStatus: document.getElementById('local-storage-status')
     };
 
-    // ----------------------------------------------------------------------
-    // --- NEW: Local Storage Integration Logic (Passive App Data Load) ---
-    // ----------------------------------------------------------------------
-    const SWIFT_APP_KEY = 'swiftInvoices'; // The key used by the SwiftInvoice application
+    function cleanHtml(str) {
+        if (!str) return "";
+        let text = str.replace(/<[^>]*>?/gm, '');
+        return text.trim();
+    }
+
+    const SWIFT_APP_KEY = 'swiftInvoices';
 
     function checkLocalData() {
-        // Read raw string from LocalStorage
         const localRaw = localStorage.getItem(SWIFT_APP_KEY);
         
         if (localRaw) {
             try {
-                // Parse the data
                 const data = JSON.parse(localRaw);
-                // Check if it's a valid array of objects
                 const count = Array.isArray(data) ? data.length : 0;
                 
                 if (count > 0) {
-                    // 1. Activate the card visually
                     ui.btnLocalLoad.style.opacity = '1';
                     ui.btnLocalLoad.style.pointerEvents = 'auto';
                     ui.btnLocalLoad.style.borderStyle = 'solid';
@@ -194,27 +186,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     ui.txtLocalStatus.textContent = `Found ${count} invoice(s) in this browser`;
                     
-                    // 2. Define the loading logic
                     ui.btnLocalLoad.onclick = () => {
                         currentFileName = "SwiftInvoice Data";
                         currentFileSize = "LocalStorage";
-
-                        // Package the raw array data into a JSON string
                         const wrappedData = JSON.stringify({ invoices: data, encrypted: false, source: 'local_storage' }); 
-                        
-                        // Pass the wrapped JSON string to the existing analysis flow
                         analyzeLandingFile(wrappedData);
                         addHistoryItem(`Loaded ${count} invoices from SwiftInvoice App storage`, 'active');
-                        
-                        // Clear the URL parameter so refreshing doesn't get stuck in a loop (optional, but good UX)
                         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                         window.history.replaceState({path:newUrl},'',newUrl);
                     };
 
-                    // 3. API URL Check: Auto-load if ?load=local is present
                     const urlParams = new URLSearchParams(window.location.search);
                     if (urlParams.get('load') === 'local') {
-                        console.log("Auto-loading from LocalStorage via URL parameter...");
                         ui.btnLocalLoad.click();
                     }
                 }
@@ -224,10 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    // ----------------------------------------------------------------------
-    // --- END NEW LOCAL STORAGE LOGIC ---
-    // ----------------------------------------------------------------------
-
 
     function toggleSidebar(show) {
         if (show) {
@@ -347,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const bytes = CryptoJS.AES.decrypt(raw.data, pass);
             const str = bytes.toString(CryptoJS.enc.Utf8);
             if (!str) throw new Error("Decryption failed");
-            // The decrypted string should be the internal JSON structure (e.g., {invoices: [...]})
             decryptedData = JSON.parse(str); 
             activePassword = pass; 
             loadSuccess();
@@ -363,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.landingBackBtn.addEventListener('click', () => {
         tempFileContent = null;
         toggleLandingState('upload');
-        // Re-check local data availability when returning to upload screen
         checkLocalData(); 
     });
 
@@ -394,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
         decryptedData.invoicesList = invoices; 
         
         updateFileStats(invoices);
-        // Start the analysis, but the rendering is now handled by the delay
         calculateAnalytics(invoices, true); 
 
         if (invoices.length > 0) {
@@ -409,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.pdfBtn.disabled = true;
         }
 
-        // Switch to Analytics tab by default upon successful load
         switchTab('analytics');
     }
 
@@ -420,7 +395,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ui.fileStatsCard.classList.remove('hidden');
 
-        const dates = invoices.map(i => i.invoiceDate).filter(d => d).sort();
+        const sortedInvoices = [...invoices].sort((a, b) => {
+            const da = a.invoiceDate ? new Date(a.invoiceDate) : new Date(0);
+            const db = b.invoiceDate ? new Date(b.invoiceDate) : new Date(0);
+            return da - db;
+        });
+
+        const dates = sortedInvoices.map(i => i.invoiceDate).filter(d => d);
         if (dates.length > 0) {
             const first = dates[0];
             const last = dates[dates.length - 1];
@@ -490,25 +471,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<span class="trend-neutral">No change</span>`;
     }
 
-    // --- UPDATED calculateAnalytics FUNCTION ---
     function calculateAnalytics(invoices, runLoadingEffect = false) {
         if (!invoices || invoices.length === 0) {
             ui.analysisPeriod.textContent = "Analysis Period: No data found";
-            ui.executiveSummary.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-muted);">No invoice data loaded. Please upload a file to generate an executive summary.</div>`;
+            ui.executiveSummary.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-muted); padding: 1rem;">No invoice data loaded. Please upload a file to generate an executive summary.</div>`;
             return;
         }
 
-        // Add original index
         invoices.forEach((inv, index) => inv.originalIdx = index);
 
-        // Sort chronologically
         invoices.sort((a, b) => {
             const dateA = new Date(a.invoiceDate + ' ' + (a.invoiceTime || '00:00:00'));
             const dateB = new Date(b.invoiceDate + ' ' + (b.invoiceTime || '00:00:00'));
             return dateA - dateB;
         });
 
-        // Period Text
         const firstInv = invoices[0];
         const latestInv = invoices[invoices.length - 1];
         let startTime = firstInv.invoiceTime || '00:00:00';
@@ -517,7 +494,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const latestDate = new Date(latestInv.invoiceDate + ' ' + endTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
         ui.analysisPeriod.textContent = `Analysis Period: ${firstDate} to ${latestDate}`;
 
-        // Initialize Metrics
         const midIndex = Math.floor(invoices.length / 2);
         let totalRevenue = 0, totalTax = 0, totalItems = 0;
         let p1Revenue = 0, p2Revenue = 0;
@@ -525,13 +501,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let productMap = {};
         let dailyStats = {}; 
         let hourlyStats = new Array(24).fill(0); 
-        let weeklyStats = new Array(7).fill(0); // 0=Sun, 6=Sat
+        let weeklyStats = new Array(7).fill(0); 
         let distributionBuckets = {}; 
         let loyaltyStats = {};        
         let knownClients = new Set();
         let uniqueDays = new Set();
 
-        // Enhanced Logic Variables
         let weekendRevenue = 0;
         let weekdayRevenue = 0;
 
@@ -551,7 +526,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!dailyStats[dateKey]) dailyStats[dateKey] = { rev: 0, qty: 0 };
             dailyStats[dateKey].rev += grandTotal;
 
-            // Loyalty
             const clientRaw = inv.buyer || 'Unknown Client';
             const clientName = clientRaw.split('<br>')[0].split('<div>')[0].trim() || 'Client';
 
@@ -565,13 +539,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 isNewClient = true;
             }
 
-            // Client Map
             if (!clientMap[clientName]) clientMap[clientName] = { count: 0, spend: 0, lastSeen: '', isNew: isNewClient };
             clientMap[clientName].count++;
             clientMap[clientName].spend += grandTotal;
             clientMap[clientName].lastSeen = inv.invoiceDate; 
 
-            // Distribution
             let bucket = "";
             if(grandTotal <= 100) bucket = "0 - 100";
             else if(grandTotal <= 500) bucket = "101 - 500";
@@ -581,7 +553,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!distributionBuckets[bucket]) distributionBuckets[bucket] = 0;
             distributionBuckets[bucket]++;
 
-            // Temporal & Weekday/Weekend
             if (inv.invoiceTime) {
                 const hourPart = inv.invoiceTime.split(':')[0];
                 const hourInt = parseInt(hourPart, 10);
@@ -597,15 +568,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Items
             if (inv.items && Array.isArray(inv.items)) {
                 inv.items.forEach(item => {
                     const qty = parseFloat(item.qty || 0);
                     totalItems += qty;
                     dailyStats[dateKey].qty += qty;
 
-                    const pKey = item.desc ? item.desc.trim() : (item.code || "Unknown Item");
-                    if (!productMap[pKey]) productMap[pKey] = { name: pKey, qty: 0, rev: 0 };
+                    const rawDesc = item.desc || item.code || "Unknown Item";
+                    const cleanName = cleanHtml(rawDesc);
+                    const pKey = cleanName;
+
+                    if (!productMap[pKey]) productMap[pKey] = { name: cleanName, qty: 0, rev: 0 };
                     const lineTotal = item.incl ? parseCurrency(item.incl) : (parseCurrency(item.excl) + parseCurrency(item.vat));
                     productMap[pKey].qty += qty;
                     productMap[pKey].rev += lineTotal;
@@ -613,7 +586,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Determine Currency
         let currencySymbol = '¤'; 
         let currencyCode = 'Currency'; 
         if (invoices.length > 0 && invoices[0].region) {
@@ -626,7 +598,6 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (region === 'AU') { currencySymbol = 'A$'; currencyCode = 'AUD'; }
         }
 
-        // Update Basic Stats
         ui.statRevenue.textContent = currencySymbol + formatMoney(totalRevenue, currencyCode);
         const revGrowth = calculateGrowth(p2Revenue, p1Revenue);
         ui.statRevTrend.innerHTML = getTrendHtml(revGrowth);
@@ -643,12 +614,12 @@ document.addEventListener('DOMContentLoaded', () => {
         productStats = Object.values(productMap);
         const productStatsByRev = [...productStats].sort((a,b) => b.rev - a.rev);
         const topProdRevName = productStatsByRev.length > 0 ? productStatsByRev[0].name : '-';
-        ui.statTopProdRev.textContent = topProdRevName;
+        ui.statTopProdRev.innerHTML = topProdRevName; 
+        
         const productStatsByVol = [...productStats].sort((a,b) => b.qty - a.qty);
         const topProdVolName = productStatsByVol.length > 0 ? productStatsByVol[0].name : '-';
-        ui.statTopProdVol.textContent = topProdVolName;
+        ui.statTopProdVol.innerHTML = topProdVolName;
 
-        // Populate Client Table
         const sortedClients = Object.entries(clientMap).sort(([,a], [,b]) => b.spend - a.spend);
         ui.topClientsBody.innerHTML = sortedClients.slice(0, 5).map(([name, data]) => `
             <tr>
@@ -663,11 +634,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProductLeaderboard('qty');
         generateSmartInsights(sortedClients, totalRevenue, weeklyStats, hourlyStats, currencyCode);
         
-        // -----------------------------------------
-        // --- NEW AI SUMMARY GENERATION LOGIC ---
-        // -----------------------------------------
-        
-        // 1. Financial Logic
         let growthPct = 0;
         if (p1Revenue > 0) growthPct = ((p2Revenue - p1Revenue) / p1Revenue) * 100;
         else if (p2Revenue > 0) growthPct = 100;
@@ -675,7 +641,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const trendWord = growthPct >= 0 ? 'positive' : 'downward';
         const effectiveTaxRate = netRevenue > 0 ? (totalTax / netRevenue) * 100 : 0;
         
-        // 2. Market Logic
         const uniqueProductCount = Object.keys(productMap).length;
         const topClientEntry = sortedClients.length > 0 ? sortedClients[0] : null;
         const topClientSpend = topClientEntry ? topClientEntry[1].spend : 0;
@@ -684,7 +649,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const newClientRevenue = Object.values(loyaltyStats).reduce((sum, day) => sum + day.new, 0);
         const newClientShare = totalRevenue > 0 ? (newClientRevenue / totalRevenue) * 100 : 0;
 
-        // 3. Ops Logic
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const bestDayIndex = weeklyStats.indexOf(Math.max(...weeklyStats));
         const bestDayName = days[bestDayIndex];
@@ -697,61 +661,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const dailyAvgRev = uniqueDays.size > 0 ? totalRevenue / uniqueDays.size : 0;
 
         const summaryHTML = `
-            <div class="ai-insight-col">
-                <div class="ai-subhead">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" /></svg>
-                    FINANCIAL VELOCITY
+            <div class="ai-card fade-in-up delay-1">
+                <div class="ai-card-header">
+                    <svg class="ai-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" /></svg>
+                    <span>Financial Velocity</span>
                 </div>
-                <p class="ai-text">
-                    Total turnover reached <span class="ai-highlight">${currencySymbol}${formatMoney(totalRevenue, currencyCode)}</span>, with a Net Revenue of ${currencySymbol}${formatMoney(netRevenue, currencyCode)}. 
-                    The trajectory is <span class="ai-highlight">${trendWord}</span> (${Math.abs(growthPct).toFixed(1)}% vs previous period). 
-                    Tax efficiency is monitored at an effective rate of <span class="ai-highlight">${effectiveTaxRate.toFixed(1)}%</span>. 
-                    Daily revenue averages at ${currencySymbol}${formatMoney(dailyAvgRev, currencyCode)} across <span class="ai-highlight">${uniqueDays.size}</span> active trading days.
-                </p>
+                <div class="ai-prose">
+                    Turnover reached <span class="ai-em">${currencySymbol}${formatMoney(totalRevenue, currencyCode)}</span>, netting <span class="ai-em">${currencySymbol}${formatMoney(netRevenue, currencyCode)}</span>. 
+                    The trajectory is currently <span class="ai-em">${trendWord}</span> (${Math.abs(growthPct).toFixed(1)}%). 
+                    Averaging <span class="ai-em">${currencySymbol}${formatMoney(dailyAvgRev, currencyCode)}</span> per active trading day.
+                </div>
             </div>
 
-            <div class="ai-insight-col">
-                <div class="ai-subhead">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
-                    MARKET DYNAMICS
+            <div class="ai-card fade-in-up delay-2">
+                <div class="ai-card-header">
+                    <svg class="ai-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
+                    <span>Composition</span>
                 </div>
-                <p class="ai-text">
-                    Revenue is driven by <span class="ai-highlight">${Object.keys(clientMap).length}</span> distinct clients and a portfolio of <span class="ai-highlight">${uniqueProductCount}</span> products. 
-                    Top client dominance is <span class="ai-highlight">${clientConcentration}%</span>. 
-                    Customer acquisition is healthy, with new clients contributing <span class="ai-highlight">${newClientShare.toFixed(1)}%</span> of total revenue, while recurring business makes up the remaining ${(100-newClientShare).toFixed(1)}%.
-                </p>
+                <div class="ai-prose">
+                    Driven by <span class="ai-em">${Object.keys(clientMap).length}</span> clients and <span class="ai-em">${uniqueProductCount}</span> distinct products. 
+                    Top client dominance is <span class="ai-em">${clientConcentration}%</span>. 
+                    New client acquisition contributed <span class="ai-em">${newClientShare.toFixed(1)}%</span> to the total volume.
+                </div>
             </div>
 
-            <div class="ai-insight-col">
-                <div class="ai-subhead">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.542 0 1.055.19 1.45.54L12 5.06l.956-2.58c.394-.35 1.45-.54 1.45-.54h3.018c.523 0 .97.43 1.054.954l.03.17c.18 1.037 1.034 2.158 2.373 3.324l.115.1c.365.33.682.723.943 1.164a7.924 7.924 0 00.902 1.439l.17.29a3.793 3.793 0 01.378 1.018l.068.322c.07.337.037.66-.098.966-.135.305-.37.58-.707.828l-.29.215a3.784 3.784 0 00-.77.87l-.098.155c-.244.38-.5.738-.767 1.077l-.17.21c-.287.35-.557.653-.82.91a3.81 3.81 0 01-1.076.77l-.37.135c-.328.118-.63.076-.906-.11l-.315-.224a5.275 5.275 0 01-.734-.848l-.06-.118c-.14-.25-.3-.48-.48-.68l-.138-.157c-.237-.272-.46-.51-.665-.717l-.17-.168a.8.8 0 00-.285-.18.8.8 0 00-.312.002.8.8 0 00-.265.132l-.17.15c-.235.215-.468.455-.688.718l-.06.118c-.14.248-.3.477-.48.677l-.138.158c-.24.272-.46.51-.665.717l-.17.168a.8.8 0 00-.285.18.8.8 0 00-.312-.002.8.8 0 00-.265-.132l-.315-.276a5.275 5.275 0 01-.734-.848l-.06-.118c-.14-.25-.3-.48-.48-.68l-.138-.157c-.237-.272-.46-.51-.665-.717l-.17-.168a.8.8 0 00-.285.18.8.8 0 00-.312-.002.8.8 0 00-.265-.132l-.17.15c-.235.215-.468.455-.688.718l-.06.118c-.14.248-.3.477-.48.677l-.138.158c-.24.272-.46.51-.665.717l-.17.168a.8.8 0 00-.285.18.8.8 0 00-.312-.002.8.8 0 00-.265-.132l-.17.15c-.235.215-.468.455-.688.718l-.06.118c-.14.248-.3.477-.48.677l-.138.158c-.24.272-.46.51-.665.717l-.17.168a.8.8 0 00-.285.18.8.8 0 00-.312-.002.8.8 0 00-.265-.132L6.11 3.864zM12 18.75a6.75 6.75 0 110-13.5 6.75 6.75 0 010 13.5z" /></svg>
-                    OPERATIONAL RHYTHM
+            <div class="ai-card fade-in-up delay-3">
+                <div class="ai-card-header">
+                    <svg class="ai-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Rhythm</span>
                 </div>
-                <p class="ai-text">
-                    Trading intensity peaks on <span class="ai-highlight">${bestDayName}s</span> and during the <span class="ai-highlight">${bestHourRange}</span> window. 
-                    Weekend trading accounts for <span class="ai-highlight">${weekendShare.toFixed(1)}%</span> of volume. 
-                    The Average Transaction Value (ATV) is stable at <span class="ai-highlight">${currencySymbol}${formatMoney(avgInvValue, currencyCode)}</span> per invoice.
-                </p>
+                <div class="ai-prose">
+                    Activity peaks on <span class="ai-em">${bestDayName}s</span>, specifically between <span class="ai-em">${bestHourRange}</span>. 
+                    Weekend trading accounts for <span class="ai-em">${weekendShare.toFixed(1)}%</span> of total revenue.
+                </div>
             </div>
         `;
         
-        // --- UPDATED AI LOADING LOGIC ---
         if (runLoadingEffect) {
-            // Remove the loading placeholder UI class and inject the final HTML after a delay
             setTimeout(() => {
-                ui.executiveSummary.classList.remove('ai-loading-placeholder');
                 ui.executiveSummary.innerHTML = summaryHTML;
             }, 1800); 
         } else {
-             ui.executiveSummary.classList.remove('ai-loading-placeholder');
              ui.executiveSummary.innerHTML = summaryHTML;
         }
 
-        // -----------------------------------------
-        // --- END NEW AI SUMMARY GENERATION LOGIC ---
-        // -----------------------------------------
-        
-        // --- PREPARE CHART DATA ---
         const sortedDates = Object.keys(dailyStats).sort();
         let runningTotal = 0;
         const cumulativeData = sortedDates.map(d => {
@@ -759,7 +712,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return runningTotal;
         });
 
-        // bucket ordering
         const bucketOrder = ["0 - 100", "101 - 500", "501 - 1k", "1k - 5k", "5k+"];
         const sortedBuckets = bucketOrder.map(b => distributionBuckets[b] || 0);
 
@@ -774,7 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
             totalTax: totalTax,
             currency: currencySymbol,
             currencyCode: currencyCode,
-            // New Data
             loyaltyLabels: Object.keys(loyaltyStats).sort(),
             loyaltyNew: Object.keys(loyaltyStats).sort().map(d => loyaltyStats[d].new),
             loyaltyRet: Object.keys(loyaltyStats).sort().map(d => loyaltyStats[d].returning),
@@ -783,8 +734,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         renderAllCharts();
     }
-    // --- END UPDATED calculateAnalytics FUNCTION ---
-
 
     function generateSmartInsights(sortedClients, totalRevenue, weeklyStats, hourlyStats, currencyCode) {
         const insights = [];
@@ -822,7 +771,6 @@ document.addEventListener('DOMContentLoaded', () => {
             grid: isDark ? '#27272a' : '#f3f4f6',
             text: isDark ? '#9ca3af' : '#6b7280',
             primary: '#0d9488',
-            // Adjusted primary color for dark mode readability
             accent: isDark ? '#8183f1' : '#6366f1', 
             weekly: '#f59e0b'
         };
@@ -892,7 +840,6 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             data: {
                 labels: ['Net Revenue', 'Tax Collected'],
-                    // Using primary color for Net Revenue, and a complementary red/pink for Tax
                     datasets: [{
                     data: [netRev, currentChartData.totalTax],
                     backgroundColor: [c.primary, '#f43f5e'],
@@ -903,7 +850,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // NEW: Distribution Chart
         distributionChartInstance = new Chart(ctxDist, {
             type: 'bar',
             data: {
@@ -927,7 +873,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // NEW: Loyalty Chart
         loyaltyChartInstance = new Chart(ctxLoyalty, {
             type: 'bar',
             data: {
@@ -935,14 +880,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [
                     {
                         label: 'New Customers',
-                        // Using a distinct green for 'New'
                         data: currentChartData.loyaltyNew,
                         backgroundColor: '#10b981', 
                         stack: 'Stack 0'
                     },
                     {
                         label: 'Returning Customers',
-                         // Using the accent color for 'Returning'
                         data: currentChartData.loyaltyRet,
                         backgroundColor: c.accent,
                         stack: 'Stack 0'
@@ -1453,11 +1396,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if(distributionChartInstance) distributionChartInstance.destroy(); 
         if(loyaltyChartInstance) loyaltyChartInstance.destroy();           
         
-        // Resetting the executive summary to its initial loading state HTML
-        ui.executiveSummary.classList.add('ai-loading-placeholder');
-        ui.executiveSummary.innerHTML = `<div style="width:100%;"><div class="shimmer-line"></div><div class="shimmer-line"></div><div class="shimmer-line"></div></div>`;
+        const loadingHTML = `
+             <div class="ai-card ai-loading-card">
+                 <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
+                 <div class="shim" style="width: 100%; height: 12px;"></div>
+                 <div class="shim" style="width: 90%; height: 12px;"></div>
+                 <div class="shim" style="width: 70%; height: 12px;"></div>
+             </div>
+             <div class="ai-card ai-loading-card">
+                 <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
+                 <div class="shim" style="width: 100%; height: 12px;"></div>
+                 <div class="shim" style="width: 95%; height: 12px;"></div>
+             </div>
+             <div class="ai-card ai-loading-card">
+                 <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
+                 <div class="shim" style="width: 100%; height: 12px;"></div>
+                 <div class="shim" style="width: 80%; height: 12px;"></div>
+             </div>
+        `;
+        ui.executiveSummary.classList.remove('ai-loading-placeholder'); 
+        ui.executiveSummary.innerHTML = loadingHTML;
 
-        // Re-run checkLocalData to ensure the load pane is correctly activated
         checkLocalData(); 
 
         toggleSidebar(false);
@@ -1532,13 +1491,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const desc = (item.desc || '').replace(/\n/g, '<br>');
             
+            const serial = item.serial || '';
+            const style = item.style || item.color || ''; 
+            
+            let metaInfo = '';
+            if(serial) metaInfo += `<span style="margin-right:8px;">SN: ${serial}</span>`;
+            if(style) metaInfo += `<span>Style: ${style}</span>`;
+            
             return `
                 <tr>
                     <td style="text-align: center;">${item.line || '-'}</td>
                     <td title="${item.code || ''}">${item.code || ''}</td>
                     <td>
                         <div class="desc">${desc}</div>
-                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                        
+                        ${metaInfo ? `<div style="font-size: 11px; color: #4b5563; margin-top: 4px;">${metaInfo}</div>` : ''}
+                        
+                        <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">
                             Tax: ${item.taxCategory || 'N/A'}
                         </div>
                     </td>
@@ -1658,10 +1627,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.pdfBtn.addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const MARGIN = 10; // 10mm margin on all sides
+        const MARGIN = 10; 
         const A4_WIDTH = 210;
         const A4_HEIGHT = 297;
-        const CONTENT_WIDTH = A4_WIDTH - 2 * MARGIN; // 190mm
+        const CONTENT_WIDTH = A4_WIDTH - 2 * MARGIN; 
         
         let elementToPrint;
         let filename;
@@ -1683,29 +1652,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 s.style.boxShadow = 'none';
                 s.style.borderColor = '#e5e7eb';
             });
-            elementToPrint.querySelectorAll('.ai-gradient-box').forEach(s => { 
+            
+            elementToPrint.querySelectorAll('.ai-container').forEach(s => { 
                 originalAnalyticsStyles.push({ el: s, boxShadow: s.style.boxShadow, background: s.style.background, borderColor: s.style.borderColor, color: s.style.color });
                 s.style.boxShadow = 'none';
                 s.style.borderColor = '#e5e7eb';
                 s.style.background = '#ffffff';
                 s.style.color = 'black';
             });
-            elementToPrint.querySelectorAll('.ai-title').forEach(t => { 
-                originalAnalyticsStyles.push({ el: t, background: t.style.background, webkitTextFillColor: t.style.webkitTextFillColor });
-                t.style.background = '#111827';
-                t.style.webkitTextFillColor = 'initial';
+            
+            elementToPrint.querySelectorAll('.ai-card').forEach(c => {
+                 originalAnalyticsStyles.push({ el: c, background: c.style.background, boxShadow: c.style.boxShadow, border: c.style.border });
+                 c.style.background = '#ffffff';
+                 c.style.boxShadow = 'none';
+                 c.style.border = '1px solid #e5e7eb';
             });
-            elementToPrint.querySelectorAll('.ai-badge').forEach(b => { 
-                originalAnalyticsStyles.push({ el: b, background: b.style.background, boxShadow: b.style.boxShadow, color: b.style.color }); // Include color for badge
-                b.style.background = '#0d9488';
+
+            elementToPrint.querySelectorAll('.ai-title-text').forEach(t => { 
+                originalAnalyticsStyles.push({ el: t, color: t.style.color });
+                t.style.color = '#111827';
+            });
+
+            elementToPrint.querySelectorAll('.ai-badge-pill').forEach(b => { 
+                originalAnalyticsStyles.push({ el: b, background: b.style.background, boxShadow: b.style.boxShadow, color: b.style.color, border: b.style.border }); 
+                b.style.background = '#f3f4f6';
                 b.style.boxShadow = 'none';
-                b.style.color = 'white';
+                b.style.color = '#374151';
+                b.style.border = '1px solid #e5e7eb';
             });
-            elementToPrint.querySelectorAll('.ai-highlight').forEach(h => { 
-                originalAnalyticsStyles.push({ el: h, backgroundColor: h.style.backgroundColor, borderBottom: h.style.borderBottom });
-                h.style.backgroundColor = '#f3f4f6';
-                h.style.borderBottom = 'none';
+            
+            elementToPrint.querySelectorAll('.ai-em').forEach(h => { 
+                originalAnalyticsStyles.push({ el: h, background: h.style.background, color: h.style.color });
+                h.style.background = '#f3f4f6';
+                h.style.color = '#111827';
             });
+            
             elementToPrint.querySelectorAll('canvas').forEach(c => {
                 originalAnalyticsStyles.push({ el: c, backgroundColor: c.style.backgroundColor });
                 c.style.backgroundColor = 'white';
@@ -1762,22 +1743,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeTab === 'analytics') {
                 elementToPrint.style.backgroundColor = '';
                 originalAnalyticsStyles.forEach(s => {
-                    // Restore original styles
-                    if (s.el.classList.contains('ai-gradient-box')) {
+                    if (s.el.classList.contains('ai-container')) {
                         s.el.style.boxShadow = s.boxShadow;
                         s.el.style.background = s.background;
                         s.el.style.borderColor = s.borderColor;
                         s.el.style.color = s.color;
-                    } else if (s.el.classList.contains('ai-title')) {
-                        s.el.style.background = s.background;
-                        s.el.style.webkitTextFillColor = s.webkitTextFillColor;
-                    } else if (s.el.classList.contains('ai-badge')) {
+                    } else if (s.el.classList.contains('ai-card')) {
+                         s.el.style.background = s.background;
+                         s.el.style.boxShadow = s.boxShadow;
+                         s.el.style.border = s.border;
+                    } else if (s.el.classList.contains('ai-title-text')) {
+                        s.el.style.color = s.color;
+                    } else if (s.el.classList.contains('ai-badge-pill')) {
                         s.el.style.background = s.background;
                         s.el.style.boxShadow = s.boxShadow;
                         s.el.style.color = s.color;
-                    } else if (s.el.classList.contains('ai-highlight')) {
-                        s.el.style.backgroundColor = s.backgroundColor;
-                        s.el.style.borderBottom = s.borderBottom;
+                        s.el.style.border = s.border;
+                    } else if (s.el.classList.contains('ai-em')) {
+                        s.el.style.background = s.background;
+                        s.el.style.color = s.color;
                     } else {
                         s.el.style.boxShadow = s.boxShadow;
                         s.el.style.borderColor = s.borderColor;
@@ -1821,6 +1805,5 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.tabAnalytics.onclick = () => switchTab('analytics');
     ui.tabRaw.onclick = () => switchTab('raw');
 
-    // Run the Local Storage check immediately on load to activate the button if data is present.
     checkLocalData(); 
 });

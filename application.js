@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const CONFIG_STORAGE_KEY = 'swiftInvoiceConfig'; 
     const USER_PROFILE_KEY = 'swiftInvoiceUser'; 
     const SETUP_COMPLETE_KEY = 'swiftInvoiceSetupComplete'; 
-    const ENCRYPTED_EXPORT_VERSION = '1.0'; // Marker for encrypted file format
-    const THEME_KEY = 'swiftInvoiceTheme'; // NEW: Theme Storage Key
+    const ENCRYPTED_EXPORT_VERSION = '1.0'; 
+    const THEME_KEY = 'swiftInvoiceTheme'; 
     
     let currentRegion = 'IN'; 
     let currentLogoOption = 'none';
@@ -22,11 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingDefaultLogoOption = globalConfig.defaultLogoOption;
     let pendingDefaultLogoSrc = globalConfig.defaultLogoSrc;
 
-    // --- THEME HANDLING (NEW) ---
+    // --- THEME HANDLING ---
     const themeBtn = document.getElementById('theme-toggle-btn');
     const html = document.documentElement;
 
-    // Icons
     const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`;
     const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>`;
 
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Check if the theme button exists before adding the listener
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-theme');
@@ -50,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize Theme (Run on script load)
     const savedTheme = localStorage.getItem(THEME_KEY);
     if (savedTheme) {
         setTheme(savedTheme);
@@ -59,9 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         setTheme('light');
     }
-    // --- END THEME HANDLING ---
 
-    // --- Setup Screen Elements --- 
+    // --- Element References --- 
     const setupScreen = document.getElementById('setup-screen');
     const setupFinishBtn = document.getElementById('setup-finish-btn');
     const setupUserName = document.getElementById('setup-user-name');
@@ -70,18 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const importSettingsInputSetup = document.getElementById('import-settings-input-setup');
     const importInvoicesInputSetup = document.getElementById('import-invoices-input-setup');
     
-    // --- User Profile Display Elements --- 
     const userProfileName = document.getElementById('user-profile-name');
     const userProfileEmail = document.getElementById('user-profile-email');
 
-    // --- User Profile Settings Elements --- 
     const userProfileSettingsSection = document.getElementById('user-profile-settings');
     const editUserName = document.getElementById('edit-user-name');
     const editUserEmail = document.getElementById('edit-user-email');
     const saveUserProfileBtn = document.getElementById('save-user-profile-btn');
     const rerunSetupBtn = document.getElementById('rerun-setup-btn');
 
-    // --- Core App Elements ---
     const itemsBody = document.getElementById('items-body');
     const addItemBtn = document.getElementById('add-item-btn');
     const generatePdfBtn = document.getElementById('generate-pdf-btn');
@@ -131,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addFeeBtn = document.getElementById('add-fee-btn');
     const totalsBody = document.getElementById('totals-body');
 
-    // --- Global Settings Form Elements ---
     const globalSettingsSection = document.getElementById('global-settings-section');
     const defaultSellerTextarea = document.getElementById('default-seller');
     const defaultRegionTrigger = document.getElementById('default-region-select-trigger');
@@ -157,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'IN': { name: 'INR (India) - GST', currency: 'INR', taxes: [ { category: 'Services/Computers (18%)', rate: 18.0 }, { category: 'Luxury Goods/Cars (28%)', rate: 28.0 }, { category: 'Processed Food (12%)', rate: 12.0 }, { category: 'Mobile Phones (12%)', rate: 12.0 }, { category: 'Sugar/Tea (5%)', rate: 5.0 }, { category: 'Basic Spices (5%)', rate: 5.0 }, { category: 'Milk/Fresh Veg (0%)', rate: 0.0 }, { category: 'Health/Education (0%)', rate: 0.0 } ], defaultTaxCategory: 'Services/Computers (18%)' }
     };
 
-    // --- ENCRYPTION HELPER FUNCTIONS ---
+    // --- HELPER FUNCTIONS ---
     function promptForPassword(action) {
         let password = prompt(`Enter a password to ${action} your backup file. (Leave blank for no encryption/decryption):`);
         return password;
@@ -182,32 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function decryptData(parsedData, password) {
-        if (!parsedData.encrypted) {
-            // Not encrypted, return data directly
-            return parsedData;
-        }
-        if (!password) {
-             throw new Error("This file is encrypted. Please provide a password.");
-        }
-        
+        if (!parsedData.encrypted) return parsedData;
+        if (!password) throw new Error("This file is encrypted. Please provide a password.");
         try {
             const bytes = CryptoJS.AES.decrypt(parsedData.data, password);
             const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-
-            if (!decryptedString) {
-                throw new Error("Decryption failed. Incorrect password or corrupted data.");
-            }
-
+            if (!decryptedString) throw new Error("Decryption failed.");
             return JSON.parse(decryptedString);
-
         } catch (e) {
-            console.error("Decryption or parsing error:", e);
+            console.error("Decryption error:", e);
             throw new Error("Decryption failed. Incorrect password or data format.");
         }
     }
-    // --- END ENCRYPTION HELPER FUNCTIONS ---
     
-    // --- User Profile Functions ---
     function loadUserProfile() {
         try {
             const userJSON = localStorage.getItem(USER_PROFILE_KEY);
@@ -222,9 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return null;
             }
         } catch (e) {
-            console.error("Failed to load user profile", e);
-            userProfileName.textContent = 'Error';
-            userProfileEmail.textContent = 'Error';
             return null;
         }
     }
@@ -234,10 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = { name, email };
             localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(user));
             return user;
-        } catch (e) {
-            console.error("Failed to save user profile", e);
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
     function populateUserProfileForm() {
@@ -245,37 +218,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const userJSON = localStorage.getItem(USER_PROFILE_KEY);
             if (userJSON) {
                 const user = JSON.parse(userJSON);
-                editUserName.value = user.name || '';
-                editUserEmail.value = user.email || '';
+                // Fill App Settings
+                if (editUserName) editUserName.value = user.name || '';
+                if (editUserEmail) editUserEmail.value = user.email || '';
+                // Fill Setup Screen Inputs
+                if (setupUserName) setupUserName.value = user.name || '';
+                if (setupUserEmail) setupUserEmail.value = user.email || '';
             }
-        } catch (e) {
-            console.error("Failed to populate user profile form", e);
-        }
+        } catch (e) {}
     }
-    // --- End User Profile Functions ---
 
-
-    // --- Global Config Functions ---
     function loadGlobalConfig() {
         try {
             const configJSON = localStorage.getItem(CONFIG_STORAGE_KEY);
             if (configJSON) {
                 globalConfig = { ...globalConfig, ...JSON.parse(configJSON) };
             }
-        } catch (e) {
-            console.error("Failed to parse global config from localStorage", e);
-        }
+        } catch (e) {}
         pendingDefaultRegion = globalConfig.defaultRegion;
         pendingDefaultLogoOption = globalConfig.defaultLogoOption;
         pendingDefaultLogoSrc = globalConfig.defaultLogoSrc;
-        
         populateGlobalSettingsForm();
     }
 
     function populateGlobalSettingsForm() {
         defaultSellerTextarea.value = globalConfig.defaultSeller;
-
-        // Populate Default Region Dropdown
         defaultRegionOptions.innerHTML = '';
         for (const [code, data] of Object.entries(countryData)) {
             const optionBtn = document.createElement('button');
@@ -292,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         defaultRegionLabel.textContent = countryData[globalConfig.defaultRegion]?.name || 'Select Region';
 
-        // Populate Default Logo
         defaultLogoLabel.textContent = defaultLogoOptions.querySelector(`[data-value="${globalConfig.defaultLogoOption}"]`)?.textContent || 'No Logo';
         if (globalConfig.defaultLogoOption === 'upload' && globalConfig.defaultLogoSrc) {
             defaultLogoPreview.src = globalConfig.defaultLogoSrc;
@@ -309,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             removeDefaultLogoBtn.classList.add('hidden');
         }
 
-        // Populate Default Fees
         defaultFeesList.innerHTML = '';
         globalConfig.defaultFees.forEach(fee => {
             addDefaultFeeRow(fee.name, fee.value);
@@ -360,20 +325,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return true;
         } catch (e) {
-            console.error("Failed to save global config", e);
             alert("Error saving settings. LocalStorage might be full.");
             return false;
         }
     }
     
-    // --- Storage Usage Calculation ---
     function calculateLocalStorageUsage() {
         let totalBytes = 0;
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             const value = localStorage.getItem(key);
-            
-            // Approximate calculation: (key length + value length) * 2 bytes per char (UTF-16)
             totalBytes += (key.length + value.length) * 2;
         }
         const totalKB = totalBytes / 1024;
@@ -382,41 +343,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateStorageUsageDisplay() {
         const usage = calculateLocalStorageUsage();
-        // Updated to use the new HTML structure for presentation
         storageUsageDisplay.textContent = `${usage} KB (Approx)`; 
     }
 
-
-    // --- Core App Listeners (from original and test3.html merge) ---
     saveGlobalSettingsBtn.addEventListener('click', () => saveGlobalConfig(true)); 
-    
-    addDefaultFeeBtn.addEventListener('click', () => {
-        addDefaultFeeRow();
-    });
-
+    addDefaultFeeBtn.addEventListener('click', () => { addDefaultFeeRow(); });
     defaultFeesList.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.delete-default-fee-btn');
-        if (deleteBtn) {
-            deleteBtn.closest('.default-fee-row').remove();
-        }
+        if (deleteBtn) { deleteBtn.closest('.default-fee-row').remove(); }
     });
 
     defaultRegionTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = !defaultRegionOptions.classList.contains('hidden');
         closeAllDropdowns();
-        if (!wasOpen) {
-            defaultRegionOptions.classList.remove('hidden');
-        }
+        if (!wasOpen) { defaultRegionOptions.classList.remove('hidden'); }
     });
 
     defaultLogoTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = !defaultLogoOptions.classList.contains('hidden');
         closeAllDropdowns();
-        if (!wasOpen) {
-            defaultLogoOptions.classList.remove('hidden');
-        }
+        if (!wasOpen) { defaultLogoOptions.classList.remove('hidden'); }
     });
 
     defaultLogoOptions.addEventListener('click', (e) => {
@@ -461,9 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 defaultLogoPreview.classList.remove('hidden');
                 removeDefaultLogoBtn.classList.remove('hidden');
             };
-            reader.onerror = () => {
-                alert("Error reading logo file.");
-            };
             reader.readAsDataURL(file);
         }
     });
@@ -479,23 +424,17 @@ document.addEventListener('DOMContentLoaded', () => {
         defaultLogoUpload.value = null;
     });
 
-
     function getInvoicesFromStorage() {
         try {
             const invoicesJSON = localStorage.getItem(STORAGE_KEY);
             return invoicesJSON ? JSON.parse(invoicesJSON) : [];
-        } catch (e) {
-            console.error("Failed to parse invoices from localStorage", e);
-            return [];
-        }
+        } catch (e) { return []; }
     }
     function saveInvoicesToStorage(invoices) {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
             updateStorageUsageDisplay();
-        } catch (e) {
-            console.error("Failed to save invoices to localStorage", e);
-        }
+        } catch (e) { console.error(e); }
     }
     function handleInvoiceListUpdate() {
         const searchTerm = invoiceSearch.value.toLowerCase().trim();
@@ -516,17 +455,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateB = b.invoiceDate ? new Date(b.invoiceDate) : 0;
             
             switch (currentSortCriteria) {
-                case 'date-asc':
-                    return dateA - dateB;
-                case 'number-asc':
-                    return (a.invoiceNumber || '').localeCompare(b.invoiceNumber || '', undefined, { numeric: true });
-                case 'number-desc':
-                    return (b.invoiceNumber || '').localeCompare(a.invoiceNumber || '', undefined, { numeric: true });
-                case 'buyer-asc':
-                    return buyerA.localeCompare(buyerB);
-                case 'date-desc':
-                default:
-                    return dateB - dateA;
+                case 'date-asc': return dateA - dateB;
+                case 'number-asc': return (a.invoiceNumber || '').localeCompare(b.invoiceNumber || '', undefined, { numeric: true });
+                case 'number-desc': return (b.invoiceNumber || '').localeCompare(a.invoiceNumber || '', undefined, { numeric: true });
+                case 'buyer-asc': return buyerA.localeCompare(buyerB);
+                case 'date-desc': default: return dateB - dateA;
             }
         });
 
@@ -539,9 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'list-placeholder';
             let message = 'No saved invoices.';
-            if (searchTerm) {
-                message = 'No results for "' + searchTerm + '".';
-            }
+            if (searchTerm) { message = 'No results for "' + searchTerm + '".'; }
             li.innerHTML = `
                 <svg class="list-placeholder-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -572,8 +503,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // START: MODIFIED EXPORT/IMPORT FUNCTIONS FOR ENCRYPTION
-
     function exportInvoices() {
         try {
             const invoices = getInvoicesFromStorage();
@@ -581,16 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("No invoices to export.");
                 return;
             }
-
             const password = promptForPassword('encrypt');
-            if (password === null) return; // User canceled
+            if (password === null) return; 
             
-            const exportData = {
-                invoices: invoices
-            };
-            
+            const exportData = { invoices: invoices };
             const encryptedExport = encryptData(exportData, password);
-
             const dataStr = JSON.stringify(encryptedExport, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
@@ -602,31 +526,32 @@ document.addEventListener('DOMContentLoaded', () => {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
             importExportTimestampDisplay.textContent = `Invoices exported${encryptedExport.encrypted ? ' (ENCRYPTED)' : ''} at ${new Date().toLocaleString()}.`;
-            
         } catch (e) {
-            console.error("Failed to export invoices", e);
             alert("Error exporting invoices. See console for details.");
         }
     }
 
     function importInvoices(event) {
         const file = event.target.files[0];
-        if (!file) {
-            return;
+        if (!file) return;
+
+        // UPDATED: Check if data actually exists before warning
+        const existingInvoices = getInvoicesFromStorage();
+        if (existingInvoices.length > 0) {
+             if (!confirm("Are you sure you want to import this file? This will OVERWRITE all existing saved invoices.")) {
+                event.target.value = null;
+                return;
+            }
         }
-        if (!confirm("Are you sure you want to import this file? This will OVERWRITE all existing saved invoices.")) {
-            event.target.value = null;
-            return;
-        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const content = e.target.result;
                 let parsedData = JSON.parse(content);
                 let invoices = [];
-                let timestamp = null;
+                let timestamp = parsedData.exportTimestamp ? new Date(parsedData.exportTimestamp).toLocaleString() : null;
                 let isEncrypted = parsedData.encrypted || false;
                 
                 if (isEncrypted) {
@@ -636,64 +561,46 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     parsedData = decryptData(parsedData, password);
+                } else if (parsedData.data && !Array.isArray(parsedData) && !parsedData.invoices) {
+                    parsedData = parsedData.data;
                 }
 
                 if (Array.isArray(parsedData)) {
-                    // Legacy format
                     invoices = parsedData;
-                    timestamp = 'legacy file (no timestamp)';
+                    if (!timestamp) timestamp = 'legacy file (no timestamp)';
                 } else if (typeof parsedData === 'object' && parsedData !== null && Array.isArray(parsedData.invoices)) {
-                    // New format
                     invoices = parsedData.invoices;
-                    if (parsedData.exportTimestamp) {
+                    if (!timestamp && parsedData.exportTimestamp) {
                         try {
                             timestamp = new Date(parsedData.exportTimestamp).toLocaleString();
-                        } catch (e) {
-                            timestamp = parsedData.exportTimestamp;
-                        }
-                    } else {
-                        timestamp = 'no timestamp in file';
-                    }
+                        } catch (e) { timestamp = parsedData.exportTimestamp; }
+                    } else if (!timestamp) { timestamp = 'no timestamp in file'; }
                 } else {
-                     throw new Error("Invalid format: File must contain a JSON array or a valid export object.");
+                     throw new Error("Invalid format.");
                 }
 
                 saveInvoicesToStorage(invoices);
                 clearInvoiceForm();
                 handleInvoiceListUpdate();
-                
                 importExportTimestampDisplay.textContent = `Invoices imported${isEncrypted ? ' (Decrypted)' : ''} from file created at: ${timestamp}.`;
                 alert(`Successfully imported ${invoices.length} invoice(s).`);
-                
             } catch (err) {
-                console.error("Failed to import invoices", err);
                 alert(`Error importing data: ${err.message}`);
             } finally {
                 event.target.value = null;
             }
         };
-        reader.onerror = () => {
-            alert("Error reading file.");
-            event.target.value = null;
-        };
+        reader.onerror = () => { alert("Error reading file."); event.target.value = null; };
         reader.readAsText(file);
     }
     
     function exportSettings() {
         try {
-            // Ensure settings are saved before exporting
-            saveGlobalConfig(false); // Save without notification
-
+            saveGlobalConfig(false); 
             const password = promptForPassword('encrypt');
-            if (password === null) return; // User canceled
-            
-            const exportData = {
-                settings: globalConfig,
-                user: loadUserProfile() 
-            };
-            
+            if (password === null) return; 
+            const exportData = { settings: globalConfig, user: loadUserProfile() };
             const encryptedExport = encryptData(exportData, password);
-            
             const dataStr = JSON.stringify(encryptedExport, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
@@ -705,29 +612,31 @@ document.addEventListener('DOMContentLoaded', () => {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
             importExportTimestampDisplay.textContent = `Settings exported${encryptedExport.encrypted ? ' (ENCRYPTED)' : ''} at ${new Date().toLocaleString()}.`;
-
         } catch (e) {
-            console.error("Failed to export settings", e);
             alert("Error exporting settings. See console for details.");
         }
     }
 
     function importSettings(event) {
         const file = event.target.files[0];
-        if (!file) {
-            return;
+        if (!file) return;
+
+        // UPDATED: Check if setup is complete. If so (main app), warn. If not (setup screen), don't warn.
+        const isSetupComplete = localStorage.getItem(SETUP_COMPLETE_KEY) === 'true';
+        if (isSetupComplete) {
+            if (!confirm("Are you sure you want to import settings? This will OVERWRITE all existing app settings.")) {
+                event.target.value = null;
+                return;
+            }
         }
-        if (!confirm("Are you sure you want to import settings? This will OVERWRITE all existing app settings.")) {
-            event.target.value = null;
-            return;
-        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const content = e.target.result;
                 let parsedData = JSON.parse(content);
+                let timestamp = parsedData.exportTimestamp ? new Date(parsedData.exportTimestamp).toLocaleString() : null;
                 let isEncrypted = parsedData.encrypted || false;
                 
                 if (isEncrypted) {
@@ -737,56 +646,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     parsedData = decryptData(parsedData, password);
+                } else if (parsedData.data && !parsedData.settings) {
+                    parsedData = parsedData.data;
                 }
                 
                 if (typeof parsedData !== 'object' || parsedData === null || !parsedData.settings) {
-                    throw new Error("Invalid format: File must contain a valid settings export object.");
+                    throw new Error("Invalid format.");
                 }
 
                 const settings = parsedData.settings;
-                let timestamp = null;
                 
-                if (parsedData.exportTimestamp) {
+                if (!timestamp && parsedData.exportTimestamp) {
                     try {
                         timestamp = new Date(parsedData.exportTimestamp).toLocaleString();
-                        // Also save the user profile if it's implicitly part of the settings file (not explicitly in globalConfig but needed for the UI)
-                        if (parsedData.user) {
-                             saveUserProfile(parsedData.user.name, parsedData.user.email);
-                        }
-                    } catch (e) {
-                        timestamp = parsedData.exportTimestamp;
-                    }
-                } else {
-                    timestamp = 'no timestamp in file';
+                    } catch (e) { timestamp = parsedData.exportTimestamp; }
+                } else if (!timestamp) { timestamp = 'no timestamp in file'; }
+
+                if (parsedData.user) {
+                     saveUserProfile(parsedData.user.name, parsedData.user.email);
                 }
 
                 localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(settings));
-                
-                // Reload config and populate forms
                 loadGlobalConfig();
-                populateUserProfileForm(); // Also populate user form if it's part of settings
-                
-                clearInvoiceForm(); // Re-apply new defaults
-                
+                populateUserProfileForm(); 
+                loadUserProfile(); 
+                clearInvoiceForm(); 
                 importExportTimestampDisplay.textContent = `Settings imported${isEncrypted ? ' (Decrypted)' : ''} from file created at: ${timestamp}.`;
-                alert(`Successfully imported settings. New defaults will apply to new invoices.`);
-                
+                alert(`Successfully imported settings.`);
             } catch (err) {
-                console.error("Failed to import settings", err);
                 alert(`Error importing settings: ${err.message}`);
             } finally {
                 event.target.value = null;
             }
         };
-        reader.onerror = () => {
-            alert("Error reading file.");
-            event.target.value = null;
-        };
+        reader.onerror = () => { alert("Error reading file."); event.target.value = null; };
         reader.readAsText(file);
     }
     
-    // END: MODIFIED EXPORT/IMPORT FUNCTIONS
-
     invoiceList.addEventListener('click', (e) => {
         const targetLi = e.target.closest('li');
         if (!targetLi) return;
@@ -794,17 +690,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!docId) return;
         const loadBtn = e.target.closest('.list-btn-load');
         const deleteBtn = e.target.closest('.list-btn-delete');
-        if (loadBtn) {
-            loadInvoice(docId);
-        }
+        if (loadBtn) { loadInvoice(docId); }
         if (deleteBtn) {
             let invoices = getInvoicesFromStorage();
             invoices = invoices.filter(inv => inv.id !== docId);
             saveInvoicesToStorage(invoices);
             handleInvoiceListUpdate();
-            if (currentInvoiceId === docId) {
-                clearInvoiceForm();
-            }
+            if (currentInvoiceId === docId) { clearInvoiceForm(); }
         }
     });
     function loadInvoice(docId) {
@@ -820,16 +712,21 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInvoiceForm();
         }
     }
+    
     function getInvoiceDataFromDOM() {
         const items = [];
         itemsBody.querySelectorAll('tr.item').forEach(row => {
             const taxCategoryTrigger = row.querySelector('.table-dropdown-trigger');
             const taxCategory = taxCategoryTrigger ? taxCategoryTrigger.textContent.trim() : 'Unknown';
+            const serialInput = row.querySelector('.item-serial');
+            const styleInput = row.querySelector('.item-style'); 
 
             items.push({
                 line: row.querySelector('.line').textContent,
                 code: row.querySelector('.code').textContent,
                 desc: row.querySelector('.desc').innerHTML,
+                serial: serialInput ? serialInput.value : '',
+                style: styleInput ? styleInput.value : '', 
                 taxCategory: taxCategory,
                 qty: row.querySelector('.qty').textContent,
                 excl: row.querySelector('.excl').textContent,
@@ -865,6 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grandTotal: document.getElementById('grand').textContent,
         };
     }
+    
     function setInvoiceDataToDOM(data) {
         document.getElementById('invoice-number').textContent = data.invoiceNumber || '';
         document.getElementById('invoice-date').textContent = data.invoiceDate || '';
@@ -893,25 +791,20 @@ document.addEventListener('DOMContentLoaded', () => {
         handleLogoChange(); 
 
         itemsBody.innerHTML = '';
-        
         if (totalsBody) {
             totalsBody.querySelectorAll('tr.charge-row').forEach(row => row.remove());
         }
-
         if (data.charges && data.charges.length > 0) {
             data.charges.forEach(charge => {
                 addChargeRow(charge.name, charge.value);
             });
         }
-
         if (data.items && data.items.length > 0) {
             data.items.forEach(item => addNewRow(item));
         } else {
             addNewRow();
         }
-        
         recalcTotals(); 
-        
         updateTaxSlabDisplay(currentRegion); 
     }
 
@@ -919,19 +812,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const allInvoices = getInvoicesFromStorage();
         const prefix = 'INV-';
         let maxNum = 0;
-
         if (allInvoices.length > 0) {
             allInvoices.forEach(invoice => {
                 if (invoice.invoiceNumber && invoice.invoiceNumber.startsWith(prefix)) {
                     const numPart = invoice.invoiceNumber.substring(prefix.length);
                     const num = parseInt(numPart, 10);
-                    if (!isNaN(num) && num > maxNum) {
-                        maxNum = num;
-                    }
+                    if (!isNaN(num) && num > maxNum) { maxNum = num; }
                 }
             });
         }
-        
         const nextNum = maxNum + 1;
         return `${prefix}${nextNum.toString().padStart(5, '0')}`; 
     }
@@ -971,26 +860,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateActiveInvoiceInList() {
         invoiceList.querySelectorAll('.list-item-content').forEach(btn => {
             const li = btn.closest('li');
-            if (li && li.dataset.id === currentInvoiceId) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            if (li && li.dataset.id === currentInvoiceId) { btn.classList.add('active'); } 
+            else { btn.classList.remove('active'); }
         });
     }
-    function openSidebar() {
-        sidebar.classList.add('mobile-sidebar-open');
-        sidebarOverlay.classList.remove('hidden');
-    }
-    function closeSidebar() {
-        sidebar.classList.remove('mobile-sidebar-open');
-        sidebarOverlay.classList.add('hidden');
-    }
+    function openSidebar() { sidebar.classList.add('mobile-sidebar-open'); sidebarOverlay.classList.remove('hidden'); }
+    function closeSidebar() { sidebar.classList.remove('mobile-sidebar-open'); sidebarOverlay.classList.add('hidden'); }
     sidebarOpenBtn.addEventListener('click', openSidebar);
     sidebarCloseBtn.addEventListener('click', closeSidebar);
     sidebarOverlay.addEventListener('click', closeSidebar);
     
-    // --- Sidebar Menu Toggle ---
     btnShowInvoices.addEventListener('click', () => {
         invoiceListSection.classList.remove('hidden');
         appSettingsSection.classList.add('hidden');
@@ -1004,46 +883,31 @@ document.addEventListener('DOMContentLoaded', () => {
         appDataSection.classList.remove('hidden');
         btnShowInvoices.classList.remove('active');
         btnShowAppSettings.classList.add('active');
-        
-        // Populate the form with current data
         populateUserProfileForm();
         updateStorageUsageDisplay();
     });
 
-    // --- Save User Profile (from Settings tab) ---
     saveUserProfileBtn.addEventListener('click', () => {
         const name = editUserName.value;
         const email = editUserEmail.value;
-        
-        if (!name) {
-            alert("Please enter a name.");
-            return;
-        }
-        
+        if (!name) { alert("Please enter a name."); return; }
         saveUserProfile(name, email);
-        loadUserProfile(); // Update display
-        
-        saveUserProfileBtn.disabled = true;
-        const originalText = saveUserProfileBtn.textContent;
-        saveUserProfileBtn.textContent = 'Saved!';
-        setTimeout(() => {
-            saveUserProfileBtn.disabled = false;
-            saveUserProfileBtn.textContent = originalText;
-        }, 1500);
+        const savedConfig = saveGlobalConfig(false); 
+        if (savedConfig) {
+            localStorage.setItem(SETUP_COMPLETE_KEY, 'true');
+            initApp();
+        }
     });
     
-    // --- Reset All Data ---
     resetAllDataBtn.addEventListener('click', () => {
         if (confirm("WARNING: This will permanently delete ALL saved invoices and ALL application settings. Are you sure you want to proceed?")) {
             localStorage.clear();
-            // Preserve theme preference
             localStorage.setItem(THEME_KEY, html.getAttribute('data-theme') || 'light'); 
             alert("Application data reset complete. The application will now reload.");
             window.location.reload();
         }
     });
 
-    // --- Re-run Setup ---
     rerunSetupBtn.addEventListener('click', () => {
         if (confirm("Are you sure you want to re-run the setup? This will reload the app.")) {
             localStorage.removeItem(SETUP_COMPLETE_KEY);
@@ -1096,25 +960,19 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         const wasOpen = !regionOptions.classList.contains('hidden');
         closeAllDropdowns();
-        if (!wasOpen) {
-            regionOptions.classList.remove('hidden');
-        }
+        if (!wasOpen) { regionOptions.classList.remove('hidden'); }
     });
     logoTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = !logoOptionsContainer.classList.contains('hidden');
         closeAllDropdowns();
-        if (!wasOpen) {
-            logoOptionsContainer.classList.remove('hidden');
-        }
+        if (!wasOpen) { logoOptionsContainer.classList.remove('hidden'); }
     });
     sortTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = !sortOptions.classList.contains('hidden');
         closeAllDropdowns();
-        if (!wasOpen) {
-            sortOptions.classList.remove('hidden');
-        }
+        if (!wasOpen) { sortOptions.classList.remove('hidden'); }
     });
     sortOptions.addEventListener('click', (e) => {
         const optionBtn = e.target.closest('.dropdown-option');
@@ -1127,9 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.addEventListener('click', () => {
-        closeAllDropdowns();
-    });
+    window.addEventListener('click', () => { closeAllDropdowns(); });
     function parseNum(s){
         if(!s) return 0;
         return parseFloat(String(s).replace(/,/g,'').replace(/%/g,'').trim()) || 0;
@@ -1145,29 +1001,23 @@ document.addEventListener('DOMContentLoaded', () => {
             taxSlabsContainer.classList.add('hidden');
             return;
         }
-
         taxSlabsTitle.textContent = `Tax Slabs for ${region.name.split(' (')[0].trim()}`;
         taxSlabsList.innerHTML = ''; 
-
         region.taxes.forEach(tax => {
             const li = document.createElement('li');
             li.style.display = 'flex';
             li.style.justifyContent = 'space-between';
             li.style.padding = '0.25rem 0';
-            
             const categorySpan = document.createElement('span');
             categorySpan.textContent = tax.category;
             categorySpan.style.paddingRight = '0.5rem';
-            
             const rateSpan = document.createElement('span');
             rateSpan.textContent = `${tax.rate.toFixed(2)}%`;
             rateSpan.style.fontWeight = '500';
-
             li.appendChild(categorySpan);
             li.appendChild(rateSpan);
             taxSlabsList.appendChild(li);
         });
-
         taxSlabsContainer.classList.remove('hidden');
     }
 
@@ -1176,13 +1026,10 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsBody.querySelectorAll('.item').forEach(row=>{
             const qty = parseNum(row.querySelector('.qty').textContent);
             const excl = parseNum(row.querySelector('.excl').textContent);
-            // We use the VAT amount cell for VAT calculation
             const vat = parseNum(row.querySelector('.vat').textContent); 
-            // The item price is actually the unit price (excl). Subtotal is sum of (unit_price_excl * qty)
             subtotal += excl * qty; 
             vatTotal += vat;
         });
-
         let totalCharges = 0;
         if (totalsBody) {
             totalsBody.querySelectorAll('tr.charge-row').forEach(row => {
@@ -1190,7 +1037,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalCharges += value;
             });
         }
-        
         document.getElementById('subtotal').textContent = fmt(subtotal);
         document.getElementById('vat-total').textContent = fmt(vatTotal);
         document.getElementById('grand').textContent = fmt(subtotal + vatTotal + totalCharges);
@@ -1208,89 +1054,59 @@ document.addEventListener('DOMContentLoaded', () => {
         let inclCell = row.querySelector('.incl');
         
         const activeEl = document.activeElement;
-        
-        // Determine the actual rate (remove % and parse)
         let rateText = rateCell.textContent.trim();
         let rate = parseNum(rateText);
-        
-        // Determine if the rate cell is currently designated for custom editing
         const isCustomRateSelected = rateCell.contentEditable === 'true';
 
-        // Case 1: Active element is quantity, price excl VAT, or the custom rate itself
         if (activeEl === exclCell || activeEl === row.querySelector('.qty') || (isCustomRateSelected && activeEl === rateCell)) {
-            
-            // If the rate cell is active (i.e., custom rate mode), re-read the rate
             if (activeEl === rateCell) {
                 rate = parseNum(rateCell.textContent);
-                // Ensure percentage suffix is added if it's a custom rate and was just edited
-                if (!rateCell.textContent.endsWith('%')) {
-                    rateCell.textContent = rate.toFixed(2) + '%';
-                }
+                if (!rateCell.textContent.endsWith('%')) { rateCell.textContent = rate.toFixed(2) + '%'; }
             } else if (isCustomRateSelected) {
-                // If another cell is edited but we're in custom mode, use the displayed rate
                 rate = parseNum(rateCell.textContent);
             }
-            
             let excl = parseNum(exclCell.textContent);
             const totalExcl = excl * qty;
-            
             const vatAmount = totalExcl * (rate / 100);
             const roundedVatAmount = parseNum(fmt(vatAmount));
             const totalIncl = totalExcl + roundedVatAmount;
-            
-            // Update other fields
             vatCell.textContent = fmt(roundedVatAmount);
             inclCell.textContent = fmt(totalIncl);
-            
         } 
-        // Case 2: Active element is VAT amount (only editable if not a custom rate)
         else if (activeEl === vatCell && isCustomRateSelected === false) {
             let excl = parseNum(exclCell.textContent);
             const totalExcl = excl * qty;
             const vatAmount = parseNum(vatCell.textContent);
             const totalIncl = totalExcl + vatAmount;
-            
-            // Update Price incl VAT
             inclCell.textContent = fmt(totalIncl);
-            
         } 
-        // Case 3: Active element is price inclusive of VAT (calculate back to price exclusive)
         else if (activeEl === inclCell) {
             const incl = parseNum(inclCell.textContent);
             const totalIncl = incl;
-
             if (rate > 0) {
                 const totalExcl = totalIncl / (1 + rate / 100);
                 const exclPerUnit = totalExcl / qty;
                 const roundedExclPerUnit = parseNum(fmt(exclPerUnit));
                 const roundedTotalExcl = roundedExclPerUnit * qty;
                 const vatAmount = totalIncl - roundedTotalExcl;
-                
-                // Update other fields
                 exclCell.textContent = fmt(exclPerUnit);
                 vatCell.textContent = fmt(vatAmount);
-            } else { // 0% rate
+            } else { 
                 const exclPerUnit = totalIncl / qty;
                 exclCell.textContent = fmt(exclPerUnit);
                 vatCell.textContent = fmt(0);
             }
         } 
-        // Case 4: None of the primary calculation fields were edited, just ensure consistency (e.g., initial load/recalc)
         else {
-            // Use the displayed rate for calculation
             rate = parseNum(rateCell.textContent);
-            
             let excl = parseNum(exclCell.textContent);
             const totalExcl = excl * qty;
             const vatAmount = totalExcl * (rate / 100);
             const roundedVatAmount = parseNum(fmt(vatAmount));
             const totalIncl = totalExcl + roundedVatAmount;
-            
             vatCell.textContent = fmt(roundedVatAmount);
             inclCell.textContent = fmt(totalIncl);
         }
-        
-        // Recalc totals table
         recalcTotals();
     }
     
@@ -1303,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedCategoryName === 'Custom') {
              selectedName = 'Custom';
-             selectedRate = 0.00; // Placeholder rate, actual rate comes from contenteditable
+             selectedRate = 0.00; 
              foundSelected = true;
         } else if (selectedCategoryName) {
             const matchingTax = region.taxes.find(tax => tax.category === selectedCategoryName);
@@ -1323,16 +1139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const optionsHTML = region.taxes.map(tax => {
-            return `<button type="button" 
-                            class="table-dropdown-option" 
-                            data-value="${tax.category}" 
-                            data-rate="${tax.rate}">
-                      ${tax.category}
-                    </button>`;
+            return `<button type="button" class="table-dropdown-option" data-value="${tax.category}" data-rate="${tax.rate}">${tax.category}</button>`;
         }).join('');
 
         const customOption = `<button type="button" class="table-dropdown-option" data-value="Custom" data-rate="0">Custom Rate...</button>`;
-        
         return { optionsHTML: optionsHTML + customOption, selectedName, selectedRate };
     }
     
@@ -1351,12 +1161,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
         `;
         const vatRow = document.getElementById('vat-row');
-        if (vatRow) {
-            vatRow.parentNode.insertBefore(tr, vatRow);
-        }
+        if (vatRow) { vatRow.parentNode.insertBefore(tr, vatRow); }
         recalcTotals(); 
     }
 
+    // UPDATED: Fixed layout to COLUMN (Stacked) and updated widths
     function addNewRow(itemData = null) {
         const tr = document.createElement('tr');
         tr.className = 'item';
@@ -1366,15 +1175,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const line = itemData ? itemData.line : '';
         const code = itemData ? itemData.code : '';
-        const desc = itemData ? itemData.desc : 'New Item\n\nProduct Serial Nr   ';
+        const desc = itemData ? itemData.desc : 'New Item';
         const qty = itemData ? itemData.qty : '1';
         const excl = itemData ? itemData.excl : '0.00';
+        
+        const serial = itemData && itemData.serial ? itemData.serial : '';
+        const style = itemData && itemData.style ? itemData.style : ''; 
 
         let rateStr = '0.00%';
         let isCustomRate = false;
 
         if (taxData.selectedName === 'Custom') {
-            // When loading saved custom rate, use the saved rate string
             rateStr = itemData && itemData.rate ? itemData.rate : '0.00%';
             isCustomRate = true;
         } else {
@@ -1389,13 +1200,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <td contenteditable="true" class="code" data-label="Product Code">${code}</td>
             <td data-label="Description">
                 <div contenteditable="true" class="desc">${desc}</div>
+                <div class="meta-inputs" style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">
+                    <input type="text" class="item-serial" placeholder="Serial No / IMEI" value="${serial}" style="width:100%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
+                    <input type="text" class="item-style" placeholder="Style" value="${style}" style="width:100%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
+                </div>
                 <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="${taxData.selectedName}">
-                    <button type="button" class="table-dropdown-trigger">
-                        ${taxData.selectedName}
-                    </button>
-                    <div class="table-dropdown-panel hidden">
-                        ${taxData.optionsHTML}
-                    </div>
+                    <button type="button" class="table-dropdown-trigger">${taxData.selectedName}</button>
+                    <div class="table-dropdown-panel hidden">${taxData.optionsHTML}</div>
                 </div>
             </td>
             <td contenteditable="true" class="qty" data-label="Qty">${qty}</td>
@@ -1412,22 +1223,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
         `;
         itemsBody.appendChild(tr);
-
-        
-        if (!itemData) {
-            tr.querySelector('.desc').focus();
-            calcRow(tr);
-        }
-        
+        if (!itemData) { tr.querySelector('.desc').focus(); calcRow(tr); }
         updateLineNumbers();
         recalcTotals();
     }
-    addItemBtn.addEventListener('click', () => {
-        addNewRow();
-    });
-    function updateLineNumbers(){
-        itemsBody.querySelectorAll('.line').forEach((c,i)=> c.textContent = i+1);
-    }
+    addItemBtn.addEventListener('click', () => { addNewRow(); });
+    function updateLineNumbers(){ itemsBody.querySelectorAll('.line').forEach((c,i)=> c.textContent = i+1); }
     itemsBody.addEventListener('input', (e)=>{
         const row = e.target.closest('tr.item');
         if(!row) return;
@@ -1435,43 +1236,12 @@ document.addEventListener('DOMContentLoaded', () => {
         recalcTotals();
     });
         
-    if (addFeeBtn) {
-        addFeeBtn.addEventListener('click', () => {
-            addChargeRow();
-        });
-    }
-
-    if (totalsBody) {
-        totalsBody.addEventListener('click', (e) => {
-            const deleteBtn = e.target.closest('.delete-charge-btn');
-            if (deleteBtn) {
-                const row = deleteBtn.closest('tr.charge-row');
-                if (row) {
-                    row.remove();
-                    recalcTotals();
-                }
-            }
-        });
-
-        totalsBody.addEventListener('input', (e) => {
-            const row = e.target.closest('tr.charge-row');
-            if (row) {
-                recalcTotals();
-            }
-        });
-    }
-
-
     itemsBody.addEventListener('click', (e) => {
         e.stopPropagation();
         const deleteBtn = e.target.closest('.delete-btn');
         if (deleteBtn) {
             const row = deleteBtn.closest('tr.item');
-            if (row) {
-                row.remove(); 
-                updateLineNumbers(); 
-                recalcTotals(); 
-            }
+            if (row) { row.remove(); updateLineNumbers(); recalcTotals(); }
             return;
         }
         const triggerBtn = e.target.closest('.table-dropdown-trigger');
@@ -1479,9 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const panel = triggerBtn.nextElementSibling;
             const wasOpen = !panel.classList.contains('hidden');
             closeAllDropdowns();
-            if (!wasOpen) {
-                panel.classList.remove('hidden');
-            }
+            if (!wasOpen) { panel.classList.remove('hidden'); }
             return; 
         }
         const optionBtn = e.target.closest('.table-dropdown-option');
@@ -1503,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (categoryName === 'Custom') {
                 rateDisplayCell.contentEditable = 'true';
                 vatCell.contentEditable = 'false';
-                rateDisplayCell.textContent = '0.00%'; // Default for custom rate
+                rateDisplayCell.textContent = '0.00%'; 
                 rateDisplayCell.focus(); 
             } else {
                 rateDisplayCell.contentEditable = 'false';
@@ -1528,7 +1296,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const rateDisplay = row.querySelector('.rate-display');
             const vatCell = row.querySelector('.vat');
             const categoryWrapper = row.querySelector('.tax-category-wrapper');
-            
             const isRateEditable = rateDisplay.contentEditable === 'true';
             
             if (isRateEditable) {
@@ -1536,31 +1303,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 panel.innerHTML = taxData.optionsHTML;
                 trigger.textContent = "Custom";
                 categoryWrapper.dataset.categoryPrint = "Custom";
-                // Rate display contenteditable remains true
             } else {
                 const currentCategoryName = trigger.textContent.trim();
                 const taxData = getCustomTaxOptions(currentRegion, currentCategoryName);
-                
-                // If the old category is no longer available in the new region, fall back to the new region's default
                 let selectedName = taxData.selectedName;
                 let selectedRate = taxData.selectedRate;
                 if (!countryData[currentRegion].taxes.find(t => t.category === currentCategoryName) && currentCategoryName !== 'Custom') {
                     selectedName = countryData[currentRegion].defaultTaxCategory;
                     selectedRate = countryData[currentRegion].taxes.find(t => t.category === selectedName).rate;
                 }
-                
                 panel.innerHTML = taxData.optionsHTML;
                 trigger.textContent = selectedName;
                 rateDisplay.textContent = selectedRate.toFixed(2) + '%';
                 categoryWrapper.dataset.categoryPrint = selectedName;
-                rateDisplay.contentEditable = 'false'; // Ensure correct state
-                vatCell.contentEditable = 'true'; // Ensure correct state
+                rateDisplay.contentEditable = 'false'; 
+                vatCell.contentEditable = 'true'; 
             }
         });
         recalcAllRows();
-        if (showNote) {
-            regionNote.classList.remove('hidden');
-        }
+        if (showNote) { regionNote.classList.remove('hidden'); }
     }
     
     function handleLogoChange() {
@@ -1607,12 +1368,8 @@ document.addEventListener('DOMContentLoaded', () => {
         logoLabel.textContent = 'No Logo'; 
         handleLogoChange(); 
     });
-    dismissNoteBtn.addEventListener('click', () => {
-        regionNote.classList.add('hidden');
-    });
-    newInvoiceBtn.addEventListener('click', () => {
-        clearInvoiceForm();
-    });
+    dismissNoteBtn.addEventListener('click', () => { regionNote.classList.add('hidden'); });
+    newInvoiceBtn.addEventListener('click', () => { clearInvoiceForm(); });
     saveInvoiceBtn.addEventListener('click', () => {
         const data = getInvoiceDataFromDOM();
         let invoices = getInvoicesFromStorage();
@@ -1622,12 +1379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if (currentInvoiceId) {
                 const index = invoices.findIndex(inv => inv.id === currentInvoiceId);
-                if (index > -1) {
-                    invoices[index] = { ...data, id: currentInvoiceId };
-                } else {
-                    data.id = currentInvoiceId;
-                    invoices.push(data);
-                }
+                if (index > -1) { invoices[index] = { ...data, id: currentInvoiceId }; } 
+                else { data.id = currentInvoiceId; invoices.push(data); }
             } else {
                 data.id = 'inv_' + Date.now();
                 currentInvoiceId = data.id;
@@ -1652,21 +1405,18 @@ document.addEventListener('DOMContentLoaded', () => {
     importInvoicesInput.addEventListener('change', importInvoices);
     exportSettingsBtn.addEventListener('click', exportSettings);
     importSettingsInput.addEventListener('change', importSettings);
-
-    // Setup screen import handlers
     importInvoicesInputSetup.addEventListener('change', importInvoices);
     importSettingsInputSetup.addEventListener('change', importSettings);
-
 
     printBtn.addEventListener('click', () => {
         itemsBody.querySelectorAll('.tax-category-wrapper').forEach(cell => {
             const trigger = cell.querySelector('.table-dropdown-trigger');
-            if (trigger) {
-                cell.dataset.categoryPrint = trigger.textContent.trim();
-            }
+            if (trigger) { cell.dataset.categoryPrint = trigger.textContent.trim(); }
         });
         window.print();
     });
+    
+    // UPDATED: PDF Generation (Render width 800px + Style logic + Tax removal)
     generatePdfBtn.addEventListener('click', async () => {
         const invoiceEl = document.getElementById('invoice');
         if(document.activeElement) document.activeElement.blur();
@@ -1690,9 +1440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceEl.style.minHeight = 'auto'; 
         itemsBody.querySelectorAll('.tax-category-wrapper').forEach(cell => {
             const trigger = cell.querySelector('.table-dropdown-trigger');
-            if (trigger) {
-                cell.dataset.categoryPrint = trigger.textContent.trim();
-            }
+            if (trigger) { cell.dataset.categoryPrint = trigger.textContent.trim(); }
         });
         try {
             const { jsPDF } = window.jspdf;
@@ -1716,19 +1464,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 clonedEl.querySelectorAll('.table-dropdown-trigger, .table-dropdown-panel, .delete-btn, .hide-on-print').forEach(el => {
                     el.parentNode.removeChild(el);
                 });
+                
+                // UPDATED: Convert Serial/Style inputs to text for PDF (Updated logic for Style)
+                const originalInputs = element.querySelectorAll('input.item-serial, input.item-style');
+                const clonedInputs = clonedEl.querySelectorAll('input.item-serial, input.item-style');
+                if (originalInputs.length > 0 && clonedInputs.length > 0) {
+                    clonedInputs.forEach((input, index) => {
+                        const val = originalInputs[index].value; 
+                        const span = document.createElement('div');
+                        // Logic updated to check for item-style instead of item-color
+                        span.textContent = val ? (input.classList.contains('item-serial') ? `SN: ${val}` : `Style: ${val}`) : '';
+                        span.style.fontSize = '10px';
+                        span.style.color = '#6b7280';
+                        span.style.marginTop = '2px';
+                        if (val) { input.parentNode.replaceChild(span, input); } 
+                        else { input.remove(); }
+                    });
+                }
+
+                // REMOVE TAX SLAB FROM PDF
                 clonedEl.querySelectorAll('.tax-category-wrapper').forEach(cell => {
-                    const printText = cell.dataset.categoryPrint || '';
-                    cell.innerHTML = ''; 
-                    cell.style.fontSize = '12px';
-                    cell.style.color = '#111827';
-                    cell.style.whiteSpace = 'nowrap';
-                    cell.style.marginTop = '8px';
-                    cell.innerHTML = `<span style="font-weight: 600; color: #4b5563; padding-right: 8px;">Tax Category:</span>${printText}`;
+                    cell.remove(); 
                 });
+                
                 const renderContainer = document.createElement('div');
                 renderContainer.style.position = 'absolute';
                 renderContainer.style.left = '-9999px';
-                renderContainer.style.width = `1200px`; 
+                // FIXED: Width 800px to fix zoom issue
+                renderContainer.style.width = `800px`; 
                 renderContainer.style.background = '#fff';
                 renderContainer.style.padding = '0'; 
                 renderContainer.style.margin = '0';
@@ -1756,29 +1519,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 pdf.addImage(imgData, 'PNG', margin, currentY, imgW, imgH, undefined, 'FAST');
                 currentY += imgH; 
-                if (element.tagName === 'TR') {
-                    currentY += 0.5; 
-                } else {
-                    currentY += 2; 
-                }
+                if (element.tagName === 'TR') { currentY += 0.5; } 
+                else { currentY += 2; }
             }
             const headerBlock = document.createElement('div');
             headerBlock.appendChild(invoiceEl.querySelector('.invoice-header-row').cloneNode(true));
             headerBlock.appendChild(invoiceEl.querySelector('.party-row').cloneNode(true));
             const tableHead = invoiceEl.querySelector('#items thead').cloneNode(true); 
             const itemRows = invoiceEl.querySelectorAll('#items-body .item');
+            
+            // Adjusted colgroup for 800px width
             const colgroup = document.createElement('colgroup');
             colgroup.innerHTML = `
+                <col style="width: 30px;">
+                <col style="width: 70px;">
+                <col style="width: 400px;">
                 <col style="width: 40px;">
-                <col style="width: 80px;">
-                <col style="width: 680px;">
-                <col style="width: 40px;">
-                <col style="width: 90px;">
+                <col style="width: 70px;">
+                <col style="width: 50px;">
                 <col style="width: 60px;">
                 <col style="width: 80px;">
-                <col style="width: 90px;">
-                <col style="width: 40px;">
             `;
+            
             const footerBlock = document.createElement('div');
             footerBlock.appendChild(invoiceEl.querySelector('.totals').cloneNode(true));
             footerBlock.appendChild(invoiceEl.querySelector('.invoice-footer').cloneNode(true));
@@ -1817,52 +1579,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // ** FIX: Add listener for the "Get Started" button **
     setupFinishBtn.addEventListener('click', () => {
         const name = setupUserName.value.trim();
         const email = setupUserEmail.value.trim();
-
-        if (!name) {
-            alert("Please enter your name to get started.");
-            return;
-        }
-
-        // 1. Save User Profile
+        if (!name) { alert("Please enter your name to get started."); return; }
         saveUserProfile(name, email);
-        
-        // 2. Save Global Config (from the setup modal form)
-        // Since setup form is just the global settings section, we save the inputs there.
-        const savedConfig = saveGlobalConfig(false); // Save without notification
-
+        const savedConfig = saveGlobalConfig(false); 
         if (savedConfig) {
-            // 3. Mark setup as complete
             localStorage.setItem(SETUP_COMPLETE_KEY, 'true');
-            
-            // 4. Re-run initApp to transition to the main application
             initApp();
         }
     });
 
-    // --- APP INITIALIZATION ---
     function initApp() {
-        // 1. Prepare DOM: Move Global Settings form to setup modal (temporarily)
         if (setupGlobalSettingsContainer && globalSettingsSection) {
              setupGlobalSettingsContainer.appendChild(globalSettingsSection);
         }
-
         const setupComplete = localStorage.getItem(SETUP_COMPLETE_KEY);
-
         if (setupComplete === 'true') {
-            // App is already set up, load normally
             loadUserProfile();
             loadGlobalConfig();
-            
-            // 2. Re-append global settings section back to the regular settings menu
              if (appSettingsSection && globalSettingsSection) {
                  appSettingsSection.prepend(globalSettingsSection);
              }
-            
-            // Initialize main app UI
             populateDropdown(); 
             regionNote.classList.add('hidden');
             handleLogoChange(); 
@@ -1871,12 +1610,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStorageUsageDisplay();
             setupScreen.classList.add('hidden'); 
         } else {
-            // First time run: show setup screen
             setupScreen.classList.remove('hidden');
-            loadGlobalConfig(); // Load defaults into the setup modal's form
+            loadGlobalConfig(); 
         }
     }
 
-    // --- Run App Initialization ---
     initApp();
 });
