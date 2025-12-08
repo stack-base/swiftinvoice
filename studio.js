@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             ui.invSelect.innerHTML = '<option>No invoices found</option>';
             ui.mobInvSelectedText.textContent = "No invoices found";
-            ui.invListContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--text-muted);">No invoices found in file.</div>';
+            ui.invListContainer.innerHTML = '<div style="padding: 2rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.875rem;">No invoices found in file.</div>';
             renderInvoice(null, "No invoice data found in this file.");
             ui.pdfBtn.disabled = true;
         }
@@ -1155,10 +1155,16 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.invListContainer.innerHTML = '';
         ui.mobInvScrollArea.innerHTML = ''; 
         
+        // --- PATCH FOR NEW UI: Update the badge count ---
+        if (ui.listCount) {
+            ui.listCount.textContent = invoices.length;
+        }
+        
         ui.listCount.textContent = invoices.length;
 
         if (invoices.length === 0) {
-             ui.invListContainer.innerHTML = '<div style="padding:1.5rem; text-align:center; color:var(--text-muted);">No matches found.</div>';
+             // Added slight padding fix for empty state
+             ui.invListContainer.innerHTML = '<div style="padding:2rem 1rem; text-align:center; color:var(--text-muted); font-size:0.875rem;">No invoices loaded</div>';
              ui.mobInvScrollArea.innerHTML = '<div style="padding:0.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem;">No matches</div>';
              return;
         }
@@ -1173,6 +1179,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const div = document.createElement('div');
             div.className = 'invoice-list-item';
+            
+            // --- PATCH FOR NEW UI: Active state persistence ---
+            if (originalIdx === currentInvoiceIndex) {
+                div.classList.add('active');
+            }
+
             div.dataset.idx = originalIdx;
             const grandTotal = inv.grandTotal ? currencySymbol + formatMoney(parseCurrency(inv.grandTotal), currencyCode) : '0.00';
             div.innerHTML = `
@@ -1219,8 +1231,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return num.includes(term) || buyer.includes(term) || date.includes(term);
         });
         renderInvoiceList(filtered);
+        
+        // --- PATCH FOR NEW UI: Count update on search ---
+        if (ui.listCount) {
+            ui.listCount.textContent = filtered.length;
+        }
+
         if (filtered.length > 0) {
-             selectInvoice(filtered[0].originalIdx);
+             // Keep selection if visible, otherwise select first
+             const currentStillVisible = filtered.find(inv => inv.originalIdx === currentInvoiceIndex);
+             if (!currentStillVisible) {
+                 selectInvoice(filtered[0].originalIdx);
+             }
         } else {
              renderInvoice(null, "No matches found.");
              ui.mobInvSelectedText.textContent = "No matches";
@@ -1537,10 +1559,23 @@ document.addEventListener('DOMContentLoaded', () => {
             logoHtml = `<img src="${data.logoSrc}" class="invoice-logo" alt="Logo">`;
         }
         
-        const sellerAddress = document.createElement('div');
-        sellerAddress.textContent = (data.seller || '').replace(/<div>/g, '').replace(/<\/div>/g, '');
-        const buyerAddress = document.createElement('div');
-        buyerAddress.textContent = (data.buyer || '').replace(/<div>/g, '').replace(/<\/div>/g, '');
+        // --- PATCH FOR ADDRESS FIX ---
+        // Helper function to strip HTML tags properly and preserve line breaks
+        const formatAddress = (raw) => {
+            if (!raw) return '';
+            // Replace <div...> with newline, remove </div>
+            let str = raw.replace(/<div[^>]*>/gi, '\n').replace(/<\/div>/gi, '');
+            // Replace <br> with newline
+            str = str.replace(/<br\s*\/?>/gi, '\n');
+            // Remove any other tags
+            str = str.replace(/<[^>]+>/g, '');
+            // Split by newline, trim, filter empty lines, join with <br>
+            return str.split('\n').map(s => s.trim()).filter(s => s).join('<br>');
+        };
+
+        const sellerAddress = formatAddress(data.seller);
+        const buyerAddress = formatAddress(data.buyer);
+        // -----------------------------
         
         const subtotal = data.subtotal ? formatMoney(parseCurrency(data.subtotal), currencyCode) : '0.00';
         const vatTotal = data.vatTotal ? formatMoney(parseCurrency(data.vatTotal), currencyCode) : '0.00';
@@ -1567,11 +1602,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="party-row">
                 <div class="party">
                     <h2>Seller</h2>
-                    <div class="address">${sellerAddress.innerHTML.replace(/\n/g, '<br>')}</div>
+                    <div class="address">${sellerAddress}</div>
                 </div>
                 <div class="party">
                     <h2>Buyer</h2>
-                    <div class="address">${buyerAddress.innerHTML.replace(/\n/g, '<br>')}</div>
+                    <div class="address">${buyerAddress}</div>
                 </div>
             </div>
 
