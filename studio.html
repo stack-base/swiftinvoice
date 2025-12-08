@@ -1,916 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Data Studio | SwiftInvoice</title>
-    <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-body: #f3f4f6;
-            --bg-paper: #ffffff;
-            --bg-sidebar: #ffffff;
-            --bg-header-pill: rgba(255, 255, 255, 0.75);
-            --bg-input: #ffffff;
-            --bg-hover: #f9fafb;
-            --bg-active: #f0fdfa;
-            --text-main: #111827;
-            --text-secondary: #4b5563;
-            --text-muted: #9ca3af;
-            --text-accent: #0d9488;
-            --border-color: #e5e7eb;
-            --border-active: #ccfbf1;
-            --primary: #0d9488;
-            --primary-hover: #0f766e;
-            --chart-grid: #f3f4f6;
-            --chart-text: #6b7280;
-            --scrollbar-track: #f3f4f6;
-            --scrollbar-thumb: #d1d5db;
-            --scrollbar-thumb-hover: #9ca3af;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-        }
-        [data-theme="dark"] {
-            --bg-body: #000000;
-            --bg-paper: #09090b;
-            --bg-sidebar: #000000;
-            --bg-header-pill: rgba(20, 20, 20, 0.85);
-            --bg-input: #000000;
-            --bg-hover: #18181b;
-            --bg-active: #112825;
-            --text-main: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #6b7280;
-            --text-accent: #2dd4bf;
-            --border-color: #27272a;
-            --border-active: #115e59;
-            --primary: #14b8a6;
-            --primary-hover: #0d9488;
-            --chart-grid: #27272a;
-            --chart-text: #9ca3af;
-            --scrollbar-track: #000000;
-            --scrollbar-thumb: #27272a;
-            --scrollbar-thumb-hover: #52525b;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
-        }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; border: 2px solid var(--scrollbar-track); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
-        * { -webkit-tap-highlight-color: transparent; }
-        ::selection { background: var(--primary); color: #ffffff; }
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body { font-family: 'Inter', Arial, Helvetica, sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
-        .hidden { display: none !important; }
-        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        #view-landing { position: fixed; inset: 0; z-index: 50; background-color: var(--bg-body); display: flex; align-items: center; justify-content: center; transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; padding: 1rem; }
-        #view-landing.fade-out { opacity: 0; pointer-events: none; transform: scale(0.98); }
-        .landing-card { background: var(--bg-paper); width: 100%; max-width: 32rem; padding: 2.5rem; border-radius: 1rem; box-shadow: var(--shadow-lg); text-align: center; position: relative; overflow: hidden; border: 1px solid var(--border-color); }
-        .landing-header { margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; }
-        .landing-logo-bg { display: flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background-color: var(--primary); border-radius: 0.75rem; margin-bottom: 1rem; }
-        .landing-logo-icon { width: 2rem; height: 2rem; color: #ffffff; }
-        .landing-title { font-family: 'Ubuntu', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text-accent); margin: 0; }
-        .landing-subtitle { font-size: 1.25rem; color: var(--text-secondary); margin-top: 0.25rem; font-weight: 500; }
-        .landing-state-section { transition: opacity 0.3s ease, transform 0.3s ease; }
-        .landing-state-active { opacity: 1; transform: translateX(0); display: block; }
-        .landing-state-inactive { opacity: 0; transform: translateX(-20px); display: none; }
-        .upload-area { border: 2px dashed var(--border-color); border-radius: 0.75rem; padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; background-color: var(--bg-hover); transition: all 0.2s ease-in-out; position: relative; }
-        .upload-area:hover, .upload-area.drag-active { border-color: var(--primary); background-color: var(--bg-active); }
-        .upload-icon { width: 3rem; height: 3rem; color: var(--text-muted); margin-bottom: 1rem; transition: color 0.2s; }
-        .upload-area:hover .upload-icon, .upload-area.drag-active .upload-icon { color: var(--primary); }
-        .upload-text-main { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem; }
-        .upload-text-sub { font-size: 0.8rem; color: var(--text-secondary); }
-        .auth-file-badge { background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; text-align: left; }
-        .auth-lock-icon { width: 1.5rem; height: 1.5rem; color: #d97706; }
-        .auth-filename { font-weight: 600; color: var(--text-main); font-size: 0.875rem; word-break: break-all; }
-        .auth-label { font-size: 0.75rem; color: var(--text-secondary); display: block; }
-        #view-app { display: flex; height: 100vh; width: 100%; opacity: 0; transform: scale(1.02); transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; }
-        #view-app.active { opacity: 1; transform: scale(1); }
-        .sidebar { width: 100%; max-width: none; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s ease; }
-        .sidebar.sidebar-open { transform: translateX(0); }
-        .sidebar-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
-        @media (min-width: 1024px) { 
-            .sidebar { width: 20%; min-width: 250px; max-width: 20vw; position: relative; transform: none; z-index: 20; }
-            .sidebar-overlay { display: none; }
-            .menu-btn { display: none !important; }
-        }
-        .right-pane-wrapper { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-body); position: relative; width: 100%; min-width: 0; }
-        .right-pane-header { position: absolute; top: 1.5rem; left: 0; width: 100%; z-index: 50; display: flex; justify-content: center; align-items: center; pointer-events: none; padding: 0 1rem; box-sizing: border-box; transition: opacity 0.2s ease; }
-        @media (min-width: 1024px) { .right-pane-header { padding-left: calc(20% + 1rem); } }
-        @media (max-width: 1023px) { body.mobile-menu-open .right-pane-header { display: none !important; } }
-        .header-pill { background: var(--bg-header-pill); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0,0,0,0.02); border-radius: 9999px; padding: 0.35rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; pointer-events: auto; transition: all 0.2s ease; max-width: 100%; }
-        #mobile-invoice-controls { display: none; width: 100%; padding: 0 1rem; box-sizing: border-box; justify-content: center; margin-top: 5rem; margin-bottom: 1rem; z-index: 10; }
-        .mobile-control-bar { background: var(--bg-header-pill); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); border-radius: 0.75rem; padding: 0.5rem; display: flex; align-items: center; gap: 0.5rem; width: 100%; max-width: 32rem; position: relative; }
-        .mob-nav-btn { background: var(--bg-paper); border: 1px solid var(--border-color); color: var(--text-secondary); width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-        .mob-nav-btn:active { background: var(--bg-hover); }
-        .mob-inv-trigger { flex: 1; background: var(--bg-paper); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0 0.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; min-width: 0; font-size: 0.875rem; font-weight: 500; color: var(--text-main); user-select: none; }
-        .mob-inv-trigger:active { background-color: var(--bg-hover); }
-        .mob-inv-list-container { position: absolute; top: calc(100% + 0.5rem); left: 0; width: 100%; background: var(--bg-paper); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); border-radius: 0.75rem; overflow: hidden; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; max-height: 50vh; display: flex; flex-direction: column; z-index: 60; }
-        .mob-inv-list-container.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .mob-inv-scroll { overflow-y: auto; padding: 0.5rem; }
-        .mob-list-item { padding: 0.75rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; cursor: pointer; transition: background 0.15s; }
-        .mob-list-item:hover { background-color: var(--bg-hover); }
-        .mob-list-item.active { background-color: var(--bg-active); border: 1px solid var(--border-active); }
-        .mob-list-item.active .mob-li-num { color: var(--text-accent); font-weight: 700; }
-        .mob-li-info { display: flex; flex-direction: column; min-width: 0; flex: 1; margin-right: 1rem; }
-        .mob-li-num { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.02em; }
-        .mob-li-client { font-size: 0.9rem; font-weight: 500; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .mob-li-check { color: var(--text-accent); opacity: 0; transition: opacity 0.2s; }
-        .mob-list-item.active .mob-li-check { opacity: 1; }
-        .three-pane-body { display: flex; flex: 1; overflow: hidden; width: 100%; }
-
-        /* --- Modern Invoice List Pane --- */
-        .pane-invoice-list {
-            width: 25%;
-            min-width: 280px; 
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            padding-top: 0;
-            position: relative;
-        }
-
-        .list-header {
-            padding: 1.5rem 1rem 1rem 1rem;
-            border-bottom: 1px solid transparent; 
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            background: var(--bg-sidebar);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .list-header-top {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-
-        .list-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-            margin: 0;
-        }
-
-        .list-count-badge {
-            background: var(--bg-hover);
-            padding: 0.15rem 0.6rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .list-search-box {
-            position: relative;
-            width: 100%;
-        }
-
-        .list-search-input {
-            width: 100%;
-            padding: 0.6rem 0.75rem 0.6rem 2.25rem;
-            font-size: 0.875rem;
-            border: 1px solid transparent; 
-            border-radius: 0.75rem;
-            box-sizing: border-box;
-            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-            background: var(--bg-hover); 
-            color: var(--text-main);
-            font-weight: 500;
-        }
-
-        .list-search-input:focus {
-            outline: none;
-            background: var(--bg-paper);
-            box-shadow: 0 0 0 2px var(--primary), var(--shadow-sm);
-        }
-        
-        .list-search-input::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .list-search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 1rem;
-            height: 1rem;
-            color: var(--text-muted);
-            pointer-events: none;
-        }
-
-        .list-scroll-area {
-            overflow-y: auto;
-            flex: 1;
-            padding: 0.5rem 0.75rem; 
-        }
-
-        .invoice-list-item {
-            padding: 0.85rem 1rem;
-            margin-bottom: 4px; 
-            border-radius: 0.75rem; 
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: transparent;
-        }
-
-        .invoice-list-item:hover {
-            background-color: var(--bg-hover);
-        }
-
-        .invoice-list-item.active {
-            background-color: var(--bg-active);
-            border-color: rgba(0,0,0,0.05);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        [data-theme="dark"] .invoice-list-item.active {
-            border-color: rgba(255,255,255,0.05);
-        }
-
-        .inv-item-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .inv-number {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-main);
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .invoice-list-item.active .inv-number {
-            color: var(--primary);
-        }
-
-        .inv-date {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .inv-buyer {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-weight: 500;
-        }
-        
-        .invoice-list-item.active .inv-buyer {
-            color: var(--text-main);
-        }
-
-        .inv-total {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted); 
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .invoice-list-item.active .inv-total {
-            color: var(--text-accent);
-        }
-        /* --- End Modern List --- */
-
-        .pane-content-area { flex: 1; overflow-y: auto; position: relative; min-width: 0; display: flex; flex-direction: column; padding-top: 5rem; }
-        .main-content { height: 100%; width: 100%; }
-        .main-content-container { max-width: 60rem; margin: 0 auto; padding: 0 2rem 3rem 2rem; }
-        .raw-data-container { padding: 0 2rem 3rem 2rem; height: 100%; box-sizing: border-box; }
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: var(--bg-paper); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.03em; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .stat-trend { font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 4px; }
-        .trend-up { color: #10b981; }
-        .trend-down { color: #ef4444; }
-        .trend-neutral { color: var(--text-muted); }
-        .ai-wrapper { position: relative; margin-bottom: 2.5rem; }
-        .ai-container {
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.70) 0%, rgba(240, 249, 255, 0.40) 100%);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            padding: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 20px 25px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255,255,255,0.4);
-            overflow: hidden;
-            position: relative;
-        }
-        [data-theme="dark"] .ai-container {
-            background: linear-gradient(160deg, rgba(25, 25, 25, 0.7) 0%, rgba(10, 10, 10, 0.5) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
-        }
-        .ai-container::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-            filter: blur(40px);
-            z-index: 0;
-            pointer-events: none;
-        }
-        .ai-header-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem 0.75rem 1.5rem; margin-bottom: 0.75rem; position: relative; z-index: 1; }
-        .ai-brand { display: flex; align-items: center; gap: 0.75rem; }
-        /* Update for the Spark Icon in the Summary Header (Orange) */
-        .ai-spark-icon { 
-            color: #f97316; /* Orange to match dashboard header */
-            width: 1.25rem; 
-            height: 1.25rem; 
-            animation: pulse-glow 4s infinite ease-in-out; 
-            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)); /* Orange glow */
-        }
-        .ai-title-text { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem; color: var(--text-main); letter-spacing: -0.01em; }
-        .ai-badge-pill { background: whitesmoke; color: #6366f1; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 99px; letter-spacing: 0.05em; border: 1px solid rgba(99, 102, 241, 0.2); backdrop-filter: blur(4px); }
-        [data-theme="dark"] .ai-badge-pill { background: black; color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
-        .ai-bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; position: relative; z-index: 1; }
-        @media (max-width: 900px) { .ai-bento-grid { grid-template-columns: 1fr; } }
-        .ai-card {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 18px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-        [data-theme="dark"] .ai-card { background: rgba(60, 60, 60, 0.25); border: 1px solid rgba(255, 255, 255, 0.06); }
-        .ai-card:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
-        [data-theme="dark"] .ai-card:hover { background: rgba(80, 80, 80, 0.35); }
-        .ai-card-header { display: flex; align-items: center; gap: 0.6rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); opacity: 0.9; }
-        /* Update for the AI Icons inside the cards (Blue) */
-        .ai-card-icon { 
-            width: 1.1rem; 
-            height: 1.1rem; 
-            color: #3b82f6; /* Bright Blue */
-        }
-        .ai-prose { font-size: 0.9rem; line-height: 1.6; color: var(--text-main); font-family: 'Inter', sans-serif; font-weight: 400; opacity: 0.95; }
-        .ai-em {
-            font-weight: 600;
-            color: var(--text-main);
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.05));
-            padding: 0 4px;
-            border-radius: 4px;
-        }
-        [data-theme="dark"] .ai-em { color: #fff; background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.15)); }
-        .ai-loading-card { min-height: 140px; }
-        .shim {
-            background: linear-gradient(90deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.02) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite linear;
-            border-radius: 6px;
-        }
-        [data-theme="dark"] .shim { background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.02) 100%); }
-        @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
-        @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
-        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .insights-box { background: var(--bg-active); border: 1px solid var(--border-active); border-radius: 0.75rem; padding: 1rem 1.5rem; margin-bottom: 2rem; }
-        .insight-header { font-size: 0.85rem; font-weight: 700; color: var(--text-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
-        .insight-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
-        @media(min-width: 768px) { .insight-list { grid-template-columns: 1fr 1fr; } }
-        .insight-li { font-size: 0.875rem; color: var(--text-main); padding-left: 1rem; border-left: 2px solid var(--primary); line-height: 1.5; }
-        .analytics-section { background: var(--bg-paper); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; }
-        .section-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem; }
-        .section-title { font-size: 1.125rem; font-weight: 600; color: var(--text-main); margin: 0 0 1.25rem 0; }
-        .section-title.has-caption { margin-bottom: 0.35rem; } 
-        .text-gradient-custom {
-            background-color: #f7b42c;
-            background-image: linear-gradient(315deg, #f7b42c 0%, #fc575e 74%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            width: fit-content; /* Ensures the gradient fits the text width */
-        }
-        .section-caption { font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 1.25rem 0; display: block; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-        .data-table th { text-align: left; padding: 0.75rem; background: var(--bg-hover); color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-        .data-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
-        .data-table tr:last-child td { border-bottom: none; }
-        .chart-box { position: relative; height: 350px; width: 100%; }
-        @media (max-width: 1023px) {
-            .pane-invoice-list { display: none; } 
-            .app-container { margin: 0; border-radius: 0; border: none; border-bottom: 1px solid var(--border-color); }
-            .right-pane-header { top: 1rem; }
-            .pane-content-area { padding-top: 0; } 
-            .main-content-container, .raw-data-container { padding-top: 5.5rem; padding-left: 1rem; padding-right: 1rem; }
-            #content-preview .main-content-container { padding-top: 0; }
-            #mobile-invoice-controls.active { display: flex; }
-            body.mobile-menu-open #mobile-invoice-controls { display: none !important; }
-        }
-        @media (min-width: 1024px) { #mobile-invoice-controls { display: none !important; } }
-        .menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 999px; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; }
-        .menu-btn:hover { background-color: rgba(128,128,128,0.1); color: var(--text-main); }
-        .header-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 999px; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; transition: all 0.2s; }
-        .header-icon-btn:hover { background-color: var(--bg-hover); color: var(--text-main); }
-        .tab-group { display: inline-flex; background-color: rgba(128,128,128,0.1); padding: 3px; border-radius: 999px; }
-        .tab-btn { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); background: transparent; border: none; padding: 0.35rem 0.85rem; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; }
-        .tab-btn:hover { color: var(--text-main); }
-        .tab-btn.active { background-color: var(--bg-paper); color: var(--text-accent); font-weight: 600; box-shadow: var(--shadow-sm); }
-        .sidebar-header { padding: 1.5rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-header-branding { display: flex; align-items: center; gap: 0.75rem; }
-        .sidebar-logo-bg { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background-color: var(--primary); border-radius: 0.5rem; flex-shrink: 0; }
-        .sidebar-logo-icon { width: 1.5rem; height: 1.5rem; color: #ffffff; }
-        .sidebar-title { font-family: 'Ubuntu', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--text-accent); margin: 0; }
-        .sidebar-subtitle { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
-        .sidebar-branding-footer { font-family: 'Ubuntu', sans-serif; text-align: center; font-size: 0.875rem; color: var(--text-muted); padding: 1.5rem; border-top: 1px solid var(--border-color); margin-top: auto; }
-        .settings-panel { padding: 1.5rem; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
-        .section-card { background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; }
-        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text-main); margin-bottom: 0.35rem; text-align: left; }
-        .setup-input { width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-size: 0.875rem; margin-bottom: 1rem; box-sizing: border-box; background: var(--bg-input); color: var(--text-main); }
-        .setup-input:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; font-size: 0.875rem; font-weight: 500; border-radius: 0.375rem; padding: 0.5rem 1rem; cursor: pointer; width: 100%; transition: all 0.15s; }
-        .btn-primary { color: #ffffff; background-color: var(--primary); }
-        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
-        .btn-secondary { color: var(--text-main); background-color: var(--bg-paper); border-color: var(--border-color); }
-        .btn-secondary:hover:not(:disabled) { background-color: var(--bg-hover); }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-text { color: var(--text-muted); background: none; border: none; padding: 0.5rem; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
-        .action-cards-container { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-        .action-card { border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.75rem; background: var(--bg-paper); text-align: left; box-sizing: border-box; width: 100%; }
-        .action-card:hover { border-color: var(--primary); background: var(--bg-active); }
-        .action-card.active { border-color: var(--primary); background: var(--bg-active); ring: 2px solid var(--primary); }
-        .ac-icon { width: 24px; height: 24px; color: var(--text-accent); flex-shrink: 0; }
-        .ac-text h3 { margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
-        .ac-text p { margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-secondary); }
-        .sub-settings { border-left: 2px solid var(--border-color); padding-left: 1rem; margin-left: 0.5rem; margin-bottom: 1rem; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .radio-option { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem; cursor: pointer; color: var(--text-main); }
-        .activity-log { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
-        .activity-header { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.75rem; letter-spacing: 0.05em; }
-        .log-list { list-style: none; padding: 0; margin: 0; }
-        .log-item { position: relative; padding-left: 1.25rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); }
-        .log-item::before { content: ''; position: absolute; left: 0; top: 0.4rem; width: 6px; height: 6px; border-radius: 50%; background-color: var(--border-color); }
-        .log-item.active::before { background-color: var(--primary); }
-        .log-time { font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 2px; }
-        .log-highlight { color: var(--text-main); font-weight: 500; }
-        .status-box { padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; display: flex; align-items: start; gap: 0.5rem; margin-bottom: 1rem; line-height: 1.4; text-align: left; }
-        .status-box.error { background-color: #fef2f2; border: 1px solid #fee2e2; color: #991b1b; }
-        .meta-info-row { display: flex; justify-content: space-between; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.8rem; }
-        .meta-info-label { color: var(--text-muted); font-weight: 500; margin-bottom: 2px; font-size: 0.7rem; text-transform: uppercase; }
-        .meta-info-val { color: var(--text-main); font-weight: 600; }
-        .app-container { background-color: var(--bg-paper); border-radius: 0.75rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden; }
-        #invoice { width:100%; background:#fff; padding: 40px; box-sizing:border-box; color: #111827; font-family: 'Inter', Arial, sans-serif; min-height: 29.7cm; display: flex; flex-direction: column; justify-content: space-between; }
-        .invoice-logo { max-height: 80px; width: 100%; max-width: 160px; object-fit: contain; border-radius: 6px; }
-        .invoice-header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; margin-bottom: 24px; flex-direction: row; }
-        .header-left { width: 58%; }
-        .header-right { width: 40%; display: flex; justify-content: flex-end; align-items: flex-start; }
-        .party-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 32px; flex-direction: row; }
-        h1.title { font-size: 32px; margin: 0 0 16px 0; font-weight: 700; letter-spacing: -0.02em; color: #111827; text-transform: uppercase; }
-        .meta-table { font-size:12px; border-collapse:collapse; }
-        .meta-table td { padding: 4px 0; vertical-align:top; }
-        .meta-table td.label { width:120px; font-weight: 600; color: #4b5563; }
-        .party { width:48%; }
-        .party h2 { font-size: 14px; margin: 0 0 8px 0; font-weight: 600; color: #111827; }
-        .address { font-size: 12px; white-space:pre-wrap; line-height: 1.6; min-height:72px; padding:4px; border:none; color: #4b5563; }
-        .table-wrap { margin-top: 0; width:100%; overflow-x:auto; }
-        #items { width:100%; border-collapse:collapse; font-size: 12px; table-layout: auto; }
-        #items th, #items td { padding: 12px 8px; vertical-align:top; font-family:'Inter', Arial, sans-serif; border:none; text-align: left; vertical-align: middle; }
-        #items td:nth-child(1), #items th:nth-child(1) { text-align: center; width: 40px; }
-        #items td:nth-child(2), #items th:nth-child(2) { text-align: left; width: 80px;}
-        #items td:nth-child(3), #items th:nth-child(3) { text-align: left; }
-        #items td:nth-child(4), #items th:nth-child(4) { text-align: center; width: 40px; }
-        #items td:nth-child(5), #items th:nth-child(5) { text-align: right; width: 90px; }
-        #items td:nth-child(6), #items th:nth-child(6) { text-align: right; width: 60px; }
-        #items td:nth-child(7), #items th:nth-child(7) { text-align: right; width: 80px; }
-        #items td:nth-child(8), #items th:nth-child(8) { text-align: right; width: 90px; }
-        #items thead th { background: #f9fafb; font-weight: 600; font-size: 11px; vertical-align:middle; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 8px; }
-        #items tbody tr { border-bottom:1px solid #f3f4f6; }
-        .desc { white-space:pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
-        .totals { display:flex; justify-content:flex-end; margin-top: 32px; }
-        .totals .box { width: 380px; font-size: 12px; }
-        .totals .currency { text-align:right; padding-right:10px; margin-bottom:6px; color: #4b5563; font-size: 12px; }
-        .totals table { width:100%; border-collapse:collapse; font-size: 12px; }
-        .totals td { padding: 8px; }
-        .totals td.label { text-align:left; width:100px; font-weight: 500; color: #4b5563; }
-        .totals td.value { text-align:right; font-weight: 700; width:140px; color: #111827; }
-        .totals table tr:last-child { background-color: #f9fafb; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
-        .totals table tr:last-child td { font-size: 14px; padding-top: 12px; padding-bottom: 12px; }
-        .invoice-footer { font-family: 'Ubuntu', sans-serif; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #9ca3af; font-weight: 400; }
-        .invoice-footer-brand { font-family: 'Roboto', sans-serif; font-weight: 400; }
-        @media (max-width: 768px) {
-            .invoice-header-row, .party-row { flex-direction: column; gap: 20px; }
-            .header-left, .header-right, .party { width: 100%; }
-            .header-right { justify-content: flex-start; }
-            .totals .box { width: 100%; }
-        }
-        #invoice-placeholder { padding: 4rem; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        #json-preview { background-color: var(--bg-paper); color: var(--text-main); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 0.75rem; white-space: pre-wrap; word-wrap: break-word; font-size: 0.875rem; margin-top: 0; overflow: auto; height: 100%; }
-        .analysis-period { font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 1.5rem 0; display: block; font-weight: 500; }
-    </style>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Data Studio | SwiftInvoice</title>
+<link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg-body:#f3f4f6;--bg-paper:#ffffff;--bg-sidebar:#ffffff;--bg-header-pill:rgba(255,255,255,0.75);--bg-input:#ffffff;--bg-hover:#f9fafb;--bg-active:#f0fdfa;--text-main:#111827;--text-secondary:#4b5563;--text-muted:#9ca3af;--text-accent:#0d9488;--border-color:#e5e7eb;--border-active:#ccfbf1;--primary:#0d9488;--primary-hover:#0f766e;--chart-grid:#f3f4f6;--chart-text:#6b7280;--scrollbar-track:#f3f4f6;--scrollbar-thumb:#d1d5db;--scrollbar-thumb-hover:#9ca3af;--shadow-sm:0 1px 3px rgba(0,0,0,0.05);--shadow-lg:0 20px 25px -5px rgb(0 0 0 / 0.1)}
+[data-theme="dark"]{--bg-body:#000000;--bg-paper:#09090b;--bg-sidebar:#000000;--bg-header-pill:rgba(20,20,20,0.85);--bg-input:#000000;--bg-hover:#18181b;--bg-active:#112825;--text-main:#f9fafb;--text-secondary:#d1d5db;--text-muted:#6b7280;--text-accent:#2dd4bf;--border-color:#27272a;--border-active:#115e59;--primary:#14b8a6;--primary-hover:#0d9488;--chart-grid:#27272a;--chart-text:#9ca3af;--scrollbar-track:#000000;--scrollbar-thumb:#27272a;--scrollbar-thumb-hover:#52525b;--shadow-sm:0 1px 3px rgba(0,0,0,0.5);--shadow-lg:0 20px 25px -5px rgb(0 0 0 / 0.5)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--scrollbar-track)}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:4px;border:2px solid var(--scrollbar-track)}::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-thumb-hover)}
+*{scrollbar-width:thin;scrollbar-color:var(--scrollbar-thumb) var(--scrollbar-track);-webkit-tap-highlight-color:transparent}::selection{background:var(--primary);color:#fff}
+html,body{height:100%;margin:0;padding:0}body{font-family:'Inter',Arial,sans-serif;background-color:var(--bg-body);color:var(--text-main);overflow:hidden;transition:background-color .3s ease,color .3s ease}
+.hidden{display:none!important}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view-landing{position:fixed;inset:0;z-index:50;background-color:var(--bg-body);display:flex;align-items:center;justify-content:center;transition:opacity .4s ease-in-out,transform .4s ease-in-out;padding:1rem}#view-landing.fade-out{opacity:0;pointer-events:none;transform:scale(.98)}
+.landing-card{background:var(--bg-paper);width:100%;max-width:32rem;padding:2.5rem;border-radius:1rem;box-shadow:var(--shadow-lg);text-align:center;position:relative;overflow:hidden;border:1px solid var(--border-color)}
+.landing-header{margin-bottom:2rem;display:flex;flex-direction:column;align-items:center}.landing-logo-bg{display:flex;align-items:center;justify-content:center;width:3.5rem;height:3.5rem;background-color:var(--primary);border-radius:.75rem;margin-bottom:1rem}.landing-logo-icon{width:2rem;height:2rem;color:#fff}
+.landing-title{font-family:'Ubuntu',sans-serif;font-size:1.5rem;font-weight:700;color:var(--text-accent);margin:0}.landing-subtitle{font-size:1.25rem;color:var(--text-secondary);margin-top:.25rem;font-weight:500}
+.landing-state-section{transition:opacity .3s ease,transform .3s ease}.landing-state-active{opacity:1;transform:translateX(0);display:block}.landing-state-inactive{opacity:0;transform:translateX(-20px);display:none}
+.upload-area{border:2px dashed var(--border-color);border-radius:.75rem;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;background-color:var(--bg-hover);transition:all .2s ease-in-out;position:relative}
+.upload-area:hover,.upload-area.drag-active{border-color:var(--primary);background-color:var(--bg-active)}.upload-icon{width:3rem;height:3rem;color:var(--text-muted);margin-bottom:1rem;transition:color .2s}.upload-area:hover .upload-icon,.upload-area.drag-active .upload-icon{color:var(--primary)}
+.upload-text-main{font-size:.95rem;font-weight:600;color:var(--text-main);margin-bottom:.25rem}.upload-text-sub{font-size:.8rem;color:var(--text-secondary)}
+.auth-file-badge{background-color:var(--bg-hover);border:1px solid var(--border-color);border-radius:.5rem;padding:.75rem;display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;text-align:left}
+.auth-lock-icon{width:1.5rem;height:1.5rem;color:#d97706}.auth-filename{font-weight:600;color:var(--text-main);font-size:.875rem;word-break:break-all}.auth-label{font-size:.75rem;color:var(--text-secondary);display:block}
+#view-app{display:flex;height:100vh;width:100%;opacity:0;transform:scale(1.02);transition:opacity .4s ease-in-out,transform .4s ease-in-out}#view-app.active{opacity:1;transform:scale(1)}
+.sidebar{width:100%;max-width:none;background-color:var(--bg-sidebar);border-right:1px solid var(--border-color);flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:fixed;z-index:40;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .3s ease}.sidebar.sidebar-open{transform:translateX(0)}
+.sidebar-overlay{position:fixed;inset:0;background-color:rgba(0,0,0,0.5);z-index:30;opacity:0;pointer-events:none;transition:opacity .3s ease}.sidebar-overlay.visible{opacity:1;pointer-events:auto}
+@media (min-width:1024px){.sidebar{width:20%;min-width:250px;max-width:20vw;position:relative;transform:none;z-index:20}.sidebar-overlay{display:none}.menu-btn{display:none!important}}
+.right-pane-wrapper{flex:1;display:flex;flex-direction:column;background-color:var(--bg-body);position:relative;width:100%;min-width:0}
+.right-pane-header{position:absolute;top:1.5rem;left:0;width:100%;z-index:50;display:flex;justify-content:center;align-items:center;pointer-events:none;padding:0 1rem;box-sizing:border-box;transition:opacity .2s ease}
+@media (min-width:1024px){.right-pane-header{padding-left:calc(20% + 1rem)}}@media (max-width:1023px){body.mobile-menu-open .right-pane-header{display:none!important}}
+.header-pill{background:var(--bg-header-pill);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border-color);box-shadow:var(--shadow-sm),0 0 0 1px rgba(0,0,0,0.02);border-radius:9999px;padding:.35rem .5rem;display:flex;align-items:center;gap:.5rem;pointer-events:auto;transition:all .2s ease;max-width:100%}
+#mobile-invoice-controls{display:none;width:100%;padding:0 1rem;box-sizing:border-box;justify-content:center;margin-top:5rem;margin-bottom:1rem;z-index:10}
+.mobile-control-bar{background:var(--bg-header-pill);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-color);box-shadow:var(--shadow-sm);border-radius:.75rem;padding:.5rem;display:flex;align-items:center;gap:.5rem;width:100%;max-width:32rem;position:relative}
+.mob-nav-btn{background:var(--bg-paper);border:1px solid var(--border-color);color:var(--text-secondary);width:2.75rem;height:2.75rem;border-radius:.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s}.mob-nav-btn:active{background:var(--bg-hover)}
+.mob-inv-trigger{flex:1;background:var(--bg-paper);border:1px solid var(--border-color);border-radius:.5rem;padding:0 .75rem;height:2.75rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;min-width:0;font-size:.875rem;font-weight:500;color:var(--text-main);user-select:none}.mob-inv-trigger:active{background-color:var(--bg-hover)}
+.mob-inv-list-container{position:absolute;top:calc(100% + .5rem);left:0;width:100%;background:var(--bg-paper);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border-color);box-shadow:var(--shadow-lg);border-radius:.75rem;overflow:hidden;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .2s ease,transform .2s ease;max-height:50vh;display:flex;flex-direction:column;z-index:60}.mob-inv-list-container.open{opacity:1;transform:translateY(0);pointer-events:auto}.mob-inv-scroll{overflow-y:auto;padding:.5rem}
+.mob-list-item{padding:.75rem;border-radius:.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;cursor:pointer;transition:background .15s}.mob-list-item:hover{background-color:var(--bg-hover)}.mob-list-item.active{background-color:var(--bg-active);border:1px solid var(--border-active)}.mob-list-item.active .mob-li-num{color:var(--text-accent);font-weight:700}
+.mob-li-info{display:flex;flex-direction:column;min-width:0;flex:1;margin-right:1rem}.mob-li-num{font-size:.75rem;color:var(--text-muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.02em}.mob-li-client{font-size:.9rem;font-weight:500;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mob-li-check{color:var(--text-accent);opacity:0;transition:opacity .2s}.mob-list-item.active .mob-li-check{opacity:1}.three-pane-body{display:flex;flex:1;overflow:hidden;width:100%}
+.pane-invoice-list{width:25%;min-width:280px;background:var(--bg-sidebar);border-right:1px solid var(--border-color);display:flex;flex-direction:column;flex-shrink:0;padding-top:0;position:relative}
+.list-header{padding:1.5rem 1rem 1rem 1rem;border-bottom:1px solid transparent;display:flex;flex-direction:column;gap:1rem;background:var(--bg-sidebar);position:sticky;top:0;z-index:10}.list-header-top{display:flex;justify-content:space-between;align-items:center}
+.list-title{font-size:1.125rem;font-weight:700;color:var(--text-main);letter-spacing:-.02em;margin:0}.list-count-badge{background:var(--bg-hover);padding:.15rem .6rem;border-radius:999px;font-size:.75rem;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-color);min-width:24px;text-align:center}
+.list-search-box{position:relative;width:100%}.list-search-input{width:100%;padding:.6rem .75rem .6rem 2.25rem;font-size:.875rem;border:1px solid transparent;border-radius:.75rem;box-sizing:border-box;transition:all .2s cubic-bezier(.2,.8,.2,1);background:var(--bg-hover);color:var(--text-main);font-weight:500}
+.list-search-input:focus{outline:0;background:var(--bg-paper);box-shadow:0 0 0 2px var(--primary),var(--shadow-sm)}.list-search-input::placeholder{color:var(--text-muted);font-weight:400}.list-search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:1rem;height:1rem;color:var(--text-muted);pointer-events:none}
+.list-scroll-area{overflow-y:auto;flex:1;padding:.5rem .75rem}.invoice-list-item{padding:.85rem 1rem;margin-bottom:4px;border-radius:.75rem;border:1px solid transparent;cursor:pointer;transition:all .2s ease;display:flex;flex-direction:column;gap:6px;background:transparent}
+.invoice-list-item:hover{background-color:var(--bg-hover)}.invoice-list-item.active{background-color:var(--bg-active);border-color:rgba(0,0,0,0.05);box-shadow:var(--shadow-sm)}[data-theme="dark"] .invoice-list-item.active{border-color:rgba(255,255,255,0.05)}
+.inv-item-top{display:flex;justify-content:space-between;align-items:center}.inv-number{font-size:.85rem;font-weight:600;color:var(--text-main);font-variant-numeric:tabular-nums}.invoice-list-item.active .inv-number{color:var(--primary)}
+.inv-date{font-size:.75rem;color:var(--text-muted);font-weight:400}.inv-buyer{font-size:.85rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}.invoice-list-item.active .inv-buyer{color:var(--text-main)}
+.inv-total{font-size:.8rem;font-weight:600;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums}.invoice-list-item.active .inv-total{color:var(--text-accent)}
+.pane-content-area{flex:1;overflow-y:auto;position:relative;min-width:0;display:flex;flex-direction:column;padding-top:5rem}.main-content{height:100%;width:100%}.main-content-container{max-width:60rem;margin:0 auto;padding:0 2rem 3rem 2rem}.raw-data-container{padding:0 2rem 3rem 2rem;height:100%;box-sizing:border-box}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}.stat-card{background:var(--bg-paper);border:1px solid var(--border-color);border-radius:.75rem;padding:1.5rem;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+.stat-label{font-size:.8rem;color:var(--text-muted);font-weight:500;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.03em}.stat-value{font-size:1.5rem;font-weight:700;color:var(--text-main)}
+.stat-trend{font-size:.75rem;font-weight:500;margin-top:.5rem;display:inline-flex;align-items:center;gap:4px}.trend-up{color:#10b981}.trend-down{color:#ef4444}.trend-neutral{color:var(--text-muted)}
+.ai-wrapper{position:relative;margin-bottom:2.5rem}.ai-container{background:linear-gradient(160deg,rgba(255,255,255,0.70) 0%,rgba(240,249,255,0.40) 100%);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.6);border-radius:24px;padding:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.02),0 20px 25px -5px rgba(0,0,0,0.04),inset 0 0 0 1px rgba(255,255,255,0.4);overflow:hidden;position:relative}
+[data-theme="dark"] .ai-container{background:linear-gradient(160deg,rgba(25,25,25,0.7) 0%,rgba(10,10,10,0.5) 100%);border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03)}
+.ai-container::before{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:radial-gradient(circle,rgba(139,92,246,0.15) 0%,transparent 70%);filter:blur(40px);z-index:0;pointer-events:none}
+.ai-header-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem .75rem 1.5rem;margin-bottom:.75rem;position:relative;z-index:1}.ai-brand{display:flex;align-items:center;gap:.75rem}
+.ai-spark-icon{color:#f97316;width:1.25rem;height:1.25rem;animation:pulse-glow 4s infinite ease-in-out;filter:drop-shadow(0 0 8px rgba(249,115,22,0.4))}.ai-title-text{font-family:'Inter',sans-serif;font-weight:600;font-size:.95rem;color:var(--text-main);letter-spacing:-.01em}
+.ai-badge-pill{background:whitesmoke;color:#6366f1;font-size:.65rem;font-weight:700;padding:.2rem .6rem;border-radius:99px;letter-spacing:.05em;border:1px solid rgba(99,102,241,0.2);backdrop-filter:blur(4px)}[data-theme="dark"] .ai-badge-pill{background:black;color:#a5b4fc;border:1px solid rgba(99,102,241,0.3)}
+.ai-bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;z-index:1}@media (max-width:900px){.ai-bento-grid{grid-template-columns:1fr}}
+.ai-card{background:rgba(255,255,255,0.25);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:18px;padding:1.5rem;border:1px solid rgba(255,255,255,0.4);display:flex;flex-direction:column;gap:.75rem;transition:transform .3s ease,background .3s ease}
+[data-theme="dark"] .ai-card{background:rgba(60,60,60,0.25);border:1px solid rgba(255,255,255,0.06)}.ai-card:hover{background:rgba(255,255,255,0.4);transform:translateY(-2px)}[data-theme="dark"] .ai-card:hover{background:rgba(80,80,80,0.35)}
+.ai-card-header{display:flex;align-items:center;gap:.6rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);opacity:.9}.ai-card-icon{width:1.1rem;height:1.1rem;color:#3b82f6}
+.ai-prose{font-size:.9rem;line-height:1.6;color:var(--text-main);font-family:'Inter',sans-serif;font-weight:400;opacity:.95}.ai-em{font-weight:600;color:var(--text-main);background:linear-gradient(90deg,rgba(99,102,241,0.1),rgba(168,85,247,0.05));padding:0 4px;border-radius:4px}
+[data-theme="dark"] .ai-em{color:#fff;background:linear-gradient(90deg,rgba(99,102,241,0.25),rgba(168,85,247,0.15))}.ai-loading-card{min-height:140px}
+.shim{background:linear-gradient(90deg,rgba(0,0,0,0.02) 0%,rgba(0,0,0,0.06) 50%,rgba(0,0,0,0.02) 100%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:6px}[data-theme="dark"] .shim{background:linear-gradient(90deg,rgba(255,255,255,0.02) 0%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.02) 100%)}
+@keyframes pulse-glow{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}}@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.fade-in-up{animation:fadeInUp .6s cubic-bezier(.16,1,.3,1) forwards;opacity:0;transform:translateY(20px)}@keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}.delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}
+.insights-box{background:var(--bg-active);border:1px solid var(--border-active);border-radius:.75rem;padding:1rem 1.5rem;margin-bottom:2rem}
+.insight-header{font-size:.85rem;font-weight:700;color:var(--text-accent);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:.5rem}.insight-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr;gap:.5rem}
+@media(min-width:768px){.insight-list{grid-template-columns:1fr 1fr}}.insight-li{font-size:.875rem;color:var(--text-main);padding-left:1rem;border-left:2px solid var(--primary);line-height:1.5}
+.analytics-section{background:var(--bg-paper);border:1px solid var(--border-color);border-radius:.75rem;padding:1.5rem;margin-bottom:2rem}
+.section-header-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:.75rem;margin-bottom:1.25rem}.section-title{font-size:1.125rem;font-weight:600;color:var(--text-main);margin:0 0 1.25rem 0}.section-title.has-caption{margin-bottom:.35rem}
+.text-gradient-custom{background-color:#f7b42c;background-image:linear-gradient(315deg,#f7b42c 0%,#fc575e 74%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;width:fit-content}
+.section-caption{font-size:.875rem;color:var(--text-secondary);margin:0 0 1.25rem 0;display:block}.data-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.data-table th{text-align:left;padding:.75rem;background:var(--bg-hover);color:var(--text-muted);font-weight:600;font-size:.75rem;text-transform:uppercase;border-bottom:1px solid var(--border-color)}
+.data-table td{padding:.75rem;border-bottom:1px solid var(--border-color);color:var(--text-secondary)}.data-table tr:last-child td{border-bottom:none}.chart-box{position:relative;height:350px;width:100%}
+@media (max-width:1023px){.pane-invoice-list{display:none}.app-container{margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border-color)}.right-pane-header{top:1rem}.pane-content-area{padding-top:0}.main-content-container,.raw-data-container{padding-top:5.5rem;padding-left:1rem;padding-right:1rem}#content-preview .main-content-container{padding-top:0}#mobile-invoice-controls.active{display:flex}body.mobile-menu-open #mobile-invoice-controls{display:none!important}}
+@media (min-width:1024px){#mobile-invoice-controls{display:none!important}}.menu-btn{display:inline-flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:999px;color:var(--text-secondary);background:transparent;border:none;cursor:pointer}.menu-btn:hover{background-color:rgba(128,128,128,0.1);color:var(--text-main)}
+.header-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:999px;color:var(--text-secondary);background:transparent;border:none;cursor:pointer;transition:all .2s}.header-icon-btn:hover{background-color:var(--bg-hover);color:var(--text-main)}
+.tab-group{display:inline-flex;background-color:rgba(128,128,128,0.1);padding:3px;border-radius:999px}.tab-btn{font-size:.75rem;font-weight:500;color:var(--text-muted);background:transparent;border:none;padding:.35rem .85rem;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;transition:all .2s ease}.tab-btn:hover{color:var(--text-main)}.tab-btn.active{background-color:var(--bg-paper);color:var(--text-accent);font-weight:600;box-shadow:var(--shadow-sm)}
+.sidebar-header{padding:1.5rem 1.5rem;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center}.sidebar-header-branding{display:flex;align-items:center;gap:.75rem}.sidebar-logo-bg{display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;background-color:var(--primary);border-radius:.5rem;flex-shrink:0}.sidebar-logo-icon{width:1.5rem;height:1.5rem;color:#fff}
+.sidebar-title{font-family:'Ubuntu',sans-serif;font-size:1.15rem;font-weight:700;color:var(--text-accent);margin:0}.sidebar-subtitle{font-size:.95rem;color:var(--text-secondary);font-weight:500}.sidebar-branding-footer{font-family:'Ubuntu',sans-serif;text-align:center;font-size:.875rem;color:var(--text-muted);padding:1.5rem;border-top:1px solid var(--border-color);margin-top:auto}
+.settings-panel{padding:1.5rem;flex-grow:1;overflow-y:auto;display:flex;flex-direction:column;gap:1.5rem}.section-card{background-color:var(--bg-hover);border:1px solid var(--border-color);border-radius:.5rem;padding:1rem}
+.form-label{display:block;font-size:.875rem;font-weight:500;color:var(--text-main);margin-bottom:.35rem;text-align:left}.setup-input{width:100%;padding:.5rem .75rem;border-radius:.375rem;border:1px solid var(--border-color);font-size:.875rem;margin-bottom:1rem;box-sizing:border-box;background:var(--bg-input);color:var(--text-main)}.setup-input:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;font-size:.875rem;font-weight:500;border-radius:.375rem;padding:.5rem 1rem;cursor:pointer;width:100%;transition:all .15s}.btn-primary{color:#fff;background-color:var(--primary)}.btn-primary:hover:not(:disabled){background-color:var(--primary-hover)}
+.btn-secondary{color:var(--text-main);background-color:var(--bg-paper);border-color:var(--border-color)}.btn-secondary:hover:not(:disabled){background-color:var(--bg-hover)}.btn:disabled{opacity:.7;cursor:not-allowed}.btn-text{color:var(--text-muted);background:none;border:none;padding:.5rem;font-size:.8rem;cursor:pointer;text-decoration:underline}
+.action-cards-container{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}.action-card{border:1px solid var(--border-color);border-radius:.5rem;padding:1rem;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;gap:.75rem;background:var(--bg-paper);text-align:left;box-sizing:border-box;width:100%}
+.action-card:hover{border-color:var(--primary);background:var(--bg-active)}.action-card.active{border-color:var(--primary);background:var(--bg-active);ring:2px solid var(--primary)}.ac-icon{width:24px;height:24px;color:var(--text-accent);flex-shrink:0}.ac-text h3{margin:0;font-size:.95rem;font-weight:600;color:var(--text-main)}.ac-text p{margin:2px 0 0 0;font-size:.75rem;color:var(--text-secondary)}
+.sub-settings{border-left:2px solid var(--border-color);padding-left:1rem;margin-left:.5rem;margin-bottom:1rem;animation:slideDown .3s ease-out}@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.radio-option{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-size:.875rem;cursor:pointer;color:var(--text-main)}.activity-log{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-color)}.activity-header{font-size:.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:.75rem;letter-spacing:.05em}
+.log-list{list-style:none;padding:0;margin:0}.log-item{position:relative;padding-left:1.25rem;margin-bottom:.75rem;font-size:.8rem;color:var(--text-secondary)}.log-item::before{content:'';position:absolute;left:0;top:.4rem;width:6px;height:6px;border-radius:50%;background-color:var(--border-color)}.log-item.active::before{background-color:var(--primary)}
+.log-time{font-size:.7rem;color:var(--text-muted);display:block;margin-top:2px}.log-highlight{color:var(--text-main);font-weight:500}.status-box{padding:.75rem;border-radius:.375rem;font-size:.875rem;display:flex;align-items:start;gap:.5rem;margin-bottom:1rem;line-height:1.4;text-align:left}.status-box.error{background-color:#fef2f2;border:1px solid #fee2e2;color:#991b1b}
+.meta-info-row{display:flex;justify-content:space-between;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border-color);font-size:.8rem}.meta-info-label{color:var(--text-muted);font-weight:500;margin-bottom:2px;font-size:.7rem;text-transform:uppercase}.meta-info-val{color:var(--text-main);font-weight:600}
+.app-container{background-color:var(--bg-paper);border-radius:.75rem;box-shadow:var(--shadow-lg);border:1px solid var(--border-color);overflow:hidden}
+#invoice{width:100%;background:#fff;padding:40px;box-sizing:border-box;color:#111827;font-family:'Inter',Arial,sans-serif;min-height:29.7cm;display:flex;flex-direction:column;justify-content:space-between}
+.invoice-logo{max-height:80px;width:100%;max-width:160px;object-fit:contain;border-radius:6px}.invoice-header-row{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #f3f4f6;padding-bottom:20px;margin-bottom:24px;flex-direction:row}
+.header-left{width:58%}.header-right{width:40%;display:flex;justify-content:flex-end;align-items:flex-start}.party-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:32px;flex-direction:row}
+h1.title{font-size:32px;margin:0 0 16px 0;font-weight:700;letter-spacing:-.02em;color:#111827;text-transform:uppercase}.meta-table{font-size:12px;border-collapse:collapse}.meta-table td{padding:4px 0;vertical-align:top}.meta-table td.label{width:120px;font-weight:600;color:#4b5563}
+.party{width:48%}.party h2{font-size:14px;margin:0 0 8px 0;font-weight:600;color:#111827}.address{font-size:12px;white-space:pre-wrap;line-height:1.6;min-height:72px;padding:4px;border:none;color:#4b5563}.table-wrap{margin-top:0;width:100%;overflow-x:auto}
+#items{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}#items th,#items td{padding:12px 8px;vertical-align:top;font-family:'Inter',Arial,sans-serif;border:none;text-align:left;vertical-align:middle}
+#items td:nth-child(1),#items th:nth-child(1){text-align:center;width:40px}#items td:nth-child(2),#items th:nth-child(2){text-align:left;width:80px}#items td:nth-child(3),#items th:nth-child(3){text-align:left}
+#items td:nth-child(4),#items th:nth-child(4){text-align:center;width:40px}#items td:nth-child(5),#items th:nth-child(5){text-align:right;width:90px}#items td:nth-child(6),#items th:nth-child(6){text-align:right;width:60px}
+#items td:nth-child(7),#items th:nth-child(7){text-align:right;width:80px}#items td:nth-child(8),#items th:nth-child(8){text-align:right;width:90px}
+#items thead th{background:#f9fafb;font-weight:600;font-size:11px;vertical-align:middle;color:#4b5563;text-transform:uppercase;letter-spacing:.05em;padding:12px 8px}#items tbody tr{border-bottom:1px solid #f3f4f6}.desc{white-space:pre-wrap;line-height:1.6;font-size:12px;color:#111827;width:100%}
+.totals{display:flex;justify-content:flex-end;margin-top:32px}.totals .box{width:380px;font-size:12px}.totals .currency{text-align:right;padding-right:10px;margin-bottom:6px;color:#4b5563;font-size:12px}.totals table{width:100%;border-collapse:collapse;font-size:12px}
+.totals td{padding:8px}.totals td.label{text-align:left;width:100px;font-weight:500;color:#4b5563}.totals td.value{text-align:right;font-weight:700;width:140px;color:#111827}
+.totals table tr:last-child{background-color:#f9fafb;border-top:2px solid #e5e7eb;border-bottom:2px solid #e5e7eb}.totals table tr:last-child td{font-size:14px;padding-top:12px;padding-bottom:12px}
+.invoice-footer{font-family:'Ubuntu',sans-serif;text-align:center;margin-top:3rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:.875rem;color:#9ca3af;font-weight:400}.invoice-footer-brand{font-family:'Roboto',sans-serif;font-weight:400}
+@media (max-width:768px){.invoice-header-row,.party-row{flex-direction:column;gap:20px}.header-left,.header-right,.party{width:100%}.header-right{justify-content:flex-start}.totals .box{width:100%}}
+#invoice-placeholder{padding:4rem;text-align:center;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:1rem}
+#json-preview{background-color:var(--bg-paper);color:var(--text-main);border:1px solid var(--border-color);padding:1.5rem;border-radius:.75rem;white-space:pre-wrap;word-wrap:break-word;font-size:.875rem;margin-top:0;overflow:auto;height:100%}
+.analysis-period{font-size:.875rem;color:var(--text-secondary);margin:0 0 1.5rem 0;display:block;font-weight:500}
+</style>
 </head>
 <body>
-    <div id="view-landing">
-        <div class="landing-card">
-            <div class="landing-header">
-                <span class="landing-logo-bg">
-                    <svg class="landing-logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                    </svg>
-                </span>
-                <h1 class="landing-title">SwiftInvoice</h1>
-                <div class="landing-subtitle">Data Studio</div>
-            </div>
-            <div id="landing-status" class="status-box error hidden"></div>
-            <div id="landing-state-upload" class="landing-state-section landing-state-active">
-                <div id="landing-drop-zone" class="upload-area">
-                    <input type="file" id="landing-file-input" accept=".json,application/json" class="hidden">
-                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                    </svg>
-                    <div class="upload-text-main">Drag & Drop Backup File</div>
-                    <div class="upload-text-sub">or click to select .json file</div>
-                </div>
-                <div style="display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-muted);">
-                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                    <span style="padding: 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">OR</span>
-                    <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                </div>
-                <div id="local-storage-card" class="action-card" style="opacity: 0.6; pointer-events: none; border-style: dashed;">
-                    <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
-                    </svg>
-                    <div class="ac-text">
-                        <h3>Load from SwiftInvoice</h3>
-                        <p id="local-storage-status">No SwiftInvoice LocalStorage data found</p>
-                    </div>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1.5rem;">
-                    Safe & Local: Your data never leaves this browser.
-                </p>
-            </div>
-            <div id="landing-state-auth" class="landing-state-section landing-state-inactive">
-                <div class="auth-file-badge">
-                    <svg class="auth-lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
-                    </svg>
-                    <div style="overflow:hidden;">
-                        <span class="auth-label">File is Encrypted</span>
-                        <div id="auth-filename-display" class="auth-filename">backup.json</div>
-                    </div>
-                </div>
-                <label for="landing-password" class="form-label">Enter Password to Unlock</label>
-                <input type="password" id="landing-password" class="setup-input" placeholder="Passkey...">
-                <button id="landing-unlock-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Unlock File</button>
-                <button id="landing-back-btn" class="btn-text">Pick a different file</button>
-            </div>
-        </div>
+<div id="view-landing">
+  <div class="landing-card">
+    <div class="landing-header">
+      <span class="landing-logo-bg">
+        <svg class="landing-logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+        </svg>
+      </span>
+      <h1 class="landing-title">SwiftInvoice</h1>
+      <div class="landing-subtitle">Data Studio</div>
     </div>
-    <div id="view-app" class="hidden">
-        <div id="sidebar-overlay" class="sidebar-overlay"></div>
-        <aside id="app-sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-header-branding">
-                    <span class="sidebar-logo-bg">
-                        <svg class="sidebar-logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                        </svg>
-                    </span>
-                    <div>
-                        <h1 class="sidebar-title">SwiftInvoice</h1>
-                        <div class="sidebar-subtitle">Data Studio</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <button id="header-theme-btn" class="header-icon-btn" title="Toggle Theme">
-                        </button>
-                    <button id="close-sidebar-btn" class="menu-btn" style="margin-left: auto;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.5rem;height:1.5rem;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="settings-panel">
-                <div class="section-card" style="background-color: var(--bg-active); border-color: var(--border-active); margin-bottom: 0.5rem; padding: 0.75rem;">
-                    <div style="display: flex; align-items: start; gap: 0.75rem;">
-                         <div style="background:var(--primary); border-radius:6px; padding:6px; color:white;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                            </svg>
-                         </div>
-                         <div style="overflow: hidden;">
-                            <div id="display-filename" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">filename.json</div>
-                            <div id="display-filesize" style="font-size: 0.75rem; color: var(--text-accent);">0 KB</div>
-                         </div>
-                    </div>
-                </div>
-                <div id="file-stats-card" class="section-card hidden" style="padding: 0.75rem; margin-bottom: 1rem;">
-                    <h4 style="margin:0 0 0.5rem 0; font-size:0.8rem; color:var(--text-accent); font-weight:600;">File Insights</h4>
-                    <div class="meta-info-row" style="border-top:none; padding-top:0; margin-top:0;">
-                        <div style="flex:1;">
-                            <div class="meta-info-label">Date Range</div>
-                            <div class="meta-info-val" id="meta-date-range">-</div>
-                        </div>
-                    </div>
-                    <div class="meta-info-row">
-                        <div style="flex:1;">
-                            <div class="meta-info-label">Invoice Range</div>
-                            <div class="meta-info-val" id="meta-inv-range">-</div>
-                        </div>
-                    </div>
-                </div>
-                <label class="form-label">Data Export Options</label>
-                <div class="action-cards-container">
-                    <button id="ac-plain" class="action-card">
-                        <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        <div class="ac-text">
-                            <h3>Unencrypted File</h3>
-                            <p>Standard JSON. No password required.</p>
-                        </div>
-                    </button>
-                    <button id="ac-enc" class="action-card">
-                        <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        <div class="ac-text">
-                            <h3>Encrypted Backup</h3>
-                            <p>Password protected AES-256 file.</p>
-                        </div>
-                    </button>
-                </div>
-                <div id="enc-settings" class="sub-settings hidden">
-                    <div id="pass-logic-container" class="hidden">
-                        <label class="form-label" style="margin-bottom: 0.5rem;">Security Preference:</label>
-                        <label class="radio-option">
-                            <input type="radio" name="pass_pref" value="same" checked>
-                            <span>Use existing password (from unlock)</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="pass_pref" value="new">
-                            <span>Set a new password</span>
-                        </label>
-                    </div>
-                    <div id="new-pass-field-group" class="hidden">
-                        <label for="new-password-input" class="form-label">Set New Password</label>
-                        <input type="password" id="new-password-input" class="setup-input" placeholder="Enter secure passkey...">
-                    </div>
-                    <button id="final-save-btn" class="btn btn-primary">
-                        Download Encrypted File
-                    </button>
-                </div>
-                <button id="reset-btn" class="btn btn-secondary" style="margin-top: 0.5rem;">
-                    Start Over / New File
-                </button>
-                <div class="activity-log">
-                    <div class="activity-header">History</div>
-                    <ul class="log-list" id="activity-list"></ul>
-                </div>
-            </div>
-            <div class="sidebar-branding-footer">SwiftInvoice | <strong>StackBase</strong></div>
-        </aside> 
-        <div class="right-pane-wrapper">
-            <header class="right-pane-header">
-                <div class="header-pill">
-                    <button id="mobile-menu-btn" class="menu-btn" style="margin-right: 0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.5rem;height:1.5rem;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>
-                    </button>
-                    <div class="tab-group">
-                        <button id="tab-btn-preview" class="tab-btn active">Preview</button>
-                        <button id="tab-btn-analytics" class="tab-btn">Analytics</button>
-                        <button id="tab-btn-raw" class="tab-btn">JSON</button>
-                    </div>
-                    <div style="width:1px; height:1.5rem; background:var(--border-color); margin:0 0.25rem;"></div>
-                    <button id="download-pdf-btn" class="btn btn-secondary" style="width: auto; padding: 0.35rem 0.75rem; height:auto; border-radius:999px; font-size:0.75rem;" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 0.9rem; height: 0.9rem; margin-right: 0.4rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                        PDF
-                    </button>
-                </div>
-            </header>
-            <div class="three-pane-body">
-                <aside id="pane-invoice-list" class="pane-invoice-list">
-                    <div class="list-header">
-                        <div class="list-header-top">
-                            <h2 class="list-title">Invoices</h2>
-                            <div id="list-count" class="list-count-badge">0</div>
-                        </div>
-                        <div class="list-search-box">
-                            <svg class="list-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
-                            <input type="text" id="list-search-input" class="list-search-input" placeholder="Search client, number...">
-                        </div>
-                    </div>
-                    <div id="invoice-list-container" class="list-scroll-area">
-                        <div style="padding: 2rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.875rem;">
-                            No invoices loaded
-                        </div>
-                    </div>
-                </aside>
-                <div class="pane-content-area">
-                    <div id="mobile-invoice-controls" class="active">
-                        <div class="mobile-control-bar">
-                            <button id="mob-prev-btn" class="mob-nav-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                                </svg>
-                            </button>
-                            <div id="mob-inv-trigger" class="mob-inv-trigger">
-                                <span id="mob-inv-selected-text" class="truncate">Select Invoice</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1rem; height: 1rem; color: var(--text-muted); flex-shrink:0; margin-left:0.5rem;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
-                            </div>
-                            <button id="mob-next-btn" class="mob-nav-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                </svg>
-                            </button>
-                            <div id="mob-inv-list-container" class="mob-inv-list-container">
-                                <div id="mob-inv-scroll-area" class="mob-inv-scroll"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <main id="content-preview" class="main-content">
-                        <div class="main-content-container">
-                            <div class="app-container">
-                                <div id="invoice">
-                                    <div id="invoice-placeholder">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                                        <p>Load a file to begin.</p>
-                                    </div>
-                                    <div id="invoice-content" class="hidden"></div>
-                                </div>
-                            </div> 
-                        </div> 
-                    </main> 
-                    <div id="content-analytics" class="main-content hidden">
-                        <div class="main-content-container">
-                            <!-- <h2 class="section-title" style="border-bottom:none; margin-bottom:0.5rem; margin-top: 3rem; font-size: 3rem;">Analytics Dashboard</h2> -->
-                             <h2 class="section-title text-gradient-custom" style="border-bottom:none; margin-bottom:0.5rem; margin-top: 3rem; font-size: 3rem;">Analytics Dashboard</h2>
-                            <p id="analysis-period" class="analysis-period" style="margin-bottom: 3rem;">Analysis Period: Loading...</p>
-                            <div class="ai-wrapper">
-                                <div id="ai-summary-container" class="ai-container">
-                                    <div class="ai-header-row">
-                                        <div class="ai-brand">
-                                            <svg class="ai-spark-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/>
-                                            </svg>
-                                            <span class="ai-title-text">Summary</span>
-                                        </div>
-                                        <span class="ai-badge-pill">BETA</span>
-                                    </div>
-                                    <div id="executive-summary-text" class="ai-bento-grid">
-                                         <div class="ai-card ai-loading-card">
-                                             <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
-                                             <div class="shim" style="width: 100%; height: 12px;"></div>
-                                             <div class="shim" style="width: 90%; height: 12px;"></div>
-                                             <div class="shim" style="width: 70%; height: 12px;"></div>
-                                         </div>
-                                         <div class="ai-card ai-loading-card">
-                                             <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
-                                             <div class="shim" style="width: 100%; height: 12px;"></div>
-                                             <div class="shim" style="width: 95%; height: 12px;"></div>
-                                         </div>
-                                         <div class="ai-card ai-loading-card">
-                                             <div class="shim" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
-                                             <div class="shim" style="width: 100%; height: 12px;"></div>
-                                             <div class="shim" style="width: 80%; height: 12px;"></div>
-                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="analytics-grid">
-                                <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">0.00</div><div id="stat-rev-trend" class="stat-trend"></div></div>
-                                <div class="stat-card"><div class="stat-label">Net Revenue (Excl. Tax)</div><div class="stat-value" id="stat-net-revenue">0.00</div></div>
-                                <div class="stat-card"><div class="stat-label">Total Tax Collected</div><div class="stat-value" id="stat-tax">0.00</div></div>
-                                <div class="stat-card"><div class="stat-label">Total Items Sold</div><div class="stat-value" id="stat-items-sold">0</div></div>
-                                <div class="stat-card"><div class="stat-label">Served Customers</div><div class="stat-value" id="stat-customers">0</div></div>
-                                <div class="stat-card"><div class="stat-label">Top Product (Revenue)</div><div class="stat-value" id="stat-top-prod-rev" style="font-size:1rem; line-height:1.4;">-</div></div>
-                                <div class="stat-card"><div class="stat-label">Top Product (Volume)</div><div class="stat-value" id="stat-top-prod-vol" style="font-size:1rem; line-height:1.4;">-</div></div>
-                                <div class="stat-card"><div class="stat-label">Average Invoice Value</div><div class="stat-value" id="stat-avg">0.00</div></div>
-                            </div>
-                            <div id="insights-container" class="insights-box hidden"><div class="insight-header">Key Findings</div><ul id="insight-list" class="insight-list"></ul></div>
-                            <div class="analytics-section">
-                                <div class="section-header-row">
-                                    <h3 class="section-title" style="margin:0;">Cumulative Revenue</h3>
-                                    <div class="tab-group">
-                                        <button id="btn-cum-line" class="tab-btn active">Line</button>
-                                        <button id="btn-cum-bar" class="tab-btn">Bar</button>
-                                    </div>
-                                </div>
-                                <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
-                            </div>
-                            <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Daily Revenue Trend</h3><div class="tab-group"><button id="btn-rev-line" class="tab-btn active">Line</button><button id="btn-rev-bar" class="tab-btn">Bar</button></div></div><div class="chart-box"><canvas id="chart-revenue"></canvas></div></div>
-                            <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Sales Volume</h3><div class="tab-group"><button id="btn-qty-line" class="tab-btn">Line</button><button id="btn-qty-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-qty"></canvas></div></div>
-                            <div class="analytics-section"><div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Peak Trading Hours</h3><p class="section-caption">Distribution of sales by time of day</p></div><div class="tab-group"><button id="btn-hour-line" class="tab-btn">Line</button><button id="btn-hour-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-hourly"></canvas></div></div>
-                            <div class="analytics-section"><div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Weekly Pattern</h3><p class="section-caption">Sales performance by day of the week</p></div><div class="tab-group"><button id="btn-week-line" class="tab-btn">Line</button><button id="btn-week-bar" class="tab-btn active">Bar</button></div></div><div class="chart-box"><canvas id="chart-weekly"></canvas></div></div>
-                            <div class="analytics-section"><h3 class="section-title">Revenue Composition</h3><div class="chart-box" style="display:flex; align-items:center; justify-content:center;"><div style="width: 100%; max-width: 320px;"><canvas id="chart-composition"></canvas></div></div></div>
-                            <div class="analytics-section"><div class="section-header-row"><h3 class="section-title" style="margin:0;">Product Leaderboard</h3><div class="tab-group"><button id="btn-sort-qty" class="tab-btn active">By Vol</button><button id="btn-sort-rev" class="tab-btn">By Rev</button></div></div><div style="overflow-x:auto; max-height: 300px; overflow-y: auto;"><table class="data-table"><thead style="position: sticky; top: 0; z-index: 10;"><tr><th>Product</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rev</th></tr></thead><tbody id="product-leaderboard-body"><tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No data available</td></tr></tbody></table></div></div>
-                            <div class="analytics-section">
-                                <div class="section-header-row">
-                                    <div>
-                                        <h3 class="section-title" style="margin:0;">Ticket Size Distribution</h3>
-                                        <p class="section-caption">How invoice values are distributed across price ranges</p>
-                                    </div>
-                                    <div class="tab-group">
-                                        <button id="btn-dist-line" class="tab-btn">Line</button>
-                                        <button id="btn-dist-bar" class="tab-btn active">Bar</button>
-                                    </div>
-                                </div>
-                                <div class="chart-box">
-                                    <canvas id="chart-distribution"></canvas>
-                                </div>
-                            </div>
-                            <div class="analytics-section">
-                                <div class="section-header-row">
-                                    <div>
-                                        <h3 class="section-title" style="margin:0;">Customer Loyalty Trend</h3>
-                                        <p class="section-caption">Revenue split by New vs. Returning customers</p>
-                                    </div>
-                                    <div class="tab-group">
-                                        <button id="btn-loy-line" class="tab-btn">Line</button>
-                                        <button id="btn-loy-bar" class="tab-btn active">Bar</button>
-                                    </div>
-                                </div>
-                                <div class="chart-box">
-                                    <canvas id="chart-loyalty"></canvas>
-                                </div>
-                            </div>
-                            <div class="analytics-section">
-                                <h3 class="section-title">Top Clients</h3>
-                                <div style="overflow-x:auto;">
-                                    <table class="data-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Client Name</th>
-                                                <th style="text-align:center;">Invoices</th>
-                                                <th style="text-align:right;">Avg Basket</th>
-                                                <th style="text-align:right;">Last Seen</th>
-                                                <th style="text-align:right;">Total Spend</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="top-clients-body">
-                                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No data available</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <aside id="content-raw" class="main-content hidden">
-                        <div class="raw-data-container">
-                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; margin-top:0;">Raw JSON Data</h2>
-                            <div style="height: calc(100% - 3rem); border:1px solid var(--border-color); border-radius: 0.75rem; overflow: hidden;">
-                                <pre id="json-preview" style="margin:0; height:100%; overflow:auto; padding:1.5rem; background:var(--bg-input); color:var(--text-main); font-size:0.875rem;">Waiting for file...</pre>
-                            </div>
-                        </div>
-                    </aside> 
-                </div>
-            </div>
+    <div id="landing-status" class="status-box error hidden"></div>
+    <div id="landing-state-upload" class="landing-state-section landing-state-active">
+      <div id="landing-drop-zone" class="upload-area">
+        <input type="file" id="landing-file-input" accept=".json,application/json" class="hidden">
+        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/>
+        </svg>
+        <div class="upload-text-main">Drag & Drop Backup File</div>
+        <div class="upload-text-sub">or click to select .json file</div>
+      </div>
+      <div style="display:flex;align-items:center;margin:1.5rem 0;color:var(--text-muted);">
+        <div style="flex:1;height:1px;background:var(--border-color);"></div>
+        <span style="padding:0 1rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;">OR</span>
+        <div style="flex:1;height:1px;background:var(--border-color);"></div>
+      </div>
+      <div id="local-storage-card" class="action-card" style="opacity:0.6;pointer-events:none;border-style:dashed;">
+        <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
+        </svg>
+        <div class="ac-text"><h3>Load from SwiftInvoice</h3><p id="local-storage-status">No SwiftInvoice LocalStorage data found</p></div>
+      </div>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-top:1.5rem;">Safe & Local: Your data never leaves this browser.</p>
+    </div>
+    <div id="landing-state-auth" class="landing-state-section landing-state-inactive">
+      <div class="auth-file-badge">
+        <svg class="auth-lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/>
+        </svg>
+        <div style="overflow:hidden;"><span class="auth-label">File is Encrypted</span><div id="auth-filename-display" class="auth-filename">backup.json</div></div>
+      </div>
+      <label for="landing-password" class="form-label">Enter Password to Unlock</label>
+      <input type="password" id="landing-password" class="setup-input" placeholder="Passkey...">
+      <button id="landing-unlock-btn" class="btn btn-primary" style="width:100%;margin-bottom:1rem;">Unlock File</button>
+      <button id="landing-back-btn" class="btn-text">Pick a different file</button>
+    </div>
+  </div>
+</div>
+<div id="view-app" class="hidden">
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <aside id="app-sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-header-branding">
+        <span class="sidebar-logo-bg">
+          <svg class="sidebar-logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+          </svg>
+        </span>
+        <div><h1 class="sidebar-title">SwiftInvoice</h1><div class="sidebar-subtitle">Data Studio</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button id="header-theme-btn" class="header-icon-btn" title="Toggle Theme"></button>
+        <button id="close-sidebar-btn" class="menu-btn" style="margin-left:auto;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.5rem;height:1.5rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="settings-panel">
+      <div class="section-card" style="background-color:var(--bg-active);border-color:var(--border-active);margin-bottom:0.5rem;padding:0.75rem;">
+        <div style="display:flex;align-items:start;gap:0.75rem;">
+          <div style="background:var(--primary);border-radius:6px;padding:6px;color:white;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:1.25rem;height:1.25rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+            </svg>
+          </div>
+          <div style="overflow:hidden;">
+            <div id="display-filename" style="font-weight:600;font-size:0.9rem;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">filename.json</div>
+            <div id="display-filesize" style="font-size:0.75rem;color:var(--text-accent);">0 KB</div>
+          </div>
         </div>
-    </div> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+      </div>
+      <div id="file-stats-card" class="section-card hidden" style="padding:0.75rem;margin-bottom:1rem;">
+        <h4 style="margin:0 0 0.5rem 0;font-size:0.8rem;color:var(--text-accent);font-weight:600;">File Insights</h4>
+        <div class="meta-info-row" style="border-top:none;padding-top:0;margin-top:0;">
+          <div style="flex:1;"><div class="meta-info-label">Date Range</div><div class="meta-info-val" id="meta-date-range">-</div></div>
+        </div>
+        <div class="meta-info-row">
+          <div style="flex:1;"><div class="meta-info-label">Invoice Range</div><div class="meta-info-val" id="meta-inv-range">-</div></div>
+        </div>
+      </div>
+      <label class="form-label">Data Export Options</label>
+      <div class="action-cards-container">
+        <button id="ac-plain" class="action-card">
+          <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+          </svg>
+          <div class="ac-text"><h3>Unencrypted File</h3><p>Standard JSON. No password required.</p></div>
+        </button>
+        <button id="ac-enc" class="action-card">
+          <svg class="ac-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+          </svg>
+          <div class="ac-text"><h3>Encrypted Backup</h3><p>Password protected AES-256 file.</p></div>
+        </button>
+      </div>
+      <div id="enc-settings" class="sub-settings hidden">
+        <div id="pass-logic-container" class="hidden">
+          <label class="form-label" style="margin-bottom:0.5rem;">Security Preference:</label>
+          <label class="radio-option"><input type="radio" name="pass_pref" value="same" checked><span>Use existing password (from unlock)</span></label>
+          <label class="radio-option"><input type="radio" name="pass_pref" value="new"><span>Set a new password</span></label>
+        </div>
+        <div id="new-pass-field-group" class="hidden">
+          <label for="new-password-input" class="form-label">Set New Password</label>
+          <input type="password" id="new-password-input" class="setup-input" placeholder="Enter secure passkey...">
+        </div>
+        <button id="final-save-btn" class="btn btn-primary">Download Encrypted File</button>
+      </div>
+      <button id="reset-btn" class="btn btn-secondary" style="margin-top:0.5rem;">Start Over / New File</button>
+      <div class="activity-log">
+        <div class="activity-header">History</div>
+        <ul class="log-list" id="activity-list"></ul>
+      </div>
+    </div>
+    <div class="sidebar-branding-footer">SwiftInvoice | <strong>StackBase</strong></div>
+  </aside>
+  <div class="right-pane-wrapper">
+    <header class="right-pane-header">
+      <div class="header-pill">
+        <button id="mobile-menu-btn" class="menu-btn" style="margin-right:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.5rem;height:1.5rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+          </svg>
+        </button>
+        <div class="tab-group">
+          <button id="tab-btn-preview" class="tab-btn active">Preview</button>
+          <button id="tab-btn-analytics" class="tab-btn">Analytics</button>
+          <button id="tab-btn-raw" class="tab-btn">JSON</button>
+        </div>
+        <div style="width:1px;height:1.5rem;background:var(--border-color);margin:0 0.25rem;"></div>
+        <button id="download-pdf-btn" class="btn btn-secondary" style="width:auto;padding:0.35rem 0.75rem;height:auto;border-radius:999px;font-size:0.75rem;" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:0.9rem;height:0.9rem;margin-right:0.4rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> PDF
+        </button>
+      </div>
+    </header>
+    <div class="three-pane-body">
+      <aside id="pane-invoice-list" class="pane-invoice-list">
+        <div class="list-header">
+          <div class="list-header-top"><h2 class="list-title">Invoices</h2><div id="list-count" class="list-count-badge">0</div></div>
+          <div class="list-search-box">
+            <svg class="list-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+            </svg>
+            <input type="text" id="list-search-input" class="list-search-input" placeholder="Search client, number...">
+          </div>
+        </div>
+        <div id="invoice-list-container" class="list-scroll-area"><div style="padding:2rem 1rem;text-align:center;color:var(--text-muted);font-size:0.875rem;">No invoices loaded</div></div>
+      </aside>
+      <div class="pane-content-area">
+        <div id="mobile-invoice-controls" class="active">
+          <div class="mobile-control-bar">
+            <button id="mob-prev-btn" class="mob-nav-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+              </svg>
+            </button>
+            <div id="mob-inv-trigger" class="mob-inv-trigger">
+              <span id="mob-inv-selected-text" class="truncate">Select Invoice</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:1rem;height:1rem;color:var(--text-muted);flex-shrink:0;margin-left:0.5rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+              </svg>
+            </div>
+            <button id="mob-next-btn" class="mob-nav-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.25rem;height:1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+              </svg>
+            </button>
+            <div id="mob-inv-list-container" class="mob-inv-list-container"><div id="mob-inv-scroll-area" class="mob-inv-scroll"></div></div>
+          </div>
+        </div>
+        <main id="content-preview" class="main-content">
+          <div class="main-content-container">
+            <div class="app-container">
+              <div id="invoice">
+                <div id="invoice-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:3rem;height:3rem;margin-bottom:1rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                  <p>Load a file to begin.</p>
+                </div>
+                <div id="invoice-content" class="hidden"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <div id="content-analytics" class="main-content hidden">
+          <div class="main-content-container">
+            <h2 class="section-title text-gradient-custom" style="border-bottom:none;margin-bottom:0.5rem;margin-top:3rem;font-size:3rem;">Analytics Dashboard</h2>
+            <p id="analysis-period" class="analysis-period" style="margin-bottom:3rem;">Analysis Period: Loading...</p>
+            <div class="ai-wrapper">
+              <div id="ai-summary-container" class="ai-container">
+                <div class="ai-header-row">
+                  <div class="ai-brand">
+                    <svg class="ai-spark-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/></svg>
+                    <span class="ai-title-text">Summary</span>
+                  </div>
+                  <span class="ai-badge-pill">BETA</span>
+                </div>
+                <div id="executive-summary-text" class="ai-bento-grid">
+                  <div class="ai-card ai-loading-card"><div class="shim" style="width:40%;height:16px;margin-bottom:12px;"></div><div class="shim" style="width:100%;height:12px;"></div><div class="shim" style="width:90%;height:12px;"></div><div class="shim" style="width:70%;height:12px;"></div></div>
+                  <div class="ai-card ai-loading-card"><div class="shim" style="width:40%;height:16px;margin-bottom:12px;"></div><div class="shim" style="width:100%;height:12px;"></div><div class="shim" style="width:95%;height:12px;"></div></div>
+                  <div class="ai-card ai-loading-card"><div class="shim" style="width:40%;height:16px;margin-bottom:12px;"></div><div class="shim" style="width:100%;height:12px;"></div><div class="shim" style="width:80%;height:12px;"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="analytics-grid">
+              <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">0.00</div><div id="stat-rev-trend" class="stat-trend"></div></div>
+              <div class="stat-card"><div class="stat-label">Net Revenue (Excl. Tax)</div><div class="stat-value" id="stat-net-revenue">0.00</div></div>
+              <div class="stat-card"><div class="stat-label">Total Tax Collected</div><div class="stat-value" id="stat-tax">0.00</div></div>
+              <div class="stat-card"><div class="stat-label">Total Items Sold</div><div class="stat-value" id="stat-items-sold">0</div></div>
+              <div class="stat-card"><div class="stat-label">Served Customers</div><div class="stat-value" id="stat-customers">0</div></div>
+              <div class="stat-card"><div class="stat-label">Top Product (Revenue)</div><div class="stat-value" id="stat-top-prod-rev" style="font-size:1rem;line-height:1.4;">-</div></div>
+              <div class="stat-card"><div class="stat-label">Top Product (Volume)</div><div class="stat-value" id="stat-top-prod-vol" style="font-size:1rem;line-height:1.4;">-</div></div>
+              <div class="stat-card"><div class="stat-label">Average Invoice Value</div><div class="stat-value" id="stat-avg">0.00</div></div>
+            </div>
+            <div id="insights-container" class="insights-box hidden"><div class="insight-header">Key Findings</div><ul id="insight-list" class="insight-list"></ul></div>
+            <div class="analytics-section">
+              <div class="section-header-row">
+                <h3 class="section-title" style="margin:0;">Cumulative Revenue</h3>
+                <div class="tab-group"><button id="btn-cum-line" class="tab-btn active">Line</button><button id="btn-cum-bar" class="tab-btn">Bar</button></div>
+              </div>
+              <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><h3 class="section-title" style="margin:0;">Daily Revenue Trend</h3><div class="tab-group"><button id="btn-rev-line" class="tab-btn active">Line</button><button id="btn-rev-bar" class="tab-btn">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-revenue"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><h3 class="section-title" style="margin:0;">Sales Volume</h3><div class="tab-group"><button id="btn-qty-line" class="tab-btn">Line</button><button id="btn-qty-bar" class="tab-btn active">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-qty"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Peak Trading Hours</h3><p class="section-caption">Distribution of sales by time of day</p></div><div class="tab-group"><button id="btn-hour-line" class="tab-btn">Line</button><button id="btn-hour-bar" class="tab-btn active">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-hourly"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Weekly Pattern</h3><p class="section-caption">Sales performance by day of the week</p></div><div class="tab-group"><button id="btn-week-line" class="tab-btn">Line</button><button id="btn-week-bar" class="tab-btn active">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-weekly"></canvas></div>
+            </div>
+            <div class="analytics-section"><h3 class="section-title">Revenue Composition</h3><div class="chart-box" style="display:flex;align-items:center;justify-content:center;"><div style="width:100%;max-width:320px;"><canvas id="chart-composition"></canvas></div></div></div>
+            <div class="analytics-section">
+              <div class="section-header-row"><h3 class="section-title" style="margin:0;">Product Leaderboard</h3><div class="tab-group"><button id="btn-sort-qty" class="tab-btn active">By Vol</button><button id="btn-sort-rev" class="tab-btn">By Rev</button></div></div>
+              <div style="overflow-x:auto;max-height:300px;overflow-y:auto;">
+                <table class="data-table"><thead style="position:sticky;top:0;z-index:10;"><tr><th>Product</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rev</th></tr></thead><tbody id="product-leaderboard-body"><tr><td colspan="3" style="text-align:center;color:var(--text-muted);">No data available</td></tr></tbody></table>
+              </div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Ticket Size Distribution</h3><p class="section-caption">How invoice values are distributed across price ranges</p></div><div class="tab-group"><button id="btn-dist-line" class="tab-btn">Line</button><button id="btn-dist-bar" class="tab-btn active">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-distribution"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <div class="section-header-row"><div><h3 class="section-title" style="margin:0;">Customer Loyalty Trend</h3><p class="section-caption">Revenue split by New vs. Returning customers</p></div><div class="tab-group"><button id="btn-loy-line" class="tab-btn">Line</button><button id="btn-loy-bar" class="tab-btn active">Bar</button></div></div>
+              <div class="chart-box"><canvas id="chart-loyalty"></canvas></div>
+            </div>
+            <div class="analytics-section">
+              <h3 class="section-title">Top Clients</h3>
+              <div style="overflow-x:auto;">
+                <table class="data-table"><thead><tr><th>Client Name</th><th style="text-align:center;">Invoices</th><th style="text-align:right;">Avg Basket</th><th style="text-align:right;">Last Seen</th><th style="text-align:right;">Total Spend</th></tr></thead><tbody id="top-clients-body"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No data available</td></tr></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside id="content-raw" class="main-content hidden">
+          <div class="raw-data-container">
+            <h2 style="font-size:1.25rem;font-weight:600;margin-bottom:1rem;margin-top:0;">Raw JSON Data</h2>
+            <div style="height:calc(100% - 3rem);border:1px solid var(--border-color);border-radius:.75rem;overflow:hidden;">
+              <pre id="json-preview" style="margin:0;height:100%;overflow:auto;padding:1.5rem;background:var(--bg-input);color:var(--text-main);font-size:0.875rem;">Waiting for file...</pre>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
