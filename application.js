@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ENCRYPTED_EXPORT_VERSION = '1.0'; 
     const THEME_KEY = 'swiftInvoiceTheme'; 
     
+    // Viewer URL base
+    const VIEWER_URL_BASE = 'https://stack-base.github.io/swiftinvoice/invoice?view=';
+
     let currentRegion = 'IN'; 
     let currentLogoOption = 'none';
     let currentSortCriteria = 'date-desc'; 
@@ -21,6 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingDefaultRegion = globalConfig.defaultRegion;
     let pendingDefaultLogoOption = globalConfig.defaultLogoOption;
     let pendingDefaultLogoSrc = globalConfig.defaultLogoSrc;
+
+    // --- UTILS ---
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 
     // --- THEME HANDLING ---
     const themeBtn = document.getElementById('theme-toggle-btn');
@@ -138,7 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultFeesList = document.getElementById('default-fees-list');
     const addDefaultFeeBtn = document.getElementById('add-default-fee-btn');
     const saveGlobalSettingsBtn = document.getElementById('save-global-settings-btn');
-
+    
+    const qrCodeContainer = document.getElementById('qr-code');
 
     const countryData = {
         'AE': { name: 'AED (United Arab Emirates) - VAT', currency: 'AED', taxes: [ { category: 'General Goods/Services', rate: 5.0 }, { category: 'Electronics', rate: 5.0 }, { category: 'Basic Foodstuffs', rate: 0.0 }, { category: 'Healthcare (Specific)', rate: 0.0 }, { category: 'Education (Specific)', rate: 0.0 }, { category: 'Local Transport', rate: 0.0 }, { category: 'Exempt', rate: 0.0 } ], defaultTaxCategory: 'General Goods/Services' },
@@ -536,7 +549,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = event.target.files[0];
         if (!file) return;
 
-        // UPDATED: Check if data actually exists before warning
         const existingInvoices = getInvoicesFromStorage();
         if (existingInvoices.length > 0) {
              if (!confirm("Are you sure you want to import this file? This will OVERWRITE all existing saved invoices.")) {
@@ -622,7 +634,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = event.target.files[0];
         if (!file) return;
 
-        // UPDATED: Check if setup is complete. If so (main app), warn. If not (setup screen), don't warn.
         const isSetupComplete = localStorage.getItem(SETUP_COMPLETE_KEY) === 'true';
         if (isSetupComplete) {
             if (!confirm("Are you sure you want to import settings? This will OVERWRITE all existing app settings.")) {
@@ -806,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         recalcTotals(); 
         updateTaxSlabDisplay(currentRegion); 
+        updateQRCode(); // Ensure QR is updated when loading data
     }
 
     function getNextInvoiceNumber() {
@@ -1040,6 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('subtotal').textContent = fmt(subtotal);
         document.getElementById('vat-total').textContent = fmt(vatTotal);
         document.getElementById('grand').textContent = fmt(subtotal + vatTotal + totalCharges);
+        updateQRCode(); // Recalculate QR on total changes
     }
     function recalcAllRows() {
         itemsBody.querySelectorAll('tr.item').forEach(calcRow);
@@ -1235,6 +1248,11 @@ document.addEventListener('DOMContentLoaded', () => {
         calcRow(row);
         recalcTotals();
     });
+    
+    // Listen for text changes to update QR
+    document.getElementById('invoice').addEventListener('input', debounce(() => {
+        updateQRCode();
+    }, 500));
         
     itemsBody.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1349,7 +1367,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 removeLogoBtn.classList.add('hidden');
             }
         }
+        updateQRCode(); // Update QR if logo changes (though base64 images are excluded)
     }
+
+    // --- QR CODE GENERATION ---
+    const updateQRCode = debounce(() => {
+        try {
+            if (!QRCode) return; // Wait for lib to load
+            
+            const fullData = getInvoiceDataFromDOM();
+            
+            // Map data to minified keys to save URL space
+            // NOTE: We generally omit the base64 logo image from QR code to keep it scannable
+            const minified = {
+                n: fullData.invoiceNumber,
+                d: fullData.invoiceDate,
+                t: fullData.invoiceTime,
+                s: fullData.seller,
+                b: fullData.buyer,
+                r: fullData.region,
+                l: (fullData.logoOption !== 'upload') ? fullData.logoSrc : null, // Only include logo if it's a URL
+                st: fullData.subtotal,
+                vt: fullData.vatTotal,
+                gt: fullData.grandTotal,
+                i: fullData.items.map(i => ({
+                    l: i.line,
+                    c: i.code,
+                    d: i.desc, // Description can be long, might truncate for QR if needed
+                    q: i.qty,
+                    e: i.excl,
+                    r: i.rate,
+                    v: i.vat,
+                    t: i.incl,
+                    sn: i.serial,
+                    st: i.style
+                })),
+                ch: fullData.charges ? fullData.charges.map(c => ({ n: c.name, v: c.value })) : []
+            };
+
+            const jsonString = JSON.stringify(minified);
+            const compressed = LZString.compressToEncodedURIComponent(jsonString);
+            const fullUrl = VIEWER_URL_BASE + compressed;
+
+            qrCodeContainer.innerHTML = '';
+            new QRCode(qrCodeContainer, {
+                text: fullUrl,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.L
+            });
+        } catch (e) {
+            console.error("QR Gen Error", e);
+        }
+    }, 500);
+
     logoUpload.addEventListener('change', () => {
         const file = logoUpload.files[0];
         if (file) {
@@ -1359,6 +1432,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 invoiceLogo.crossOrigin = null;
                 invoiceLogo.classList.remove('hidden');
                 removeLogoBtn.classList.remove('hidden');
+                updateQRCode();
             };
             reader.readAsDataURL(file);
         }

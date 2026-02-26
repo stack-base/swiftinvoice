@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.6, user-scalable=yes" />
     <title>Invoice Viewer | SwiftInvoice</title>
     <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
     
@@ -68,11 +68,25 @@
         .btn svg { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; }
 
         /* Invoice Container */
-        .main-content { flex: 1; padding: 2rem; display: flex; justify-content: center; }
+        .main-content { 
+            flex: 1; 
+            padding: 2rem; 
+            display: flex; 
+            justify-content: center; 
+            overflow: auto; /* Allow scrolling if paper is wider than screen */
+        }
+        
         .paper { 
-            background: white; width: 100%; max-width: 210mm; min-height: 297mm; 
-            padding: 40px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); 
-            display: flex; flex-direction: column;
+            background: white; 
+            /* Fixed A4 Width Logic */
+            width: 210mm; 
+            min-width: 210mm; 
+            min-height: 297mm; 
+            padding: 40px; 
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); 
+            display: flex; 
+            flex-direction: column;
+            margin: 0 auto; /* Center */
         }
 
         /* Invoice Typography */
@@ -96,7 +110,7 @@
         .party { width: 48%; }
         .invoice-logo { max-height: 80px; max-width: 150px; object-fit: contain; }
 
-        /* QR Code Style (Identical High-Res fix to App) */
+        /* QR Code Style */
         #qr-code { 
             margin-top: 10px; 
             padding: 4px; 
@@ -130,29 +144,11 @@
         .totals-table tr:last-child { border-top: 2px solid #e5e7eb; font-size: 14px; }
         .totals-table tr:last-child td { padding-top: 12px; }
 
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .viewer-header { padding: 1rem; }
-            .main-content { padding: 1rem; }
-            .paper { padding: 20px; height: auto; min-height: 0; }
-            .invoice-header-row, .party-row { flex-direction: column; gap: 20px; }
-            .header-right { align-items: flex-start; }
-            .party { width: 100%; }
-            #items { display: block; }
-            #items thead { display: none; }
-            #items tbody, #items tr, #items td { display: block; width: 100%; }
-            #items tr { margin-bottom: 1rem; border: 1px solid #e5e7eb; padding: 1rem; border-radius: 8px; }
-            #items td { padding: 4px 0; text-align: left; border: none; }
-            #items td::before { content: attr(data-label); font-weight: 600; display: inline-block; width: 100px; color: #6b7280; }
-            .totals { width: 100%; }
-            .totals-box { width: 100%; }
-        }
-
         /* Print Styles */
         @media print {
             .viewer-header, .hide-on-print { display: none !important; }
             body, .main-content { background: white; margin: 0; padding: 0; }
-            .paper { box-shadow: none; padding: 0; max-width: none; width: 100%; }
+            .paper { box-shadow: none; padding: 0; width: 100%; min-width: 0; }
             #qr-code { border: none; }
             #qr-code img, #qr-code canvas { max-width: none; width: 180px; }
         }
@@ -207,7 +203,8 @@
                 </div>
                 <div class="header-right">
                     <img id="inv-logo" src="" alt="Logo" class="invoice-logo hidden" />
-                    <div id="qr-code"></div> </div>
+                    <div id="qr-code"></div>
+                </div>
             </div>
 
             <div class="party-row">
@@ -296,8 +293,10 @@
                 document.getElementById('inv-num').textContent = data.n || '';
                 document.getElementById('inv-date').textContent = data.d || '';
                 document.getElementById('inv-time').textContent = data.t || '';
-                document.getElementById('inv-seller').textContent = data.s || '';
-                document.getElementById('inv-buyer').textContent = data.b || '';
+                
+                // FIX: Use innerHTML to render HTML tags (like <br> or <div>) correctly
+                document.getElementById('inv-seller').innerHTML = data.s || '';
+                document.getElementById('inv-buyer').innerHTML = data.b || '';
 
                 // Logo
                 const logoImg = document.getElementById('inv-logo');
@@ -357,12 +356,11 @@
                 document.getElementById('inv-total').textContent = data.gt || '0.00';
 
                 // --- GENERATE QR CODE ---
-                // We use the current URL (window.location.href) because it already contains the compressed data.
                 const qrContainer = document.getElementById('qr-code');
                 if (QRCode) {
                     new QRCode(qrContainer, {
                         text: window.location.href,
-                        width: 256,  // High resolution for crisp printing
+                        width: 256,  
                         height: 256,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
@@ -396,26 +394,18 @@
 
             try {
                 const { jsPDF } = window.jspdf;
-                // A4 size in mm
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfW = pdf.internal.pageSize.getWidth();
                 const pdfH = pdf.internal.pageSize.getHeight();
                 
-                // We create a temporary container to render the PDF clean of browser styles
                 const renderContainer = document.createElement('div');
-                // Set fixed width to match the app generator's resolution logic
                 renderContainer.style.width = '800px'; 
                 renderContainer.style.position = 'absolute';
                 renderContainer.style.left = '-9999px';
                 
-                // Clone
                 const clonedPaper = paper.cloneNode(true);
-                // Ensure QR code looks good in PDF
                 const qr = clonedPaper.querySelector('#qr-code');
-                if(qr) {
-                     // Ensure images inside QR are fully visible
-                     qr.style.border = 'none';
-                }
+                if(qr) { qr.style.border = 'none'; }
 
                 renderContainer.appendChild(clonedPaper);
                 document.body.appendChild(renderContainer);
