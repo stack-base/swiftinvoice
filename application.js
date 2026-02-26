@@ -106,8 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarOpenBtn = document.getElementById('sidebar-open-btn');
     const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
     const newInvoiceBtn = document.getElementById('new-invoice-btn');
     const saveInvoiceBtn = document.getElementById('save-invoice-btn');
+    const editInvoiceBtn = document.getElementById('edit-invoice-btn');
+    const editModeButtons = document.getElementById('edit-mode-buttons');
+    const viewModeButtons = document.getElementById('view-mode-buttons');
+    const invoiceContainer = document.getElementById('invoice');
+
     const invoiceList = document.getElementById('invoice-list');
     const invoiceSearch = document.getElementById('invoice-search');
     
@@ -694,6 +700,33 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
     }
     
+    // --- VIEW MODE TOGGLE LOGIC ---
+    function toggleViewMode(enable) {
+        if (enable) {
+            // VIEW Mode
+            invoiceContainer.classList.add('invoice-view-mode');
+            editModeButtons.style.display = 'none';
+            viewModeButtons.style.display = 'flex';
+            
+            // Fix for inputs in PDF/Print: Ensure DOM 'value' attribute matches current JS value
+            const inputs = invoiceContainer.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.setAttribute('value', input.value);
+            });
+            updateQRCode();
+        } else {
+            // EDIT Mode
+            invoiceContainer.classList.remove('invoice-view-mode');
+            editModeButtons.style.display = 'flex';
+            viewModeButtons.style.display = 'none';
+        }
+    }
+    
+    // Wire up Edit Button
+    editInvoiceBtn.addEventListener('click', () => {
+        toggleViewMode(false);
+    });
+
     invoiceList.addEventListener('click', (e) => {
         const targetLi = e.target.closest('li');
         if (!targetLi) return;
@@ -707,9 +740,10 @@ document.addEventListener('DOMContentLoaded', () => {
             invoices = invoices.filter(inv => inv.id !== docId);
             saveInvoicesToStorage(invoices);
             handleInvoiceListUpdate();
-            if (currentInvoiceId === docId) { clearInvoiceForm(); }
+            if (currentInvoiceId === docId) { clearInvoiceForm(); toggleViewMode(false); }
         }
     });
+
     function loadInvoice(docId) {
         const invoices = getInvoicesFromStorage();
         const invoiceData = invoices.find(inv => inv.id === docId);
@@ -718,9 +752,12 @@ document.addEventListener('DOMContentLoaded', () => {
             currentInvoiceId = docId;
             updateActiveInvoiceInList();
             closeSidebar();
+            // Automatically switch to view mode when loading
+            toggleViewMode(true); 
         } else {
             console.error("No such document!");
             clearInvoiceForm();
+            toggleViewMode(false);
         }
     }
     
@@ -1165,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.innerHTML = `
             <td class="label" contenteditable="true">${name}</td>
             <td class="value" contenteditable="true">${value}</td>
-            <td class="hide-on-print" style="width: 40px; text-align: right; padding-right: 0;">
+            <td class="hide-on-print hide-on-view" style="width: 40px; text-align: right; padding-right: 0;">
                 <button class="delete-btn delete-charge-btn" title="Remove Charge">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1227,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td contenteditable="${isCustomRate ? 'true' : 'false'}" class="rate-display" data-label="VAT rate">${rateStr}</td>
             <td contenteditable="${isCustomRate ? 'false' : 'true'}" class="vat" data-label="VAT amount">${vat}</td>
             <td contenteditable="true" class="incl" data-label="Price incl VAT">${incl}</td>
-            <td class="hide-on-print" data-label="Action">
+            <td class="hide-on-print hide-on-view" data-label="Action">
                 <button class="delete-btn" title="Delete row">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1443,7 +1480,14 @@ document.addEventListener('DOMContentLoaded', () => {
         handleLogoChange(); 
     });
     dismissNoteBtn.addEventListener('click', () => { regionNote.classList.add('hidden'); });
-    newInvoiceBtn.addEventListener('click', () => { clearInvoiceForm(); });
+    
+    // UPDATED: New Invoice logic starts in EDIT Mode
+    newInvoiceBtn.addEventListener('click', () => { 
+        clearInvoiceForm(); 
+        toggleViewMode(false);
+    });
+
+    // UPDATED: Save & View Logic
     saveInvoiceBtn.addEventListener('click', () => {
         const data = getInvoiceDataFromDOM();
         let invoices = getInvoicesFromStorage();
@@ -1462,6 +1506,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             saveInvoicesToStorage(invoices);
             handleInvoiceListUpdate();
+            
+            // Switch to VIEW mode on success
+            toggleViewMode(true);
             saveInvoiceBtn.querySelector('.btn-label').textContent = 'Saved!';
         } catch (error) {
             console.error("Error saving invoice: ", error);
@@ -1470,7 +1517,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 saveInvoiceBtn.disabled = false;
                 saveInvoiceBtn.querySelector('.btn-label').textContent = originalText;
-            }, 1500);
+            }, 1000);
         }
     });
     invoiceSearch.addEventListener('input', handleInvoiceListUpdate);
@@ -1535,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.style.outline = 'none';
                     clonedEl.style.background = 'transparent';
                 });
-                clonedEl.querySelectorAll('.table-dropdown-trigger, .table-dropdown-panel, .delete-btn, .hide-on-print').forEach(el => {
+                clonedEl.querySelectorAll('.table-dropdown-trigger, .table-dropdown-panel, .delete-btn, .hide-on-print, .hide-on-view').forEach(el => {
                     el.parentNode.removeChild(el);
                 });
                 

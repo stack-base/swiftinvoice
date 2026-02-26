@@ -478,166 +478,11 @@
         .header-left { width: 58%; }
         .header-right { width: 40%; display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end; }
         
-        .party-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 32px; }
-        h1.title { font-size: 32px; margin: 0 0 16px 0; font-weight: 700; letter-spacing: -0.02em; color: #111827; text-transform: uppercase; }
-        .meta-table { font-size: 12px; border-collapse: collapse; }
-        .meta-table td { padding: 4px 0; vertical-align: top; }
-        .meta-table td.label { width: 120px; font-weight: 600; color: #4b5563; }
-        .party { width: 48%; }
-        .party h2 { font-size: 14px; margin: 0 0 8px 0; font-weight: 600; color: #111827; }
-        .address { font-size: 12px; white-space: pre-wrap; line-height: 1.6; min-height: 72px; padding: 4px; border: none; color: #4b5563; }
-        .table-wrap { margin-top: 0; width: 100%; overflow-x: auto; }
-        #items { width: 100%; border-collapse: collapse; font-size: 12px; }
-        #items th, #items td { padding: 12px 8px; vertical-align: top; font-family: 'Inter', Arial, sans-serif; border: none; text-align: left; vertical-align: middle; }
-        #items td:nth-child(1), #items th:nth-child(1) { text-align: center; }
-        #items td:nth-child(2), #items th:nth-child(2) { text-align: left; }
-        #items td:nth-child(3), #items th:nth-child(3) { text-align: left; }
-        #items td:nth-child(4), #items th:nth-child(4) { text-align: center; }
-        #items td:nth-child(5), #items th:nth-child(5) { text-align: right; }
-        #items td:nth-child(6), #items th:nth-child(6) { text-align: right; }
-        #items td:nth-child(7), #items th:nth-child(7) { text-align: right; }
-        #items td:nth-child(8), #items th:nth-child(8) { text-align: right; }
-        #items th:last-child, #items td:last-child { text-align: center; }
-        #items thead th { background: #f9fafb; font-weight: 600; font-size: 11px; vertical-align: middle; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 8px; }
-        #items th:nth-child(1) { width: 40px; }
-        #items th:nth-child(2) { width: 80px; }
-        #items th:nth-child(4) { width: 40px; }
-        #items th:nth-child(5) { width: 90px; }
-        #items th:nth-child(6) { width: 60px; }
-        #items th:nth-child(7) { width: 80px; }
-        #items th:nth-child(8) { width: 90px; }
-        #items th:last-child { width: 40px; }
-        #items tbody tr { border-bottom: 1px solid #f3f4f6; }
-        .desc { white-space: pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
-        .tax-category-wrapper { position: relative; margin-top: 8px; max-width: 200px; }
-        .table-dropdown-trigger { width: 100%; padding: 0.5rem 0.75rem; font-size: 12px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--bg-input); font-family: 'Inter', Arial, sans-serif; text-align: left; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.5'%3e%3cpath d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px 16px; color: var(--text-main); }
-        .table-dropdown-trigger:hover { background-color: var(--bg-hover); }
-        .table-dropdown-trigger:focus { outline: 1px dashed var(--text-muted); border-color: var(--text-muted); background-color: var(--bg-paper); }
-        .table-dropdown-panel { position: absolute; z-index: 1000; top: 100%; margin-top: 4px; width: 180px; max-height: 15rem; overflow: auto; border-radius: 0.375rem; background-color: var(--bg-paper); padding-top: 0.25rem; padding-bottom: 0.25rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: 1px solid var(--border-color); }
-        .table-dropdown-option { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; font-size: 12px; line-height: 1.25; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
-        .table-dropdown-option:hover { background-color: var(--bg-active); color: var(--text-accent); }
-        .table-dropdown-option:focus { outline: 2px solid transparent; outline-offset: 2px; }
-        #invoice .table-dropdown-trigger, #invoice .table-dropdown-panel { background-color: #ffffff !important; color: #111827 !important; border-color: #e5e7eb !important; }
-        #invoice .table-dropdown-option { color: #4b5563 !important; }
-        #invoice .table-dropdown-option:hover, #invoice .table-dropdown-trigger:hover { background-color: #f9fafb !important; color: #111827 !important; }
-        #invoice input { background-color: #ffffff !important; color: #111827 !important; border-color: #e5e7eb !important; }
-        
-        .item-serial, .item-color {
-            background-color: var(--bg-input) !important;
-            color: var(--text-main) !important;
-            border-color: var(--border-color) !important;
-        }
-        .item-serial::placeholder, .item-color::placeholder {
-            color: var(--text-muted);
-        }
-        .item-serial:focus, .item-color:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            border-color: var(--text-accent) !important;
-            box-shadow: 0 0 0 2px var(--text-accent);
-        }
-        
-        .rate-display { text-align: right !important; color: #4b5563; font-size: 12px; padding-right: 8px; }
-        .totals { display: flex; justify-content: flex-end; margin-top: 32px; }
-        .totals .box { width: 380px; font-size: 12px; }
-        .totals .currency { text-align: right; padding-right: 10px; margin-bottom: 6px; color: #4b5563; font-size: 12px; }
-        .totals table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .totals td { padding: 8px; }
-        .totals td.label { text-align: left; width: 100px; font-weight: 500; color: #4b5563; }
-        .totals td.value { text-align: right; font-weight: 700; width: 140px; color: #111827; }
-        .totals table tr:last-child { background-color: #f9fafb; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
-        .totals table tr:last-child td { font-size: 14px; padding-top: 12px; padding-bottom: 12px; }
-        .delete-btn { background: transparent; border: none; cursor: pointer; padding: 2px; border-radius: 4px; }
-        .delete-btn svg { color: #dc2626; width: 1rem; height: 1rem; }
-        .delete-btn:hover svg { stroke: #b91c1c; }
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-        @media (min-width: 640px) { .sm\:inline { display: inline; } }
-        @media (min-width: 1024px) { .lg\:hidden { display: none !important; } .lg\:block { display: block; } .lg\:relative { position: relative; } .lg\:translate-x-0 { transform: translateX(0); } }
-        @media (min-width: 1024px) { .app-layout { display: flex; height: 100vh; height: 100dvh; } }
-        .sidebar { width: 100%; max-width: 24rem; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); flex-shrink: 0; position: fixed; inset-y: 0; left: 0; z-index: 20; transform: translateX(-100%); transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
-        .sidebar.mobile-sidebar-open { transform: translateX(0); }
-        @media (min-width: 1024px) { .sidebar { width: 20%; max-width: none; position: fixed; transform: translateX(0); } }
-        .sidebar-overlay { position: fixed; inset: 0; z-index: 10; background-color: rgb(0 0 0 / 0.5); }
-        .settings-panel { padding: 0 1rem 1.5rem 1rem; flex-grow: 1; overflow-y: auto; }
-        @media (min-width: 768px) { .settings-panel { padding: 0 1.5rem 2.5rem 1.5rem; } }
-        @media (min-width: 768px) { .sidebar-header { padding-left: 1.5rem; padding-right: 1.5rem; } }
-        .user-profile-container { padding-top: 1.5rem; margin-top: 0; }
-        .sidebar-panel:not([hidden]) ~ .sidebar-panel:not([hidden]) { margin-top: 2rem; }
-        .settings-panel > .sidebar-header:not([hidden]) ~ *:not([hidden]) { margin-top: 1.5rem; }
-        .sidebar-menu:not([hidden]) ~ .sidebar-panel:not([hidden]) { margin-top: 1.5rem; }
-        .settings-column-wrapper { background-color: var(--bg-hover); border-bottom: 1px solid var(--border-color); }
-        .settings-column-wrapper .settings-panel { padding-bottom: 0; }
-        .settings-column-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
-        .settings-column-wrapper .settings-panel > .settings-column-header:not([hidden]) ~ *:not([hidden]) { margin-top: 2rem; }
-        .settings-column-wrapper .settings-panel > section:not([hidden]) ~ section:not([hidden]) { margin-top: 2rem; }
-        @media (min-width: 1024px) { 
-            .settings-column-wrapper { width: 20%; position: fixed; left: 20%; top: 0; height: 100vh; height: 100dvh; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); }
-            .settings-column-wrapper .settings-panel { overflow-y: auto; height: 100%; padding: 2rem; padding-top: 0; }
-            .settings-column-wrapper .settings-panel .user-profile-container { padding-top: 2rem; }
-            .settings-column-wrapper .settings-panel > section:first-child { padding-top: 2rem; }
-        }
-        .sidebar-menu { display: flex; gap: 10px; background-color: rgba(128, 128, 128, 0.1); padding: 4px; border-radius: 9999px; width: 100%; border: 1px solid transparent; }
-        [data-theme="dark"] .sidebar-menu { background-color: rgba(255, 255, 255, 0.1); border-color: transparent; }
-        .sidebar-menu-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.75rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); background-color: transparent; border: none; border-radius: 9999px; cursor: pointer; transition: all 0.2s ease; }
-        .sidebar-menu-btn:hover { color: var(--text-main); }
-        .sidebar-menu-btn:focus { outline: 2px solid transparent; outline-offset: 2px; }
-        .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); font-weight: 600; box-shadow: var(--shadow-sm); }
-        [data-theme="dark"] .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); }
-        .sidebar-menu-btn svg { width: 1.2rem; height: 1.2rem; margin-right: 0.5rem; }
-        .settings-section-title { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: var(--text-main); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
-        .settings-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
-        .form-label { display: block; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; color: var(--text-secondary); }
-        .form-helper-text { margin-top: 0.5rem; font-size: 0.75rem; line-height: 1rem; color: var(--text-secondary); }
-        .dropdown-container { position: relative; margin-top: 0.25rem; }
-        .dropdown-trigger { position: relative; width: 100%; cursor: default; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-input); padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 2.5rem; text-align: left; font-size: 1rem; line-height: 1.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); color: var(--text-main); }
-        .dropdown-trigger:hover { border-color: var(--text-muted); }
-        .dropdown-trigger:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #99f6e4; box-shadow: 0 0 0 2px #99f6e4; }
-        @media (min-width: 640px) { .dropdown-trigger { font-size: 0.875rem; line-height: 1.25rem; } }
-        .dropdown-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .dropdown-icon-container { pointer-events: none; position: absolute; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding-right: 0.5rem; }
-        .dropdown-icon { width: 1.25rem; height: 1.25rem; color: var(--text-muted); }
-        .dropdown-options-panel { position: absolute; z-index: 10; margin-top: 0.25rem; width: 100%; max-height: 15rem; overflow: auto; border-radius: 0.375rem; background-color: var(--bg-paper); padding-top: 0.25rem; padding-bottom: 0.25rem; font-size: 1rem; line-height: 1.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); border: 1px solid var(--border-color); }
-        .dropdown-options-panel:focus { outline: 2px solid transparent; outline-offset: 2px; }
-        @media (min-width: 640px) { .dropdown-options-panel { font-size: 0.875rem; line-height: 1.25rem; } }
-        .dropdown-option { display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; font-size: 0.875rem; line-height: 1.25rem; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
-        .dropdown-option:hover { background-color: var(--bg-active); color: var(--text-accent); }
-        .dropdown-option:focus { outline: 2px solid transparent; outline-offset: 2px; }
-        .notification-box { padding: 0.75rem; background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.25rem; color: #92400e; display: flex; justify-content: space-between; align-items: center; }
-        .notification-dismiss-btn { margin-left: 0.5rem; margin-right: -0.25rem; margin-top: -0.25rem; margin-bottom: -0.25rem; padding: 0.25rem; border-radius: 0.375rem; background: none; border: none; cursor: pointer; }
-        .notification-dismiss-btn:hover { background-color: #fef3c7; }
-        .notification-dismiss-btn:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #f59e0b; box-shadow: 0 0 0 2px #f59e0b; }
-        .notification-dismiss-btn-icon { width: 1rem; height: 1rem; stroke: currentColor; }
-        .form-file-input { margin-top: 0.75rem; width: 100%; font-size: 0.875rem; line-height: 1.25rem; color: var(--text-secondary); }
-        .form-file-input::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 0.375rem; border-width: 0; font-weight: 600; background-color: var(--bg-active); color: var(--primary-hover); cursor: pointer; }
-        .form-file-input:hover::file-selector-button { background-color: var(--border-active); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; cursor: pointer; padding: 0.5rem 1rem; }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-full { width: 100%; }
-        .btn-primary { color: #ffffff; background-color: var(--primary); }
-        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
-        .btn-primary:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
-        .btn-secondary { color: var(--text-main); background-color: var(--bg-input); border-color: var(--border-color); }
-        .btn-secondary:hover:not(:disabled) { background-color: var(--bg-hover); }
-        .invoice-toolbar .btn-secondary:hover:not(:disabled) { background-color: var(--bg-body); }
-        .btn-secondary:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
-        .btn-danger { color: #ffffff; background-color: #dc2626; padding: 0.375rem 0.75rem; font-size: 0.75rem; line-height: 1rem; margin-top: 0.75rem; }
-        .btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
-        .btn-danger:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
-        .btn-icon { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; margin-left: -0.25rem; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-        .btn-icon-only { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 0.375rem; border: 1px solid transparent; color: var(--text-secondary); background-color: transparent;}
-        .btn-icon-only:hover { background-color: var(--bg-hover); color: var(--text-main); }
-        .btn-icon-only:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
-        .btn-icon-only svg { width: 1.5rem; height: 1.5rem; }
-        
         @media (max-width: 1023px) {
             body { overflow: auto; height: auto; }
             .settings-column-wrapper { background-color: transparent; border-bottom: none; }
             .settings-column-wrapper .settings-panel { padding-top: 0; }
             .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; }
-            
-            /* -- REMOVED RESPONSIVE REFLOW FOR INVOICE TO PRESERVE A4 LAYOUT -- */
         }
         @media print {
             .hide-on-print { display: none; }
@@ -660,6 +505,58 @@
         .btn-ai-gradient:active { transform: translateY(0); box-shadow: 0 2px 4px -1px rgba(124, 58, 237, 0.25); }
         .btn-ai-gradient svg { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
         @keyframes ai-gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* --- VIEW MODE STYLES (The Fix) --- */
+        .invoice-view-mode .delete-btn,
+        .invoice-view-mode #add-item-btn,
+        .invoice-view-mode #add-fee-btn,
+        .invoice-view-mode .meta-inputs input:placeholder-shown {
+            display: none !important;
+        }
+
+        .invoice-view-mode input, 
+        .invoice-view-mode textarea,
+        .invoice-view-mode .form-textarea,
+        .invoice-view-mode .item-serial,
+        .invoice-view-mode .item-style {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            resize: none;
+            color: #111827 !important;
+            pointer-events: none;
+        }
+
+        .invoice-view-mode .table-dropdown-trigger {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            background-image: none !important;
+            color: #111827 !important;
+            pointer-events: none;
+            font-weight: normal;
+            height: auto;
+        }
+
+        .invoice-view-mode [contenteditable] {
+            contenteditable: false !important;
+            outline: none !important;
+            background: transparent !important; 
+            pointer-events: none;
+        }
+        
+        .invoice-view-mode .item-serial, 
+        .invoice-view-mode .item-style {
+            font-size: 11px;
+            color: #6b7280 !important;
+        }
+        
+        .invoice-view-mode {
+            pointer-events: none; 
+        }
     </style>
 </head>
 <body>
@@ -970,39 +867,49 @@
                 </svg>
             </button>
             <div class="invoice-toolbar">
-                <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="btn-label sm:inline">New</span>
-                </button>
-                <button id="save-invoice-btn" title="Save Invoice" class="btn btn-primary">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v13.5A2.25 2.25 0 0118 21.75H6A2.25 2.25 0 013.75 19.5V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" />
-                    </svg>
-                    <span class="btn-label sm:inline">Save</span>
-                </button>
-                <button id="add-item-btn" title="Add item" class="btn btn-secondary">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <span class="btn-label sm:inline">Add Item</span>
-                </button>
-                <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
-                    </svg>
-                    <span class="btn-label sm:inline">Print</span>
-                </button>
-                <button id="generate-pdf-btn" class="btn btn-secondary">
-                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                    </svg>
-                    <span class="btn-label sm:inline">Download</span>
-                </button>
+                <div id="edit-mode-buttons" style="display: flex; gap: 0.75rem;">
+                    <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="btn-label sm:inline">New</span>
+                    </button>
+                    <button id="add-item-btn" title="Add item" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span class="btn-label sm:inline">Add Item</span>
+                    </button>
+                    <button id="save-invoice-btn" title="Save & View" class="btn btn-primary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        <span class="btn-label sm:inline">Save & View</span>
+                    </button>
+                </div>
+                <div id="view-mode-buttons" style="display: none; gap: 0.75rem;">
+                    <button id="edit-invoice-btn" title="Edit Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+                        <span class="btn-label sm:inline">Edit</span>
+                    </button>
+                    <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
+                        </svg>
+                        <span class="btn-label sm:inline">Print</span>
+                    </button>
+                    <button id="generate-pdf-btn" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        <span class="btn-label sm:inline">Download</span>
+                    </button>
+                </div>
             </div>
         </header>
         <aside id="settings-column" class="settings-column-wrapper hide-on-print">
@@ -1114,42 +1021,11 @@ City, State 67890</div>
                                             <th>VAT<br/>rate</th>
                                             <th>VAT<br/>amount</th>
                                             <th>Price incl<br/>VAT</th>
-                                            <th class="hide-on-print">Action</th>
+                                            <th class="hide-on-print hide-on-view">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="items-body">
-                                        <tr class="item">
-                                            <td contenteditable="true" class="line" data-label="Line Nr">1</td>
-                                            <td contenteditable="true" class="code" data-label="Product Code">ASSI12MS</td>
-                                            <td data-label="Description">
-                                                <div contenteditable="true" class="desc">StackBase SwiftInvoice Subscription- 1year
-
-Product Serial Nr   N/A</div>
-                                                <div class="meta-inputs" style="display:flex; gap:8px; margin-top:6px;">
-                                                    <input type="text" class="item-serial" placeholder="Serial No / IMEI" value="" 
-                                                           style="width:50%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
-                                                    <input type="text" class="item-color" placeholder="Color / Style" value="" 
-                                                           style="width:50%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
-                                                </div>
-                                                <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="">
-                                                    <button type="button" class="table-dropdown-trigger"></button>
-                                                    <div class="table-dropdown-panel hidden"></div>
-                                                </div>
-                                            </td>
-                                            <td contenteditable="true" class="qty" data-label="Qty">1</td>
-                                            <td contenteditable="true" class="excl" data-label="Price excl VAT">66.62</td>
-                                            <td contenteditable="false" class="rate-display" data-label="VAT rate">5.00%</td>
-                                            <td contenteditable="true" class="vat" data-label="VAT amount">3.33</td>
-                                            <td contenteditable="true" class="incl" data-label="Price incl VAT">69.95</td>
-                                            <td class="hide-on-print" data-label="Action">
-                                                <button class="delete-btn" title="Delete row">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                             <div style="margin-top:8px;"></div>
@@ -1161,17 +1037,17 @@ Product Serial Nr   N/A</div>
                                             <tr>
                                                 <td class="label">Subtotal</td>
                                                 <td contenteditable="false" id="subtotal" class="value">66.62</td>
-                                                <td class="hide-on-print" style="width: 40px;"></td> 
+                                                <td class="hide-on-print hide-on-view" style="width: 40px;"></td> 
                                             </tr>
                                             <tr id="vat-row"> 
                                                 <td class="label">VAT</td>
                                                 <td contenteditable="false" id="vat-total" class="value">3.33</td>
-                                                <td class="hide-on-print"></td>
+                                                <td class="hide-on-print hide-on-view"></td>
                                             </tr>
                                             <tr>
                                                 <td class="label">Total</td>
                                                 <td contenteditable="false" id="grand" class="value">69.95</td>
-                                                <td class="hide-on-print"></td>
+                                                <td class="hide-on-print hide-on-view"></td>
                                             </tr>
                                         </tbody>
                                     </table>
