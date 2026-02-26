@@ -546,6 +546,71 @@
                 btn.disabled = false;
             }
         });
+
+        // Tamperproof
+        // --- Anti-Tamper & Anti-Inspect Mechanisms ---
+
+        function triggerSecurityLockdown(reason) {
+            console.warn("Security Event: " + reason);
+            
+            // 1. Empty the invoice canvas
+            const paper = document.getElementById('invoice-paper');
+            if (paper) paper.innerHTML = ''; 
+            
+            // 2. Hide normal UI elements
+            document.querySelector('.viewer-header').classList.add('hidden');
+            document.getElementById('website-disclaimer').classList.add('hidden');
+            
+            // 3. Show the error overlay
+            const loadingScreen = document.getElementById('loading-screen');
+            const loadingContent = document.getElementById('loading-content');
+            const errorContent = document.getElementById('error-content');
+            
+            loadingScreen.classList.remove('hidden');
+            loadingContent.classList.add('hidden');
+            errorContent.classList.remove('hidden');
+            
+            document.getElementById('error-title').textContent = "Security Lockdown";
+            document.getElementById('error-message').textContent = "Unauthorized modification or inspection attempt detected. The invoice data has been cleared for your protection.";
+        }
+
+        // 1. Block Right-Click (Context Menu)
+        document.addEventListener('contextmenu', event => {
+            event.preventDefault();
+        });
+
+        // 2. Block Keyboard Shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && e.key === 'U')
+            ) {
+                e.preventDefault();
+                triggerSecurityLockdown("Keyboard shortcut for tools intercepted.");
+            }
+        });
+
+        // 3. Detect URL Bar Changes after initial load
+        const initialUrl = window.location.href;
+        setInterval(() => {
+            if (window.location.href !== initialUrl) {
+                triggerSecurityLockdown("URL modification detected.");
+            }
+        }, 1000);
+
+        // 4. DevTools Timing Trap (The 'debugger' loop)
+        // If DevTools is open, the debugger statement pauses execution. 
+        // We measure the time it takes to execute; if it takes too long, DevTools is likely open.
+        setInterval(() => {
+            const start = performance.now();
+            debugger; // This will pause execution ONLY if DevTools is open
+            const end = performance.now();
+            
+            if (end - start > 100) { 
+                triggerSecurityLockdown("Developer tools timing anomaly detected.");
+            }
+        }, 2000);
     </script>
 </body>
 </html>
