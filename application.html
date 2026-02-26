@@ -193,26 +193,61 @@
         .party h2 { font-size: 14px; margin: 0 0 8px 0; font-weight: 600; color: #111827; }
         .address { font-size: 12px; white-space: pre-wrap; line-height: 1.6; min-height: 72px; padding: 4px; border: none; color: #4b5563; }
         .table-wrap { margin-top: 0; width: 100%; overflow-x: auto; }
-        #items { width: 100%; border-collapse: collapse; font-size: 12px; }
-        #items th, #items td { padding: 12px 8px; vertical-align: top; font-family: 'Inter', Arial, sans-serif; border: none; text-align: left; vertical-align: middle; }
-        #items td:nth-child(1), #items th:nth-child(1) { text-align: center; }
-        #items td:nth-child(2), #items th:nth-child(2) { text-align: left; }
-        #items td:nth-child(3), #items th:nth-child(3) { text-align: left; }
-        #items td:nth-child(4), #items th:nth-child(4) { text-align: center; }
-        #items td:nth-child(5), #items th:nth-child(5) { text-align: right; }
-        #items td:nth-child(6), #items th:nth-child(6) { text-align: right; }
-        #items td:nth-child(7), #items th:nth-child(7) { text-align: right; }
-        #items td:nth-child(8), #items th:nth-child(8) { text-align: right; }
-        #items th:last-child, #items td:last-child { text-align: center; }
-        #items thead th { background: #f9fafb; font-weight: 600; font-size: 11px; vertical-align: middle; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 8px; }
-        #items th:nth-child(1) { width: 40px; }
-        #items th:nth-child(2) { width: 80px; }
-        #items th:nth-child(4) { width: 40px; }
-        #items th:nth-child(5) { width: 90px; }
-        #items th:nth-child(6) { width: 60px; }
-        #items th:nth-child(7) { width: 80px; }
-        #items th:nth-child(8) { width: 90px; }
-        #items th:last-child { width: 40px; }
+
+        /* --- UPDATED TABLE LAYOUT: Fixed Widths & Hidden Tax Category --- */
+        #items { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; /* FIXED LAYOUT IS KEY */ }
+        
+        #items th { 
+            padding: 12px 8px; /* Reduced padding for tightness */
+            vertical-align: top; 
+            font-family: 'Inter', Arial, sans-serif; 
+            font-weight: 600;
+            border: none; 
+            text-align: left; 
+            vertical-align: middle; 
+            word-wrap: break-word; /* Ensure text wraps */
+        }
+        #items td { 
+            padding: 12px 8px; /* Reduced padding for tightness */
+            vertical-align: top; 
+            font-family: 'Inter', Arial, sans-serif; 
+            border: none; 
+            text-align: left; 
+            vertical-align: top; 
+            word-wrap: break-word; /* Ensure text wraps */
+        }
+
+        /* Column Alignment */
+        #items td:nth-child(1), #items th:nth-child(1) { text-align: center; } /* Line */
+        #items td:nth-child(2), #items th:nth-child(2) { text-align: left; }   /* Code */
+        #items td:nth-child(3), #items th:nth-child(3) { text-align: left; }   /* Desc */
+        #items td:nth-child(4), #items th:nth-child(4) { text-align: center; } /* Qty */
+        #items td:nth-child(5), #items th:nth-child(5) { text-align: right; }  /* Excl */
+        #items td:nth-child(6), #items th:nth-child(6) { text-align: right; }  /* Rate */
+        #items td:nth-child(7), #items th:nth-child(7) { text-align: right; }  /* VAT Amt */
+        #items td:nth-child(8), #items th:nth-child(8) { text-align: right; }  /* Incl */
+        #items th:last-child, #items td:last-child { text-align: center; }     /* Action */
+
+        #items thead th { 
+            background: #f9fafb; 
+            font-weight: 600; 
+            font-size: 10px; /* Smaller header font */
+            color: #4b5563; 
+            text-transform: uppercase; 
+            letter-spacing: 0.02em;
+        }
+
+        /* STRICT COLUMN WIDTHS (Optimized for Description Space) */
+        #items th:nth-child(1) { width: 40px; }  /* Line */
+        #items th:nth-child(2) { width: 100px; }  /* Code */
+        #items th:nth-child(3) { width: auto; }  /* Description (Takes remaining space) */
+        #items th:nth-child(4) { width: 40px; }  /* Qty */
+        #items th:nth-child(5) { width: 90px; }  /* Excl */
+        #items th:nth-child(6) { width: 60px; }  /* Rate */
+        #items th:nth-child(7) { width: 80px; }  /* VAT Amt */
+        #items th:nth-child(8) { width: 90px; }  /* Incl */
+        #items th:last-child   { width: 40px; }  /* Action */
+        
         #items tbody tr { border-bottom: 1px solid #f3f4f6; }
         .desc { white-space: pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
         .tax-category-wrapper { position: relative; margin-top: 8px; max-width: 200px; }
@@ -484,20 +519,23 @@
             .settings-column-wrapper .settings-panel { padding-top: 0; }
             .settings-column-header { padding-bottom: 1rem; margin-bottom: 1.5rem; }
         }
+
+        /* --- PRINT STYLES (Hide Tax Wrapper, Remove Margins) --- */
         @media print {
-            .hide-on-print { display: none; }
+            .hide-on-print { display: none !important; }
+            .tax-category-wrapper { display: none !important; } /* Ensure hidden on print */
             body { background: #fff; padding: 0; margin: 0; height: auto; overflow: visible; }
             .app-layout { display: block; }
             main.main-content { display: block; width: 100%; height: auto; overflow: visible; padding: 0; margin: 0; margin-left: 0; }
             main .main-content-container { max-width: none; padding: 0; margin: 0; display: block; }
             .app-container { box-shadow: none; border-radius: 0; margin: 0; border: none; width: 100%; }
-            #invoice { border: none; border-radius: 0; padding: 0; width: 100% !important; max-width: none !important; margin: 0; }
+            #invoice { border: none; border-radius: 0; padding: 0 !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
             .main-header { display: none; }
             .table-dropdown-trigger { display: none; }
             .table-dropdown-panel { display: none; }
-            .tax-category-wrapper::after { content: attr(data-category-print); font-size: 12px; color: #111827; white-space: nowrap; padding-left: 8px; }
-            .tax-category-wrapper::before { content: "Tax Category:"; font-size: 12px; font-weight: 600; color: #4b5563; }
+            @page { margin: 10mm; size: auto; }
         }
+
         .btn-ai-gradient { display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; font-weight: 600; color: #ffffff !important; text-decoration: none; background: linear-gradient(135deg, #4f46e5, #7c3aed, #d946ef, #f97316); background-size: 300% 300%; animation: ai-gradient-shift 8s ease infinite; box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.25), 0 2px 4px -1px rgba(124, 58, 237, 0.1); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255, 255, 255, 0.15); position: relative; overflow: hidden; box-sizing: border-box; text-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.01em; }
         .btn-ai-gradient::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: left 0.7s ease; }
         .btn-ai-gradient:hover::before { left: 100%; }
@@ -510,8 +548,10 @@
         .invoice-view-mode .delete-btn,
         .invoice-view-mode #add-item-btn,
         .invoice-view-mode #add-fee-btn,
-        .invoice-view-mode .meta-inputs input:placeholder-shown {
-            display: none !important;
+        .invoice-view-mode .meta-inputs input:placeholder-shown,
+        .invoice-view-mode .hide-on-view,
+        .invoice-view-mode .tax-category-wrapper { /* HIDDEN TAX CATEGORY */
+            display: none !important; 
         }
 
         .invoice-view-mode input, 
@@ -550,8 +590,10 @@
         
         .invoice-view-mode .item-serial, 
         .invoice-view-mode .item-style {
-            font-size: 11px;
+            font-size: 10px;
             color: #6b7280 !important;
+            margin-top: 1px !important;
+            display: block;
         }
         
         .invoice-view-mode {

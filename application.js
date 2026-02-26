@@ -1649,18 +1649,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const tableHead = invoiceEl.querySelector('#items thead').cloneNode(true); 
             const itemRows = invoiceEl.querySelectorAll('#items-body .item');
             
-            // Adjusted colgroup for 800px width
+            // Adjusted colgroup for PDF to match the new optimized layout
+            // We give much more width to the Description column (3rd col)
             const colgroup = document.createElement('colgroup');
             colgroup.innerHTML = `
-                <col style="width: 30px;">
-                <col style="width: 70px;">
-                <col style="width: 400px;">
-                <col style="width: 40px;">
-                <col style="width: 70px;">
-                <col style="width: 50px;">
-                <col style="width: 60px;">
-                <col style="width: 80px;">
-            `;
+                <col style="width: 30px;">  <col style="width: 70px;">  <col style="width: 400px;"> <col style="width: 40px;">  <col style="width: 70px;">  <col style="width: 50px;">  <col style="width: 60px;">  <col style="width: 80px;">  `;
             
             const footerBlock = document.createElement('div');
             footerBlock.appendChild(invoiceEl.querySelector('.totals').cloneNode(true));
