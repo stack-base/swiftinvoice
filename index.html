@@ -452,31 +452,33 @@
     <div id="footer-placeholder"></div>
     
     <script>
-    (function() {
-        // --- Dark Mode Logic ---
-        var toggleButton = document.getElementById('darkModeToggle');
-        var body = document.body;
-
-        function applyTheme() {
-            var isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
-                body.classList.add('dark-mode');
-            } else {
-                body.classList.remove('dark-mode');
+        (function() {
+            // 1. Apply the theme immediately on page load (prevents white flash)
+            function applyTheme() {
+                var isDarkMode = localStorage.getItem('darkMode') === 'true';
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
             }
-        }
+            
+            applyTheme();
 
-        applyTheme();
-
-        if (toggleButton) {
-            toggleButton.addEventListener('click', function() {
-                body.classList.toggle('dark-mode');
-                var isDarkMode = body.classList.contains('dark-mode');
-                localStorage.setItem('darkMode', isDarkMode);
+            // 2. Use Event Delegation for dynamically loaded elements
+            document.addEventListener('click', function(event) {
+                // .closest() ensures that clicking the SVG or paths inside the button also works
+                var toggleBtn = event.target.closest('#darkModeToggle');
+                
+                if (toggleBtn) {
+                    // Toggle the class and save preference
+                    document.body.classList.toggle('dark-mode');
+                    var isDarkMode = document.body.classList.contains('dark-mode');
+                    localStorage.setItem('darkMode', isDarkMode);
+                }
             });
-        }
-    })();
-</script>
+        })();
+    </script>
 
 </body>
 </html>
