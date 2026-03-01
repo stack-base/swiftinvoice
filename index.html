@@ -9,9 +9,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $("#navbar-placeholder").load("https://stack-base.github.io/framework/navbar-1/index.html");
+        });
+    </script>
+    <script>
+        $(function() {
+            $("#footer-placeholder").load("https://stack-base.github.io/framework/footer-1/index.html");
+        });
+    </script>
     
     <style>
-        /* --- 1. Global & Reset Styles --- */
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Roboto', sans-serif;
@@ -23,58 +34,10 @@
             font-size: 16px; line-height: 1.6;
         }
         
-        .container {
-            width: 90%; max-width: 1280px;
-            margin-left: auto; margin-right: auto;
-            padding-left: 1rem; padding-right: 1rem;
-        }
-        
         a { text-decoration: none; color: inherit; transition: color 0.2s ease-in-out; }
         button { cursor: pointer; font-family: inherit; border: none; background: none; }
         h1, h2, h3, h4 { font-family: 'Ubuntu', sans-serif; }
-
-        /* --- 2. Header & Navigation --- */
-        header {
-            background-color: #111827;
-            position: sticky; top: 0; z-index: 50;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        header nav { display: flex; align-items: center; justify-content: space-between; height: 4rem; }
         
-        .logo-container { display: flex; align-items: center; flex-shrink: 0; }
-        .logo-container img { height: 2rem; width: 2rem; }
-        .logo-container span { color: white; font-size: 1.5rem; font-weight: 700; margin-left: 0.75rem; }
-        
-        .nav-desktop { display: none; }
-        .nav-desktop a {
-            color: #d1d5db; font-size: 0.875rem; font-weight: 500;
-            padding: 0.5rem 0.75rem; border-radius: 0.375rem; margin-left: 0.5rem;
-            transition: color 0.2s;
-        }
-        .nav-desktop a:hover { color: white; }
-        
-        .nav-desktop-cta { display: none; align-items: center; }
-        .nav-cta-signin { color: #d1d5db; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.75rem; transition: color 0.2s; }
-        .nav-cta-signin:hover { color: white; }
-        
-        .nav-cta-signup {
-            background-image: linear-gradient(to right, #3b82f6, #14b8a6);
-            color: white; font-size: 0.875rem; font-weight: 500;
-            padding: 0.5rem 1rem; border-radius: 0.5rem; margin-left: 1rem;
-            transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-        .nav-cta-signup:hover { background-image: linear-gradient(to right, #2563eb, #0d9488); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1); }
-        
-        .mobile-menu-button { display: block; color: #d1d5db; padding: 0.5rem; }
-        .mobile-menu-button svg { height: 1.5rem; width: 1.5rem; }
-        
-        .mobile-menu { display: none; padding-bottom: 1rem; }
-        .mobile-menu.open { display: block; }
-        .mobile-menu a { display: block; color: #d1d5db; padding: 0.75rem 0.5rem; font-weight: 500; }
-        .mobile-menu a:hover { color: white; }
-        .mobile-menu .nav-cta-signup { width: 100%; text-align: left; margin-top: 0.5rem; }
-        
-        /* --- 3. Hero Section --- */
         .hero-section {
             color: white; padding-top: 6rem; padding-bottom: 6rem; text-align: center;
             background-image: linear-gradient(rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.95)), 
@@ -94,16 +57,12 @@
         .hero-cta-secondary { background-color: #4b5563; color: #d1d5db; }
         .hero-cta-secondary:hover { background-color: #374151; }
 
-        /* Hero Screenshot Frame */
         .hero-visual-wrapper {
-            /* background: rgba(255, 255, 255, 0.05); */
-            /* border: 1px solid rgba(255, 255, 255, 0.1); */
             border: 1px solid transparent;
             border-radius: 12px;
             padding: 10px;
             max-width: 1000px;
             margin: 0 auto;
-            /* box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5); */
         }
         .screenshot-frame {
             border-radius: 8px;
@@ -111,7 +70,6 @@
             background-color: #111827;
             position: relative;
             padding-top: 56.25%;
-            /* 16:9 Aspect Ratio */
         }
         .screenshot-img {
             position: absolute;
@@ -121,7 +79,6 @@
             object-position: top;
         }
         
-        /* --- 4. Features Section --- */
         .features-section { padding-top: 6rem; padding-bottom: 6rem; background-color: white; }
         .features-header { text-align: center; margin-bottom: 4rem; }
         .features-header .tagline { color: #14b8a6; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; }
@@ -143,9 +100,8 @@
         .feature-card h3 { font-size: 1.5rem; font-weight: 600; color: #111827; margin: 0 0 0.75rem 0; }
         .feature-card p { color: #4b5563; margin: 0; flex-grow: 1; }
 
-        /* --- 5. DATA STUDIO DEEP DIVE (Zig Zag Layout) --- */
         .studio-section {
-            background-color: #111827; /* Dark Brand */
+            background-color: #111827;
             color: #fff;
             padding-top: 6rem;
             padding-bottom: 6rem;
@@ -153,7 +109,6 @@
             overflow: hidden;
         }
 
-        /* Decorative blob background */
         .studio-section::before {
             content: '';
             position: absolute;
@@ -171,7 +126,6 @@
         }
         .studio-intro p { font-size: 1.25rem; color: #9ca3af; max-width: 48rem; margin: 1rem auto 0 auto; }
 
-        /* Feature Row (Zig Zag) */
         .feature-row {
             display: flex;
             flex-direction: column;
@@ -193,7 +147,6 @@
 
         .feature-visual { flex: 1; width: 100%; }
         
-        /* Screenshot Container Styling */
         .studio-screenshot-container {
             background: #1f2937;
             border: 1px solid #374151;
@@ -204,11 +157,9 @@
             overflow: hidden;
         }
         
-        /* The actual image or placeholder */
         .screenshot-placeholder {
             background-color: #0f172a;
             width: 100%;
-            /* Aspect ratio trick */
             aspect-ratio: 16/10;
             border-radius: 8px;
             display: flex;
@@ -232,7 +183,6 @@
             .feature-row.reverse { flex-direction: row-reverse; }
         }
 
-        /* --- 6. "See in Action" Section --- */
         .app-first-section { padding-top: 6rem; padding-bottom: 6rem; background-color: #f9fafb; }
         .app-first-container { display: flex; flex-direction: column; align-items: center; gap: 3rem; }
         .app-first-text { width: 100%; }
@@ -253,7 +203,6 @@
         .app-window-controls .yellow { background-color: #f59e0b; }
         .app-window-controls .green { background-color: #10b981; }
 
-        /* --- 7. CTA Section --- */
         .cta-section {
             background-image: linear-gradient(to right, #3b82f6, #14b8a6); color: white;
             padding-top: 5rem; padding-bottom: 5rem; text-align: center;
@@ -267,26 +216,6 @@
         }
         .cta-section a:hover { background-color: #f3f4f6; transform: scale(1.05); }
 
-        /* --- 8. Footer --- */
-        footer { background-color: #111827; color: #9ca3af; padding-top: 4rem; padding-bottom: 4rem; }
-        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .footer-brand { grid-column: span 2; margin-bottom: 1rem; }
-        .footer-brand .logo-container { margin-bottom: 1rem; }
-        .footer-brand p { font-size: 0.875rem; margin: 0; }
-        .footer-brand .copyright { margin-top: 1rem; }
-        .footer-links-group h4 { color: white; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; margin-bottom: 1rem; margin-top: 0; }
-        .footer-links-group ul { list-style: none; padding-left: 0; margin: 0; }
-        .footer-links-group li { margin-bottom: 0.75rem; }
-        .footer-links-group a { font-size: 0.875rem; }
-        .footer-links-group a:hover { color: white; }
-        .footer-bottom { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #374151; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 1rem; }
-        .footer-bottom p { font-size: 0.875rem; margin: 0; }
-        .footer-socials { display: flex; gap: 1.5rem; align-items: center; }
-        .footer-socials a { color: #9ca3af; display: flex; align-items: center; }
-        .footer-socials a:hover { color: white; }
-        .footer-socials svg { height: 1.5rem; width: 1.5rem; }
-
-        /* --- Dark Mode Toggle --- */
         #darkModeToggle { background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
         #darkModeToggle:hover { color: white; }
         #darkModeToggle svg { height: 1.5rem; width: 1.5rem; }
@@ -295,7 +224,6 @@
         body.dark-mode #darkModeToggle .icon-sun { display: block; }
         body.dark-mode #darkModeToggle .icon-moon { display: none; }
 
-        /* --- 9. Dark Mode Styles --- */
         body.dark-mode { background-color: #111827; color: #d1d5db; }
         body.dark-mode .features-section { background-color: #1f2937; }
         body.dark-mode .features-header h2 { color: white; }
@@ -311,7 +239,6 @@
         body.dark-mode .app-preview-block { background-color: #111827; border-color: #374151; }
         body.dark-mode .screenshot-placeholder { background-color: #1f2937; color: #94a3b8; }
 
-        /* Media Queries */
         @media (min-width: 640px) {
             .hero-section h1 { font-size: 3rem; }
             .hero-section p { font-size: 1.5rem; }
@@ -320,13 +247,8 @@
             .footer-bottom { flex-direction: row; }
         }
         @media (min-width: 768px) {
-            .nav-desktop, .nav-desktop-cta { display: flex; }
-            .mobile-menu-button { display: none; }
             .mobile-menu { display: none !important; }
             .features-grid { grid-template-columns: repeat(3, 1fr); }
-            .footer-grid { grid-template-columns: repeat(4, 1fr); }
-            .footer-brand { grid-column: span 2; }
-            .footer-links-group { grid-column: span 1; }
         }
         @media (min-width: 1024px) {
             .hero-section h1 { font-size: 3.75rem; }
@@ -338,37 +260,7 @@
     </style>
 </head>
 <body>
-
-    <header>
-        <nav class="container">
-            <div class="logo-container">
-                <img src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" alt="StackBase Logo" onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';">
-                <span>StackBase</span>
-            </div>
-            <div class="nav-desktop">
-                <a href="#features">Features</a>
-                <a href="#studio">Data Studio</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#docs">Docs</a>
-            </div>
-            <div class="nav-desktop-cta">
-                <a href="https://stack-base.github.io/account/login" class="nav-cta-signin">Sign In</a>
-                <a href="https://stack-base.github.io/swiftinvoice/application" class="nav-cta-signup">Get Started</a>
-            </div>
-            <button id="mobile-menu-button" class="mobile-menu-button" aria-label="Toggle menu">
-                <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </nav>
-        <div id="mobile-menu" class="mobile-menu container">
-            <a href="#features">Features</a>
-            <a href="#studio">Data Studio</a>
-            <a href="#pricing">Pricing</a>
-            <a href="https://stack-base.github.io/account/login" class="nav-cta-signin">Sign In</a>
-            <a href="https://stack-base.github.io/swiftinvoice/application" class="nav-cta-signup">Get Started</a>
-        </div>
-    </header>
+    <div id="navbar-placeholder"></div>
 
     <main>
         
@@ -387,8 +279,6 @@
                     <div class="screenshot-frame">
                         <div class="screenshot-placeholder" style="position: absolute; top:0; left:0; height:100%; width:100%;">
                             <div style="text-align:center;">
-                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width: 4rem; height: 4rem; margin-bottom:1rem; color: #4b5563;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <p>+ Add "Main App Interface" Screenshot Here</p> -->
                                 <img src="https://stack-base.github.io/media/swiftinvoice/img1.jpg" alt="">
                             </div>
                         </div>
@@ -459,7 +349,6 @@
                     <div class="feature-visual">
                         <div class="studio-screenshot-container">
                             <div class="screenshot-placeholder">
-                                <!-- <span>+ Screenshot: Encryption / Unlock Screen</span> -->
                                 <img src="https://stack-base.github.io/media/swiftinvoice/img2.jpg" alt="">
                             </div>
                         </div>
@@ -481,7 +370,6 @@
                     <div class="feature-visual">
                         <div class="studio-screenshot-container">
                             <div class="screenshot-placeholder">
-                                <!-- <span>+ Screenshot: AI Executive Summary Box</span> -->
                                 <img src="https://stack-base.github.io/media/swiftinvoice/img3.jpg" alt="">
                             </div>
                         </div>
@@ -503,7 +391,6 @@
                     <div class="feature-visual">
                         <div class="studio-screenshot-container">
                             <div class="screenshot-placeholder">
-                                <!-- <span>+ Screenshot: Analytics & Charts</span> -->
                                 <img src="https://stack-base.github.io/media/swiftinvoice/img4.jpg" alt="">
                             </div>
                         </div>
@@ -545,7 +432,6 @@
                     <div class="app-preview-block">
                         <div class="app-window-controls"><div class="red"></div><div class="yellow"></div><div class="green"></div></div>
                         <div class="screenshot-placeholder" style="aspect-ratio: 5/3; background: #f3f4f6; color: #9ca3af;">
-                            <!-- <span>+ Screenshot: Editor / Sidebar Interface</span> -->
                             <img src="https://stack-base.github.io/media/swiftinvoice/img2.jpg" alt="">
                         </div>
                     </div>
@@ -563,58 +449,7 @@
 
     </main>
 
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="logo-container">
-                        <img src="https://stack-base.github.io/media/brand/stackbase/stackbase-icon.png" alt="StackBase Logo" onerror="this.onerror=null;this.src='https://placehold.co/32x32/14b8a6/white?text=SB&font=roboto';">
-                        <span>StackBase</span>
-                    </div>
-                    <p>The modern platform for web development, forms, and invoicing.</p>
-                    <p class="copyright">&copy; 2025 StackBase, Inc. All rights reserved.</p>
-                </div>
-                <div class="footer-links-group">
-                    <h4>Product</h4>
-                    <ul>
-                        <li><a href="#features">Website Development</a></li>
-                        <li><a href="#features">Web Forms</a></li>
-                        <li><a href="#studio">Data Studio</a></li>
-                        <li><a href="#pricing">Pricing</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links-group">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="#docs">Documentation</a></li>
-                        <li><a href="#guides">Guides</a></li>
-                        <li><a href="#api">API Reference</a></li>
-                        <li><a href="#support">Support</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links-group">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#blog">Blog</a></li>
-                        <li><a href="#careers">Careers</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>A new way to build the web.</p>
-                <div class="footer-socials">
-                    <button id="darkModeToggle" aria-label="Toggle dark mode">
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    </button>
-                    <a href="#" aria-label="Twitter"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.93.55-1.95.94-3.027 1.15a4.93 4.93 0 00-8.38 4.482A13.97 13.97 0 011.67 3.149a4.93 4.93 0 001.524 6.57c-.8-.02-1.55-.24-2.2-.6a4.93 4.93 0 003.9 4.828 4.93 4.93 0 01-2.22.08A4.93 4.93 0 007.4 15.6a9.9 9.9 0 01-6.11 2.1 9.78 9.78 0 01-1.17-.07A13.95 13.95 0 008.28 21c10.07 0 15.58-8.35 15.58-15.58 0-.24-.005-.47-.015-.7A11.1 11.1 0 0024 4.59z"/></svg></a>
-                    <a href="#" aria-label="GitHub"><svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.488.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.602-3.369-1.34-3.369-1.34-.454-1.157-1.11-1.468-1.11-1.468-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.527 2.338 1.085 2.91.83.092-.645.35-1.085.635-1.334-2.22-.25-4.555-1.11-4.555-4.943 0-1.09.39-1.988 1.03-2.685-.103-.254-.447-1.27.096-2.647 0 0 .84-.27 2.75 1.026.798-.22 1.648-.33 2.498-.33.85 0 1.7.11 2.498.33 1.91-1.296 2.748-1.026 2.748-1.026.545 1.377.2 2.393.1 2.647.64.697 1.03 1.595 1.03 2.685 0 3.843-2.337 4.687-4.565 4.935.359.305.678.915.678 1.846 0 1.334-.012 2.41-.012 2.737 0 .267.18.577.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg></a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
