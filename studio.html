@@ -11,6 +11,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
 :root{--bg-body:#f3f4f6;--bg-paper:#ffffff;--bg-sidebar:#ffffff;--bg-header-pill:rgba(255,255,255,0.75);--bg-input:#ffffff;--bg-hover:#f9fafb;--bg-active:#f0fdfa;--text-main:#111827;--text-secondary:#4b5563;--text-muted:#9ca3af;--text-accent:#0d9488;--border-color:#e5e7eb;--border-active:#ccfbf1;--primary:#0d9488;--primary-hover:#0f766e;--chart-grid:#f3f4f6;--chart-text:#6b7280;--scrollbar-track:#f3f4f6;--scrollbar-thumb:#d1d5db;--scrollbar-thumb-hover:#9ca3af;--shadow-sm:0 1px 3px rgba(0,0,0,0.05);--shadow-lg:0 20px 25px -5px rgb(0 0 0 / 0.1)}
 [data-theme="dark"]{--bg-body:#000000;--bg-paper:#09090b;--bg-sidebar:#000000;--bg-header-pill:rgba(20,20,20,0.85);--bg-input:#000000;--bg-hover:#18181b;--bg-active:#112825;--text-main:#f9fafb;--text-secondary:#d1d5db;--text-muted:#6b7280;--text-accent:#2dd4bf;--border-color:#27272a;--border-active:#115e59;--primary:#14b8a6;--primary-hover:#0d9488;--chart-grid:#27272a;--chart-text:#9ca3af;--scrollbar-track:#000000;--scrollbar-thumb:#27272a;--scrollbar-thumb-hover:#52525b;--shadow-sm:0 1px 3px rgba(0,0,0,0.5);--shadow-lg:0 20px 25px -5px rgb(0 0 0 / 0.5)}
@@ -100,21 +109,161 @@ html,body{height:100%;margin:0;padding:0}body{font-family:'Inter',Arial,sans-ser
 .log-time{font-size:.7rem;color:var(--text-muted);display:block;margin-top:2px}.log-highlight{color:var(--text-main);font-weight:500}.status-box{padding:.75rem;border-radius:.375rem;font-size:.875rem;display:flex;align-items:start;gap:.5rem;margin-bottom:1rem;line-height:1.4;text-align:left}.status-box.error{background-color:#fef2f2;border:1px solid #fee2e2;color:#991b1b}
 .meta-info-row{display:flex;justify-content:space-between;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border-color);font-size:.8rem}.meta-info-label{color:var(--text-muted);font-weight:500;margin-bottom:2px;font-size:.7rem;text-transform:uppercase}.meta-info-val{color:var(--text-main);font-weight:600}
 .app-container{background-color:var(--bg-paper);border-radius:.75rem;box-shadow:var(--shadow-lg);border:1px solid var(--border-color);overflow:hidden}
-#invoice{width:100%;background:#fff;padding:40px;box-sizing:border-box;color:#111827;font-family:'Inter',Arial,sans-serif;min-height:29.7cm;display:flex;flex-direction:column;justify-content:space-between}
-.invoice-logo{max-height:80px;width:100%;max-width:160px;object-fit:contain;border-radius:6px}.invoice-header-row{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #f3f4f6;padding-bottom:20px;margin-bottom:24px;flex-direction:row}
-.header-left{width:58%}.header-right{width:40%;display:flex;justify-content:flex-end;align-items:flex-start}.party-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:32px;flex-direction:row}
-h1.title{font-size:32px;margin:0 0 16px 0;font-weight:700;letter-spacing:-.02em;color:#111827;text-transform:uppercase}.meta-table{font-size:12px;border-collapse:collapse}.meta-table td{padding:4px 0;vertical-align:top}.meta-table td.label{width:120px;font-weight:600;color:#4b5563}
-.party{width:48%}.party h2{font-size:14px;margin:0 0 8px 0;font-weight:600;color:#111827}.address{font-size:12px;white-space:pre-wrap;line-height:1.6;min-height:72px;padding:4px;border:none;color:#4b5563}.table-wrap{margin-top:0;width:100%;overflow-x:auto}
-#items{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}#items th,#items td{padding:12px 8px;vertical-align:top;font-family:'Inter',Arial,sans-serif;border:none;text-align:left;vertical-align:middle}
-#items td:nth-child(1),#items th:nth-child(1){text-align:center;width:40px}#items td:nth-child(2),#items th:nth-child(2){text-align:left;width:80px}#items td:nth-child(3),#items th:nth-child(3){text-align:left}
-#items td:nth-child(4),#items th:nth-child(4){text-align:center;width:40px}#items td:nth-child(5),#items th:nth-child(5){text-align:right;width:90px}#items td:nth-child(6),#items th:nth-child(6){text-align:right;width:60px}
-#items td:nth-child(7),#items th:nth-child(7){text-align:right;width:80px}#items td:nth-child(8),#items th:nth-child(8){text-align:right;width:90px}
-#items thead th{background:#f9fafb;font-weight:600;font-size:11px;vertical-align:middle;color:#4b5563;text-transform:uppercase;letter-spacing:.05em;padding:12px 8px}#items tbody tr{border-bottom:1px solid #f3f4f6}.desc{white-space:pre-wrap;line-height:1.6;font-size:12px;color:#111827;width:100%}
-.totals{display:flex;justify-content:flex-end;margin-top:32px}.totals .box{width:380px;font-size:12px}.totals .currency{text-align:right;padding-right:10px;margin-bottom:6px;color:#4b5563;font-size:12px}.totals table{width:100%;border-collapse:collapse;font-size:12px}
-.totals td{padding:8px}.totals td.label{text-align:left;width:100px;font-weight:500;color:#4b5563}.totals td.value{text-align:right;font-weight:700;width:140px;color:#111827}
-.totals table tr:last-child{background-color:#f9fafb;border-top:2px solid #e5e7eb;border-bottom:2px solid #e5e7eb}.totals table tr:last-child td{font-size:14px;padding-top:12px;padding-bottom:12px}
-.invoice-footer{font-family:'Ubuntu',sans-serif;text-align:center;margin-top:3rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:.875rem;color:#9ca3af;font-weight:400}.invoice-footer-brand{font-family:'Roboto',sans-serif;font-weight:400}
-@media (max-width:768px){.invoice-header-row,.party-row{flex-direction:column;gap:20px}.header-left,.header-right,.party{width:100%}.header-right{justify-content:flex-start}.totals .box{width:100%}}
+
+/* ==========================================================================
+SWIFTINVOICE UNIVERSAL INVOICE STYLES
+Ensures 1:1 identical layout across Editor, Viewer, and Data Studio
+========================================================================== */
+
+#invoice, .paper {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 29.7cm !important;
+    background-color: #ffffff !important;
+    padding: 40px 40px 24px 40px !important;
+    color: #111827 !important;
+    font-family: 'Inter', Arial, sans-serif !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important; /* Centers the paper in viewer/studio */
+    border: none !important;
+    border-radius: 0 !important;
+    display: block; /* Overrides previous flex layout to match invoice.html */
+}
+
+#invoice h1.title, .paper h1.title {
+    font-size: 32px !important; margin: 0 0 16px 0 !important;
+    font-weight: 700 !important; text-transform: uppercase !important; color: #111827 !important;
+    line-height: 1.2 !important; letter-spacing: -0.02em !important;
+}
+
+#invoice h2, .paper h2 { 
+    font-size: 14px !important; margin: 0 0 8px 0 !important; font-weight: 600 !important; color: #111827 !important; 
+}
+
+#invoice .meta-table, .paper .meta-table { font-size: 12px !important; border-collapse: collapse !important; margin-bottom: 24px !important; }
+#invoice .meta-table td, .paper .meta-table td { padding: 4px 0 !important; vertical-align: top !important; }
+#invoice .meta-table td.label, .paper .meta-table td.label { width: 120px !important; font-weight: 600 !important; color: #4b5563 !important; }
+
+#invoice .address, .paper .address { font-size: 12px !important; white-space: pre-wrap !important; line-height: 1.6 !important; color: #4b5563 !important; min-height: 72px !important; padding: 0 !important; }
+
+/* --- EXACT LAYOUT MATCH --- */
+.invoice-header-row { display: flex; justify-content: space-between; margin-bottom: 24px; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; }
+.party-row { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 32px; }
+.party { width: 48%; }
+.invoice-logo { max-height: 80px; max-width: 150px; object-fit: contain; border-radius: 0; }
+
+#qr-code { margin-top: 10px; padding: 4px; background: white; border: 1px solid #e5e7eb; border-radius: 4px; display: inline-block; }
+
+/* --- EXACT TABLE LAYOUT --- */
+        #items { width: 100% !important; border-collapse: collapse !important; font-size: 12px !important; table-layout: fixed !important; box-sizing: border-box !important; }
+        #items thead th { box-sizing: border-box !important; background: #f9fafb !important; font-weight: 600 !important; font-size: 10px !important; color: #4b5563 !important; text-transform: uppercase !important; letter-spacing: 0.02em !important; padding: 12px 8px !important; border: none !important; text-align: left !important; vertical-align: middle !important; }
+        #items td { box-sizing: border-box !important; padding: 12px 8px !important; border: none !important; border-bottom: 1px solid #f3f4f6 !important; vertical-align: top !important; word-wrap: break-word !important; color: #111827 !important; font-family: 'Inter', Arial, sans-serif !important; }
+
+        /* STRICT COLUMN WIDTHS */
+        #items th:nth-child(1), #items td:nth-child(1) { width: 40px !important; text-align: center !important; } 
+        #items th:nth-child(2), #items td:nth-child(2) { width: 100px !important; text-align: left !important; } 
+        #items th:nth-child(3), #items td:nth-child(3) { width: auto !important; text-align: left !important; }   
+        #items th:nth-child(4), #items td:nth-child(4) { width: 40px !important; text-align: center !important; } 
+        #items th:nth-child(5), #items td:nth-child(5) { width: 90px !important; text-align: right !important; }  
+        #items th:nth-child(6), #items td:nth-child(6) { width: 60px !important; text-align: right !important; }  
+        #items th:nth-child(7), #items td:nth-child(7) { width: 80px !important; text-align: right !important; }  
+        #items th:nth-child(8), #items td:nth-child(8) { width: 90px !important; text-align: right !important; }
+
+/* Totals Exact Match */
+.totals { display: flex !important; justify-content: flex-end !important; margin-top: 32px !important; }
+.totals .box, .totals-box { width: 380px !important; font-size: 12px !important; }
+#inv-currency, .totals .currency { text-align: right !important; margin-bottom: 8px !important; color: #6b7280 !important; font-size: 11px !important; font-weight: 400 !important; padding-right: 0 !important; }
+.totals table, .totals-table { width: 100% !important; border-collapse: collapse !important; font-size: 12px !important; }
+.totals table td, .totals-table td { padding: 8px !important; }
+.totals table td.label, .totals-table td:first-child { text-align: left !important; width: 100px !important; font-weight: 500 !important; color: #4b5563 !important; }
+.totals table td.value, .totals-table td:last-child { text-align: right !important; font-weight: 700 !important; width: 140px !important; color: #111827 !important; }
+.totals table tr:last-child, .totals-table tr:last-child { background-color: #f9fafb !important; border-top: 2px solid #e5e7eb !important; border-bottom: 2px solid #e5e7eb !important; }
+.totals table tr:last-child td, .totals-table tr:last-child td { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
+
+/* ==========================================================================
+UNIVERSAL A4 PRINT STYLES (CORRECTED & DARK-MODE SAFE)
+========================================================================== */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0; /* Let the element's padding act as the page margin */
+    }
+    
+    /* 1. Neutralize dark mode variables to prevent black bleed */
+    :root, [data-theme="dark"] {
+        --bg-body: #ffffff !important;
+        --bg-paper: #ffffff !important;
+        --text-main: #111827 !important;
+    }
+
+    /* 2. Strip all spacing, height constraints, and force white background */
+    html, body, .app-layout, .main-content, .main-content-container, .app-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important; 
+        min-height: 100% !important;
+        max-width: none !important;
+        background-color: #ffffff !important;
+        /* --- NEW: Remove the dotted background pattern specifically for printing --- */
+        background-image: none !important; 
+        color: #111827 !important;
+        box-shadow: none !important;
+        border: none !important;
+        overflow: visible !important;
+        /* --- NEW: Force browsers to print background colors (like table header gray) --- */
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important;
+    }
+
+    /* 3. Hide UI wrappers, tax categories, and dropdowns */
+    .hide-on-print, .viewer-header, .main-header, .sidebar, 
+    .settings-column-wrapper, .mobile-control-bar,
+    .tax-category-wrapper, .table-dropdown-trigger, 
+    .table-dropdown-panel {
+        display: none !important;
+    }
+    
+    /* 4. Apply exact A4 dimensions ONLY to the actual invoice sheet */
+    #invoice, .paper {
+        width: 210mm !important;
+        max-width: 210mm !important;
+        min-height: 297mm !important;
+        margin: 0 auto !important;
+        padding: 10mm !important; 
+        box-sizing: border-box !important;
+        page-break-after: auto;
+        background-color: #ffffff !important;
+    }
+
+    /* --- NEW: 4.1 Smart Page Breaking for Tables & Totals --- */
+    /* Prevents a single row of items from being sliced horizontally across two pages */
+    #items tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    /* Prevents the table header from repeating awkwardly or being detached */
+    #items thead {
+        display: table-header-group !important;
+    }
+    /* Keeps the totals box entirely intact on one page */
+    .totals {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    /* Avoids leaving single lines of text (orphans/widows) at the top or bottom of pages */
+    p, h1, h2, h3, .address {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* 5. QR Code specific print rules */
+    #qr-code { border: none; }
+    #qr-code img, #qr-code canvas { max-width: none; width: 180px !important; }
+}
+
 #invoice-placeholder{padding:4rem;text-align:center;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:1rem}
 #json-preview{background-color:var(--bg-paper);color:var(--text-main);border:1px solid var(--border-color);padding:1.5rem;border-radius:.75rem;white-space:pre-wrap;word-wrap:break-word;font-size:.875rem;margin-top:0;overflow:auto;height:100%}
 .analysis-period{font-size:.875rem;color:var(--text-secondary);margin:0 0 1.5rem 0;display:block;font-weight:500}
@@ -238,7 +387,7 @@ h1.title{font-size:32px;margin:0 0 16px 0;font-weight:700;letter-spacing:-.02em;
           <label for="new-password-input" class="form-label">Set New Password</label>
           <input type="password" id="new-password-input" class="setup-input" placeholder="Enter secure passkey...">
         </div>
-        <button id="final-save-btn" class="btn btn-primary">Download Encrypted File</button>
+        <button id="final-save-btn" class="btn primary">Download Encrypted File</button>
       </div>
       <button id="reset-btn" class="btn btn-secondary" style="margin-top:0.5rem;">Start Over / New File</button>
       <div class="activity-log">

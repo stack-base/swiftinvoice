@@ -999,7 +999,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     function setupToggle(btnLine, btnBar, chartKey, label, color) {
         btnLine.addEventListener('click', () => {
             btnLine.classList.add('active');
@@ -1117,7 +1116,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupToggle(ui.btnDistLine, ui.btnDistBar, 'distribution', 'Invoice Count', teal);
     setupToggle(ui.btnLoyLine, ui.btnLoyBar, 'loyalty', 'Loyalty', indigo);
 
-
     function renderProductLeaderboard(sortBy) {
         if (sortBy === 'qty') {
             productStats.sort((a, b) => b.qty - a.qty);
@@ -1149,13 +1147,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.btnSortQty.addEventListener('click', () => renderProductLeaderboard('qty'));
     ui.btnSortRev.addEventListener('click', () => renderProductLeaderboard('rev'));
 
-
     function renderInvoiceList(invoices) {
         ui.invSelect.innerHTML = ''; 
         ui.invListContainer.innerHTML = '';
         ui.mobInvScrollArea.innerHTML = ''; 
         
-        // --- PATCH FOR NEW UI: Update the badge count ---
         if (ui.listCount) {
             ui.listCount.textContent = invoices.length;
         }
@@ -1163,7 +1159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.listCount.textContent = invoices.length;
 
         if (invoices.length === 0) {
-             // Added slight padding fix for empty state
              ui.invListContainer.innerHTML = '<div style="padding:2rem 1rem; text-align:center; color:var(--text-muted); font-size:0.875rem;">No invoices loaded</div>';
              ui.mobInvScrollArea.innerHTML = '<div style="padding:0.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem;">No matches</div>';
              return;
@@ -1180,7 +1175,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'invoice-list-item';
             
-            // --- PATCH FOR NEW UI: Active state persistence ---
             if (originalIdx === currentInvoiceIndex) {
                 div.classList.add('active');
             }
@@ -1232,13 +1226,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         renderInvoiceList(filtered);
         
-        // --- PATCH FOR NEW UI: Count update on search ---
         if (ui.listCount) {
             ui.listCount.textContent = filtered.length;
         }
 
         if (filtered.length > 0) {
-             // Keep selection if visible, otherwise select first
              const currentStillVisible = filtered.find(inv => inv.originalIdx === currentInvoiceIndex);
              if (!currentStillVisible) {
                  selectInvoice(filtered[0].originalIdx);
@@ -1504,7 +1496,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.invContent.classList.remove('hidden');
         
         const currencyCode = currentChartData.currencyCode || data.region ? (data.region === 'US' ? 'USD' : data.region === 'GB' ? 'GBP' : data.region === 'IN' ? 'INR' : data.region === 'AE' ? 'AED' : (['DE', 'FR', 'IT', 'ES', 'NL', 'AT'].includes(data.region) ? 'EUR' : 'Currency')) : 'Currency';
-        const currencySymbol = currentChartData.currency;
 
         const itemsHtml = (data.items || []).map(item => {
             const excl = item.excl ? formatMoney(parseCurrency(item.excl), currencyCode) : '0.00';
@@ -1512,32 +1503,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const incl = item.incl ? formatMoney(parseCurrency(item.incl), currencyCode) : '0.00';
             
             const desc = (item.desc || '').replace(/\n/g, '<br>');
-            
             const serial = item.serial || '';
             const style = item.style || item.color || ''; 
             
-            let metaInfo = '';
-            if(serial) metaInfo += `<span style="margin-right:8px;">SN: ${serial}</span>`;
-            if(style) metaInfo += `<span>Style: ${style}</span>`;
+            let metaHtml = '';
+            if(serial) metaHtml += `<div>SN: ${serial}</div>`;
+            if(style) metaHtml += `<div>Style: ${style}</div>`;
             
             return `
                 <tr>
-                    <td style="text-align: center;">${item.line || '-'}</td>
-                    <td title="${item.code || ''}">${item.code || ''}</td>
-                    <td>
-                        <div class="desc">${desc}</div>
-                        
-                        ${metaInfo ? `<div style="font-size: 11px; color: #4b5563; margin-top: 4px;">${metaInfo}</div>` : ''}
-                        
-                        <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">
-                            Tax: ${item.taxCategory || 'N/A'}
-                        </div>
+                    <td data-label="#">${item.line || '-'}</td>
+                    <td data-label="Code">${item.code || ''}</td>
+                    <td data-label="Description">
+                        <div>${desc}</div>
+                        <div class="item-meta">${metaHtml}</div>
                     </td>
-                    <td style="text-align: center;">${item.qty || 1}</td>
-                    <td style="text-align: right;">${currencySymbol} ${excl}</td>
-                    <td style="text-align: right;">${item.rate || '0%'}</td>
-                    <td style="text-align: right;">${currencySymbol} ${vat}</td>
-                    <td style="text-align: right;">${currencySymbol} ${incl}</td>
+                    <td data-label="Qty">${item.qty || 1}</td>
+                    <td data-label="Price">${excl}</td>
+                    <td data-label="VAT%">${item.rate || '0%'}</td>
+                    <td data-label="VAT">${vat}</td>
+                    <td data-label="Total" style="font-weight:600;">${incl}</td>
                 </tr>
             `;
         }).join('');
@@ -1546,7 +1531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.charges && Array.isArray(data.charges)) {
             chargesHtml = data.charges.map(charge => `
                 <tr>
-                    <td class="label">${charge.name}</td>
+                    <td>${charge.name}</td>
                     <td class="value">${charge.value}</td>
                 </tr>
             `).join('');
@@ -1554,33 +1539,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let logoHtml = '';
         if (data.logoOption === 'atikle') {
-            logoHtml = '<img src="https://atikle.github.io/resource/atikle-logo_multicolor.png" class="invoice-logo" alt="Logo" crossorigin="anonymous">';
+            logoHtml = '<img id="inv-logo" src="https://atikle.github.io/resource/atikle-logo_multicolor.png" class="invoice-logo" alt="Logo" crossorigin="anonymous">';
         } else if (data.logoOption === 'upload' && data.logoSrc) {
-            logoHtml = `<img src="${data.logoSrc}" class="invoice-logo" alt="Logo">`;
+            logoHtml = `<img id="inv-logo" src="${data.logoSrc}" class="invoice-logo" alt="Logo">`;
         }
         
-        // --- PATCH FOR ADDRESS FIX ---
-        // Helper function to strip HTML tags properly and preserve line breaks
         const formatAddress = (raw) => {
             if (!raw) return '';
-            // Replace <div...> with newline, remove </div>
             let str = raw.replace(/<div[^>]*>/gi, '\n').replace(/<\/div>/gi, '');
-            // Replace <br> with newline
             str = str.replace(/<br\s*\/?>/gi, '\n');
-            // Remove any other tags
             str = str.replace(/<[^>]+>/g, '');
-            // Split by newline, trim, filter empty lines, join with <br>
             return str.split('\n').map(s => s.trim()).filter(s => s).join('<br>');
         };
 
         const sellerAddress = formatAddress(data.seller);
         const buyerAddress = formatAddress(data.buyer);
-        // -----------------------------
         
         const subtotal = data.subtotal ? formatMoney(parseCurrency(data.subtotal), currencyCode) : '0.00';
         const vatTotal = data.vatTotal ? formatMoney(parseCurrency(data.vatTotal), currencyCode) : '0.00';
         const grandTotal = data.grandTotal ? formatMoney(parseCurrency(data.grandTotal), currencyCode) : '0.00';
-
 
         ui.invContent.innerHTML = `
             <div class="invoice-header-row">
@@ -1588,75 +1565,125 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h1 class="title">Invoice</h1>
                     <table class="meta-table">
                         <tbody>
-                            <tr><td class="label">Invoice Nr</td><td>${data.invoiceNumber || ''}</td></tr>
-                            <tr><td class="label">Invoice Date</td><td>${data.invoiceDate || ''}</td></tr>
-                            <tr><td class="label">Invoice Time</td><td>${data.invoiceTime || ''}</td></tr>
+                            <tr><td class="label">Invoice Nr</td><td id="inv-num">${data.invoiceNumber || ''}</td></tr>
+                            <tr><td class="label">Invoice Date</td><td id="inv-date">${data.invoiceDate || ''}</td></tr>
+                            <tr><td class="label">Invoice Time</td><td id="inv-time">${data.invoiceTime || ''}</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="header-right">
                     ${logoHtml}
+                    <div id="qr-code"></div>
                 </div>
             </div>
 
             <div class="party-row">
                 <div class="party">
                     <h2>Seller</h2>
-                    <div class="address">${sellerAddress}</div>
+                    <div id="inv-seller" class="address">${sellerAddress}</div>
                 </div>
                 <div class="party">
                     <h2>Buyer</h2>
-                    <div class="address">${buyerAddress}</div>
+                    <div id="inv-buyer" class="address">${buyerAddress}</div>
                 </div>
             </div>
 
-            <div class="table-wrap">
-                <table id="items">
-                    <thead>
-                        <tr>
-                            <th>Line Nr</th>
-                            <th>Product Code</th>
-                            <th>Description</th>
-                            <th>Qty</th>
-                            <th>Price excl<br/>VAT</th>
-                            <th>VAT<br/>rate</th>
-                            <th>VAT<br/>amount</th>
-                            <th>Price incl<br/>VAT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemsHtml}
-                    </tbody>
-                </table>
-            </div>
+            <table id="items">
+                <thead>
+                    <tr>
+                        <th>LINE NR</th>
+                        <th>PRODUCT CODE</th>
+                        <th>DESCRIPTION</th>
+                        <th>QTY</th>
+                        <th>PRICE EXCL VAT</th>
+                        <th>VAT RATE</th>
+                        <th>VAT AMOUNT</th>
+                        <th>Price incl VAT</th>
+                    </tr>
+                </thead>
+                <tbody id="items-body">
+                    ${itemsHtml}
+                </tbody>
+            </table>
 
             <div class="totals">
-                <div class="box">
-                    <div class="currency">${currencyCode}</div>
-                    <table>
+                <div class="totals-box">
+                    <div id="inv-currency" style="text-align: right; margin-bottom: 8px; color: #6b7280; font-size: 11px;">${currencyCode}</div>
+                    <table class="totals-table">
+                        <tbody id="charges-body">${chargesHtml}</tbody>
                         <tbody>
                             <tr>
-                                <td class="label">Subtotal</td>
-                                <td class="value">${currencySymbol} ${subtotal}</td>
-                            </tr>
-                            ${chargesHtml}
-                            <tr> 
-                                <td class="label">VAT</td>
-                                <td class="value">${currencySymbol} ${vatTotal}</td>
+                                <td>Subtotal</td>
+                                <td id="inv-subtotal" class="value">${subtotal}</td>
                             </tr>
                             <tr>
-                                <td class="label">Total</td>
-                                <td class="value">${currencySymbol} ${grandTotal}</td>
+                                <td>VAT Total</td>
+                                <td id="inv-vat" class="value">${vatTotal}</td>
+                            </tr>
+                            <tr>
+                                <td>Grand Total</td>
+                                <td id="inv-total" class="value">${grandTotal}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="invoice-footer">
-                <span class="invoice-footer-brand">SwiftInvoice  | <strong>StackBase</strong></span>
+            <div style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: #9ca3af; font-size: 11px;">
+                SwiftInvoice | <strong>StackBase</strong>
             </div>
         `;
+        // ... (Your existing ui.invContent.innerHTML = `...` block)
+
+        // --- QR CODE GENERATION LOGIC ---
+        const qrContainer = document.getElementById('qr-code');
+        if (qrContainer && typeof QRCode !== 'undefined' && typeof LZString !== 'undefined') {
+            try {
+                // Minify data to save URL space (matching application.js structure)
+                const minified = {
+                    n: data.invoiceNumber,
+                    d: data.invoiceDate,
+                    t: data.invoiceTime,
+                    s: data.seller,
+                    b: data.buyer,
+                    r: data.region,
+                    l: (data.logoOption !== 'upload') ? data.logoSrc : null,
+                    st: data.subtotal,
+                    vt: data.vatTotal,
+                    gt: data.grandTotal,
+                    i: (data.items || []).map(i => ({
+                        l: i.line,
+                        c: i.code,
+                        d: i.desc,
+                        q: i.qty,
+                        e: i.excl,
+                        r: i.rate,
+                        v: i.vat,
+                        t: i.incl,
+                        sn: i.serial,
+                        st: i.style
+                    })),
+                    ch: data.charges ? data.charges.map(c => ({ n: c.name, v: c.value })) : []
+                };
+
+                const VIEWER_URL_BASE = 'https://stack-base.github.io/swiftinvoice/invoice?view=';
+                const jsonString = JSON.stringify(minified);
+                const compressed = LZString.compressToEncodedURIComponent(jsonString);
+                const fullUrl = VIEWER_URL_BASE + compressed;
+
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: fullUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+            } catch (e) {
+                console.error("QR Gen Error", e);
+            }
+        }
     }
 
     ui.pdfBtn.addEventListener('click', async () => {
