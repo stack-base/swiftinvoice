@@ -452,30 +452,31 @@
     <div id="footer-placeholder"></div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var menuButton = document.getElementById('mobile-menu-button');
-            var mobileMenu = document.getElementById('mobile-menu');
-            menuButton.addEventListener('click', function() {
-                if (mobileMenu.classList.contains('open')) {
-                    mobileMenu.classList.remove('open');
-                } else {
-                    mobileMenu.classList.add('open');
-                }
-            });
+    (function() {
+        // --- Dark Mode Logic ---
+        var toggleButton = document.getElementById('darkModeToggle');
+        var body = document.body;
 
-            var toggleButton = document.getElementById('darkModeToggle');
-            var body = document.body;
-            function applyTheme() {
-                var isDarkMode = localStorage.getItem('darkMode') === 'true';
-                if (isDarkMode) { body.classList.add('dark-mode'); } else { body.classList.remove('dark-mode'); }
+        function applyTheme() {
+            var isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
             }
-            applyTheme();
+        }
+
+        applyTheme();
+
+        if (toggleButton) {
             toggleButton.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
-                localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+                var isDarkMode = body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDarkMode);
             });
-        });
-    </script>
+        }
+    })();
+</script>
 
 </body>
 </html>
