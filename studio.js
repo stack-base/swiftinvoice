@@ -1717,17 +1717,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.viewPreview.classList.remove('hidden');
             ui.tabPreview.classList.add('active');
             ui.mobileInvControls.classList.add('active'); 
+            // Enable PDF button only if there is an active invoice to preview
             ui.pdfBtn.disabled = !currentInvoice;
         } else {
             ui.mobileInvControls.classList.remove('active'); 
             if(view === 'raw') {
                 ui.viewRaw.classList.remove('hidden');
                 ui.tabRaw.classList.add('active');
+                // Disable PDF button for JSON Raw view
                 ui.pdfBtn.disabled = true;
             } else if (view === 'analytics') {
                 ui.viewAnalytics.classList.remove('hidden');
                 ui.tabAnalytics.classList.add('active');
-                ui.pdfBtn.disabled = !decryptedData || decryptedData.invoicesList.length === 0;
+                // Disable PDF button for Analytics view
+                ui.pdfBtn.disabled = true;
             }
         }
     };
