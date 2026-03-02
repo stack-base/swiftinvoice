@@ -291,7 +291,7 @@
         #items th:nth-child(8), #items td:nth-child(8) { width: 90px !important; text-align: right !important; }  /* Incl */
         /* 9th Action column in Editor mode - ignored in viewer/studio */
         #items th:nth-child(9), #items td:nth-child(9) { width: 40px !important; text-align: center !important; } 
-        
+
         /* Totals Exact Match */
         .totals {
             display: flex !important;
@@ -1069,20 +1069,22 @@
             <button type="button" id="sidebar-open-btn" class="btn-icon-only lg:hidden">
                 <span class="sr-only">Open menu</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
             </button>
             <div class="invoice-toolbar">
+                
+                <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="btn-label sm:inline">New</span>
+                </button>
+
                 <div id="edit-mode-buttons" style="display: flex; gap: 0.75rem;">
-                    <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
-                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span class="btn-label sm:inline">New</span>
-                    </button>
                     <button id="add-item-btn" title="Add item" class="btn btn-secondary">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span class="btn-label sm:inline">Add Item</span>
                     </button>
@@ -1096,16 +1098,16 @@
                 <div id="view-mode-buttons" style="display: none; gap: 0.75rem;">
                     <button id="edit-invoice-btn" title="Edit Invoice" class="btn btn-secondary">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                         </svg>
                         <span class="btn-label sm:inline">Edit</span>
                     </button>
                     <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
                         </svg>
                         <span class="btn-label sm:inline">Print</span>
                     </button>
