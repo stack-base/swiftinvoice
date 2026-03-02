@@ -1422,6 +1422,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 s: fullData.seller,
                 b: fullData.buyer,
                 r: fullData.region,
+                c: countryData[fullData.region] ? countryData[fullData.region].currency : fullData.region,
                 l: (fullData.logoOption !== 'upload') ? fullData.logoSrc : null, // Only include logo if it's a URL
                 st: fullData.subtotal,
                 vt: fullData.vatTotal,

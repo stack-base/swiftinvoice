@@ -1645,6 +1645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     s: data.seller,
                     b: data.buyer,
                     r: data.region,
+                    c: currencyCode,
                     l: (data.logoOption !== 'upload') ? data.logoSrc : null,
                     st: data.subtotal,
                     vt: data.vatTotal,
