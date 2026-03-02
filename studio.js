@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme) applyTheme(savedTheme);
     else applyTheme('light');
 
-
     const ui = {
         viewLanding: document.getElementById('view-landing'),
         viewApp: document.getElementById('view-app'),
@@ -1633,7 +1632,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 SwiftInvoice | <strong>StackBase</strong>
             </div>
         `;
-        // ... (Your existing ui.invContent.innerHTML = `...` block)
 
         // --- QR CODE GENERATION LOGIC ---
         const qrContainer = document.getElementById('qr-code');
@@ -1686,154 +1684,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    ui.pdfBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const MARGIN = 10; 
-        const A4_WIDTH = 210;
-        const A4_HEIGHT = 297;
-        const CONTENT_WIDTH = A4_WIDTH - 2 * MARGIN; 
+    ui.pdfBtn.addEventListener('click', () => {
+        // Store the original title
+        const originalTitle = document.title;
         
-        let elementToPrint;
-        let filename;
-        let scale;
-
-        const invoiceElement = document.getElementById('invoice');
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        
-        let originalInvoiceBg = '';
-        let originalAnalyticsStyles = [];
-
+        // Temporarily change the document title so the browser uses it as the default PDF filename
         if (activeTab === 'analytics') {
-            elementToPrint = document.querySelector('#content-analytics .main-content-container');
-            filename = 'SwiftInvoice_Analytics.pdf';
-            scale = 1.5; 
-            
-            elementToPrint.querySelectorAll('.analytics-section').forEach(s => {
-                originalAnalyticsStyles.push({ el: s, boxShadow: s.style.boxShadow, borderColor: s.style.borderColor });
-                s.style.boxShadow = 'none';
-                s.style.borderColor = '#e5e7eb';
-            });
-            
-            elementToPrint.querySelectorAll('.ai-container').forEach(s => { 
-                originalAnalyticsStyles.push({ el: s, boxShadow: s.style.boxShadow, background: s.style.background, borderColor: s.style.borderColor, color: s.style.color });
-                s.style.boxShadow = 'none';
-                s.style.borderColor = '#e5e7eb';
-                s.style.background = '#ffffff';
-                s.style.color = 'black';
-            });
-            
-            elementToPrint.querySelectorAll('.ai-card').forEach(c => {
-                 originalAnalyticsStyles.push({ el: c, background: c.style.background, boxShadow: c.style.boxShadow, border: c.style.border });
-                 c.style.background = '#ffffff';
-                 c.style.boxShadow = 'none';
-                 c.style.border = '1px solid #e5e7eb';
-            });
-
-            elementToPrint.querySelectorAll('.ai-title-text').forEach(t => { 
-                originalAnalyticsStyles.push({ el: t, color: t.style.color });
-                t.style.color = '#111827';
-            });
-
-            elementToPrint.querySelectorAll('.ai-badge-pill').forEach(b => { 
-                originalAnalyticsStyles.push({ el: b, background: b.style.background, boxShadow: b.style.boxShadow, color: b.style.color, border: b.style.border }); 
-                b.style.background = '#f3f4f6';
-                b.style.boxShadow = 'none';
-                b.style.color = '#374151';
-                b.style.border = '1px solid #e5e7eb';
-            });
-            
-            elementToPrint.querySelectorAll('.ai-em').forEach(h => { 
-                originalAnalyticsStyles.push({ el: h, background: h.style.background, color: h.style.color });
-                h.style.background = '#f3f4f6';
-                h.style.color = '#111827';
-            });
-            
-            elementToPrint.querySelectorAll('canvas').forEach(c => {
-                originalAnalyticsStyles.push({ el: c, backgroundColor: c.style.backgroundColor });
-                c.style.backgroundColor = 'white';
-            });
-            elementToPrint.querySelectorAll('.data-table th').forEach(th => {
-                 originalAnalyticsStyles.push({ el: th, backgroundColor: th.style.backgroundColor });
-                 th.style.backgroundColor = '#f9fafb';
-            });
-            
-            elementToPrint.style.backgroundColor = 'white';
+            document.title = 'SwiftInvoice_Analytics';
         } else {
-            elementToPrint = invoiceElement;
             const invNum = currentInvoice?.invoiceNumber || 'INV';
             const invClient = currentInvoice?.buyer?.split('<br>')[0].split('<div>')[0].trim() || 'Client';
-            filename = `SwiftInvoice_${invNum}_${invClient.replace(/\s/g, '_')}.pdf`;
-            scale = 2;
-            
-            if (isDark) {
-                 originalInvoiceBg = invoiceElement.style.backgroundColor;
-                 invoiceElement.style.backgroundColor = '#fff';
-            }
+            document.title = `SwiftInvoice_${invNum}_${invClient.replace(/\s/g, '_')}`;
         }
         
-        try {
-            await html2canvas(elementToPrint, { 
-                scale: scale, 
-                logging: false,
-                backgroundColor: '#ffffff' 
-            }).then(canvas => {
-                const img = canvas.toDataURL('image/png');
-                const imgWidth = CONTENT_WIDTH; 
-                const pageHeight = A4_HEIGHT; 
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = MARGIN; 
-
-                pdf.addImage(img, 'PNG', MARGIN, position, imgWidth, imgHeight); 
-                heightLeft -= (pageHeight - MARGIN); 
-
-                while (heightLeft > 0) {
-                    position = position - (pageHeight - MARGIN); 
-
-                    pdf.addPage();
-                    pdf.addImage(img, 'PNG', MARGIN, position, imgWidth, imgHeight); 
-                    heightLeft -= pageHeight;
-                }
-
-                pdf.save(filename);
-            });
-        } catch (error) {
-            console.error('PDF export failed:', error);
-            alert('PDF export failed. Check console for details.'); 
-        } finally {
-            if (activeTab === 'analytics') {
-                elementToPrint.style.backgroundColor = '';
-                originalAnalyticsStyles.forEach(s => {
-                    if (s.el.classList.contains('ai-container')) {
-                        s.el.style.boxShadow = s.boxShadow;
-                        s.el.style.background = s.background;
-                        s.el.style.borderColor = s.borderColor;
-                        s.el.style.color = s.color;
-                    } else if (s.el.classList.contains('ai-card')) {
-                         s.el.style.background = s.background;
-                         s.el.style.boxShadow = s.boxShadow;
-                         s.el.style.border = s.border;
-                    } else if (s.el.classList.contains('ai-title-text')) {
-                        s.el.style.color = s.color;
-                    } else if (s.el.classList.contains('ai-badge-pill')) {
-                        s.el.style.background = s.background;
-                        s.el.style.boxShadow = s.boxShadow;
-                        s.el.style.color = s.color;
-                        s.el.style.border = s.border;
-                    } else if (s.el.classList.contains('ai-em')) {
-                        s.el.style.background = s.background;
-                        s.el.style.color = s.color;
-                    } else {
-                        s.el.style.boxShadow = s.boxShadow;
-                        s.el.style.borderColor = s.borderColor;
-                        s.el.style.backgroundColor = s.backgroundColor;
-                    }
-                });
-            } else if (isDark) {
-                invoiceElement.style.backgroundColor = originalInvoiceBg;
-            }
-        }
+        // Trigger native print/save-to-pdf dialog
+        window.print();
+        
+        // Restore the original title immediately after the dialog opens
+        document.title = originalTitle;
     });
 
     const switchTab = (view) => {

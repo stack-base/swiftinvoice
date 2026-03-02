@@ -4,19 +4,11 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Data Studio | SwiftInvoice</title>
 <link rel="shortcut icon" href="https://stack-base.github.io/media/brand/swiftinvoice/swiftinvoice-icon.png" type="image/x-icon">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -183,50 +175,72 @@ Ensures 1:1 identical layout across Editor, Viewer, and Data Studio
 .totals table tr:last-child td, .totals-table tr:last-child td { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
 
 /* ==========================================================================
-UNIVERSAL A4 PRINT STYLES (CORRECTED & DARK-MODE SAFE)
+UNIVERSAL A4 PRINT STYLES (EXACT MATCH TO INVOICE.HTML)
 ========================================================================== */
 @media print {
     @page {
         size: A4 portrait;
-        margin: 0; /* Let the element's padding act as the page margin */
+        margin: 0; 
     }
     
-    /* 1. Neutralize dark mode variables to prevent black bleed */
+    /* 1. Neutralize dark mode */
     :root, [data-theme="dark"] {
         --bg-body: #ffffff !important;
         --bg-paper: #ffffff !important;
         --text-main: #111827 !important;
+        --text-secondary: #4b5563 !important;
     }
 
-    /* 2. Strip all spacing, height constraints, and force white background */
-    html, body, .app-layout, .main-content, .main-content-container, .app-container {
+    /* 2. Flatten ONLY outer wrappers, leave the invoice paper alone */
+    html, body, 
+    #view-app, 
+    .right-pane-wrapper, 
+    .three-pane-body,
+    .pane-content-area, 
+    .main-content, 
+    .main-content-container, 
+    .app-container {
+        display: block !important;
+        position: static !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 0 !important; 
         width: 100% !important;
-        height: auto !important; 
-        min-height: 100% !important;
         max-width: none !important;
-        background-color: #ffffff !important;
-        /* --- NEW: Remove the dotted background pattern specifically for printing --- */
+        height: auto !important; 
+        min-height: 0 !important;
+        background-color: transparent !important;
         background-image: none !important; 
         color: #111827 !important;
         box-shadow: none !important;
         border: none !important;
         overflow: visible !important;
-        /* --- NEW: Force browsers to print background colors (like table header gray) --- */
+        transform: none !important;
         -webkit-print-color-adjust: exact !important; 
         print-color-adjust: exact !important;
     }
+    
+    /* Ensure inactive tabs stay hidden during print */
+    .hidden {
+        display: none !important;
+    }
 
-    /* 3. Hide UI wrappers, tax categories, and dropdowns */
-    .hide-on-print, .viewer-header, .main-header, .sidebar, 
-    .settings-column-wrapper, .mobile-control-bar,
-    .tax-category-wrapper, .table-dropdown-trigger, 
-    .table-dropdown-panel {
+    /* Ensure body actually turns white */
+    body { background-color: #ffffff !important; }
+
+    /* 3. Hide all Data Studio UI elements */
+    .hide-on-print, 
+    .sidebar, 
+    .sidebar-overlay,
+    .right-pane-header, 
+    .tab-group, 
+    #mobile-invoice-controls,
+    .mobile-control-bar,
+    #pane-invoice-list,
+    #content-raw {
         display: none !important;
     }
     
-    /* 4. Apply exact A4 dimensions ONLY to the actual invoice sheet */
+    /* 4. EXACT Match to invoice.html dimensions and padding */
     #invoice, .paper {
         width: 210mm !important;
         max-width: 210mm !important;
@@ -238,30 +252,26 @@ UNIVERSAL A4 PRINT STYLES (CORRECTED & DARK-MODE SAFE)
         background-color: #ffffff !important;
     }
 
-    /* --- NEW: 4.1 Smart Page Breaking for Tables & Totals --- */
-    /* Prevents a single row of items from being sliced horizontally across two pages */
+    /* 5. Smart Page Breaking */
     #items tr {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
-    /* Prevents the table header from repeating awkwardly or being detached */
     #items thead {
         display: table-header-group !important;
     }
-    /* Keeps the totals box entirely intact on one page */
     .totals {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
-    /* Avoids leaving single lines of text (orphans/widows) at the top or bottom of pages */
     p, h1, h2, h3, .address {
         orphans: 3;
         widows: 3;
     }
 
-    /* 5. QR Code specific print rules */
-    #qr-code { border: none; }
-    #qr-code img, #qr-code canvas { max-width: none; width: 180px !important; }
+    /* 6. EXACT Match to invoice.html QR Code size */
+    #qr-code { border: none !important; }
+    #qr-code img, #qr-code canvas { max-width: none !important; width: 180px !important; }
 }
 
 #invoice-placeholder{padding:4rem;text-align:center;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:1rem}
@@ -553,10 +563,6 @@ UNIVERSAL A4 PRINT STYLES (CORRECTED & DARK-MODE SAFE)
     </div>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="studio.js"></script>
 </body>
 </html>
