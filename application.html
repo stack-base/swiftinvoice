@@ -95,7 +95,6 @@
         .sidebar-menu-btn.active { background-color: var(--bg-paper); color: var(--text-accent); }
         .sidebar-logo-bg { background-color: var(--primary); }
         .sidebar-title { color: var(--text-accent); }
-        .app-container { background-color: var(--bg-paper); border: 1px solid var(--border-color); }
         .setup-input, .search-input, .form-textarea, .dropdown-trigger, #invoice-list .list-item-content, .dropdown-options-panel { background-color: var(--bg-input); color: var(--text-main); border-color: var(--border-color); }
         .dropdown-trigger:hover { border-color: var(--text-muted); }
         .dropdown-option { color: var(--text-main); }
@@ -591,105 +590,66 @@
             } 
         }
         
-        /* --- FLOATING PILL HEADER --- */
-.main-header {
-    position: fixed;
-    top: 1.25rem; /* Moved slightly higher up */
-    left: 0;
-    width: 100%;
-    z-index: 15;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-    padding: 0 1rem;
-    box-sizing: border-box;
-    transition: opacity 0.2s ease;
-}
-
-@media (min-width: 1024px) { 
-    .main-header { 
-        padding-left: calc(40% + 1rem); 
-    } 
-}
-
-.header-pill {
-    background: var(--bg-header-pill);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0,0,0,0.02);
-    border-radius: 9999px;
-    padding: 0.2rem 0.3rem; /* SLIMMER: Reduced outer padding */
-    display: flex;
-    align-items: center;
-    gap: 0.25rem; /* SLIMMER: Tighter gaps between elements */
-    pointer-events: auto;
-    transition: all 0.2s ease;
-    max-width: 100%;
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.header-pill::-webkit-scrollbar { display: none; }
-
-.header-pill .btn {
-    border-radius: 9999px;
-    padding: 0.35rem 0.75rem; /* SLIMMER: Reduced top/bottom button padding */
-    font-size: 0.8125rem; /* SLIMMER: Slightly smaller text for better proportions */
-}
-
-.header-pill-divider {
-    width: 1px;
-    height: 1.15rem; /* SLIMMER: Shorter divider line */
-    background: var(--border-color);
-    margin: 0 0.15rem;
-}
-
-/* Slim down the mobile menu icon specifically inside the pill */
-.header-pill .header-icon-btn {
-    width: 1.85rem;
-    height: 1.85rem;
-}
-.header-pill .header-icon-btn svg {
-    width: 1.15rem !important;
-    height: 1.15rem !important;
-}
-
-/* --- ADJUST MAIN CONTENT PADDING FOR FLOATING HEADER --- */
-.main-content-container { 
-    max-width: 100%;
-    margin-left: auto; 
-    margin-right: auto; 
-    padding: 5rem 1rem 2.5rem; /* Reduced top padding to match slimmer header */
-    display: flex;
-    justify-content: center;
-}
-
-@media (min-width: 640px) { .main-content-container { padding: 5rem 1.5rem 3.5rem; } }
-
-@media (min-width: 1024px) { 
-    .main-content-container { 
-        padding: 4.5rem 2rem 2.5rem 2rem; 
-        margin-top: 0;
-        display: block; 
-    } 
-}
-
-/* --- TOOLBAR TWEAKS --- */
-.invoice-toolbar { display: flex; gap: 0.35rem; flex-wrap: nowrap; align-items: center; }
-.invoice-toolbar .btn { width: auto; flex-shrink: 0; }
-.invoice-toolbar .btn-icon { margin-right: 0.25rem; width: 1.1rem; height: 1.1rem; } /* SLIMMER: Scaled down button icons */
-.invoice-toolbar .btn-label { display: none; }
-@media (min-width: 640px) { 
-    .invoice-toolbar .btn-label { display: inline; } 
-    .invoice-toolbar .btn-icon { margin-right: 0.35rem; } 
-}
-
-        .app-container { background-color: var(--bg-paper); border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); border: 1px solid var(--border-color); }
+        .main-header { 
+            position: sticky; 
+            top: 0; 
+            z-index: 5; 
+            background-color: var(--bg-body); 
+            backdrop-filter: blur(4px); 
+            -webkit-backdrop-filter: blur(4px); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            height: 4rem; 
+            padding-left: 1rem; 
+            padding-right: 1rem; 
+        }
         
-        @media (max-width: 640px) { .app-container { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); width: fit-content; } }
+        @media (min-width: 640px) { .main-header { padding-left: 1.5rem; padding-right: 1.5rem; } }
+        
+        @media (min-width: 1024px) { 
+            .main-header { 
+                padding-left: 2rem; 
+                padding-right: 2rem; 
+                margin-left: 40%; 
+                width: 60%; 
+                position: fixed; /* Fixed on desktop */
+                top: 0;
+            } 
+        }
+        
+        .main-content-container { 
+            /* On desktop, we constrain the width, but allow it to exceed on mobile for scrolling */
+            max-width: 100%;
+            margin-left: auto; 
+            margin-right: auto; 
+            padding: 1.5rem 1rem; 
+            display: flex;
+            justify-content: center;
+        }
+        
+        @media (min-width: 640px) { .main-content-container { padding: 2.5rem 1.5rem; } }
+        
+        @media (min-width: 1024px) { 
+            .main-content-container { 
+                padding: 0 2rem 2.5rem 2rem; 
+                padding-top: 4rem; 
+                margin-top: 0;
+                display: block; /* Revert to block on desktop for standard flow */
+            } 
+        }
+
+        .invoice-toolbar { display: flex; gap: 0.75rem; flex-wrap: nowrap; overflow-x: auto; }
+        .invoice-toolbar::-webkit-scrollbar { height: 6px; }
+        .invoice-toolbar::-webkit-scrollbar-track { background: var(--bg-body); border-radius: 3px; }
+        .invoice-toolbar::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+        .invoice-toolbar::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+        .invoice-toolbar .btn { width: auto; flex-shrink: 0; padding-left: 0.75rem; padding-right: 0.75rem; }
+        .invoice-toolbar .btn-icon { margin-right: 0.25rem; }
+        .invoice-toolbar .btn-label { display: none; }
+        @media (min-width: 640px) { .invoice-toolbar .btn { padding-left: 1rem; padding-right: 1rem; } .invoice-toolbar .btn-label { display: inline; } .invoice-toolbar .btn-icon { margin-right: 0.5rem; } }
+        
+        @media (max-width: 640px) { .app-container { width: fit-content; } }
         
         .sidebar-branding { font-family: 'Ubuntu', sans-serif; text-align: center; font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; flex-shrink: 0; padding: 1.5rem; border-top: 1px solid var(--border-color); }
         .invoice-footer { font-family: 'Ubuntu', sans-serif; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #9ca3af; font-weight: 400; }
@@ -1103,62 +1063,55 @@
             </div>
             <div class="sidebar-branding hide-on-print">Powered by <strong><a href="https://stack-base.github.io/home" style="text-decoration: none; color: var(--text-secondary);">StackBase</a></strong></div>
         </aside>
-
         <header class="main-header hide-on-print">
-            <div class="header-pill">
-                <button type="button" id="sidebar-open-btn" class="header-icon-btn lg:hidden" style="margin-right: 0.25rem;">
-                    <span class="sr-only">Open menu</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.5rem; height: 1.5rem;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            <button type="button" id="sidebar-open-btn" class="btn-icon-only lg:hidden">
+                <span class="sr-only">Open menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+            <div class="invoice-toolbar">
+                
+                <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
+                    <span class="btn-label sm:inline">New</span>
                 </button>
 
-                <div class="invoice-toolbar">
-                    <button id="new-invoice-btn" title="New Invoice" class="btn btn-secondary">
+                <div id="edit-mode-buttons" style="display: flex; gap: 0.75rem;">
+                    <button id="add-item-btn" title="Add item" class="btn btn-secondary">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
-                        <span class="btn-label sm:inline">New</span>
+                        <span class="btn-label sm:inline">Add Item</span>
                     </button>
-
-                    <div class="header-pill-divider"></div>
-
-                    <div id="edit-mode-buttons" style="display: flex; gap: 0.5rem; align-items: center;">
-                        <button id="add-item-btn" title="Add item" class="btn btn-secondary">
-                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            <span class="btn-label sm:inline">Add Item</span>
-                        </button>
-                        <button id="save-invoice-btn" title="Save & View" class="btn btn-primary">
-                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
-                            <span class="btn-label sm:inline">Save & View</span>
-                        </button>
-                    </div>
-
-                    <div id="view-mode-buttons" style="display: none; gap: 0.5rem; align-items: center;">
-                        <button id="edit-invoice-btn" title="Edit Invoice" class="btn btn-secondary">
-                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                            </svg>
-                            <span class="btn-label sm:inline">Edit</span>
-                        </button>
-                        <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
-                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
-                            </svg>
-                            <span class="btn-label sm:inline">Print</span>
-                        </button>
-                    </div>
+                    <button id="save-invoice-btn" title="Save & View" class="btn btn-primary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        <span class="btn-label sm:inline">Save & View</span>
+                    </button>
+                </div>
+                <div id="view-mode-buttons" style="display: none; gap: 0.75rem;">
+                    <button id="edit-invoice-btn" title="Edit Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+                        <span class="btn-label sm:inline">Edit</span>
+                    </button>
+                    <button id="print-btn" title="Print Invoice" class="btn btn-secondary">
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18H6.375C5.053 18 4 16.947 4 15.625V8.375C4 7.053 5.053 6 6.375 6h11.25C18.947 6 20 7.053 20 8.375v7.25C20 16.947 18.947 18 17.625 18z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.625 18v3.375c0 .73-.595 1.325-1.325 1.325H7.7c-.73 0-1.325-.595-1.325-1.325V18" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6V2.25C16.5 1.56 15.94 1 15.175 1h-6.35C7.06 1 6.5 1.56 6.5 2.25V6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8v6h8v-6z" />
+                        </svg>
+                        <span class="btn-label sm:inline">Print</span>
+                    </button>
                 </div>
             </div>
         </header>
-
         <aside id="settings-column" class="settings-column-wrapper hide-on-print">
             <div class="settings-panel">
                 <section>
