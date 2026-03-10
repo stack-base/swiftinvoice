@@ -624,8 +624,7 @@
             margin-left: auto; 
             margin-right: auto; 
             padding: 1.5rem 1rem; 
-            display: flex;
-            justify-content: center;
+            display: block; /* Changed from flex to block to prevent left-side clipping */
         }
         
         @media (min-width: 640px) { .main-content-container { padding: 2.5rem 1.5rem; } }
@@ -644,10 +643,10 @@
         .invoice-toolbar::-webkit-scrollbar-track { background: var(--bg-body); border-radius: 3px; }
         .invoice-toolbar::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
         .invoice-toolbar::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
-        .invoice-toolbar .btn { width: auto; flex-shrink: 0; padding-left: 0.75rem; padding-right: 0.75rem; }
-        .invoice-toolbar .btn-icon { margin-right: 0.25rem; }
-        .invoice-toolbar .btn-label { display: none; }
-        @media (min-width: 640px) { .invoice-toolbar .btn { padding-left: 1rem; padding-right: 1rem; } .invoice-toolbar .btn-label { display: inline; } .invoice-toolbar .btn-icon { margin-right: 0.5rem; } }
+        .invoice-toolbar .btn { width: auto; flex-shrink: 0; padding-left: 0.75rem; padding-right: 0.75rem; white-space: nowrap; }
+        .invoice-toolbar .btn-icon { margin-right: 0.5rem; }
+        .invoice-toolbar .btn-label { display: inline; }
+        @media (min-width: 640px) { .invoice-toolbar .btn { padding-left: 1rem; padding-right: 1rem; } }
         
         @media (max-width: 640px) { .app-container { width: fit-content; } }
         
