@@ -15,9 +15,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
+    <!-- Pre-load theme to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('swiftInvoiceTheme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
     <style>
         /* --- REUSED STYLES --- */
         *, *::before, *::after { box-sizing: border-box; }
+        
         :root {
             --bg-body: #f3f4f6;
             --bg-paper: #ffffff;
@@ -27,6 +38,23 @@
             --border-color: #e5e7eb;
             --primary: #0d9488;
             --primary-hover: #0f766e;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --bg-dots: #d1d5db;
+            --overlay-bg: rgba(243, 244, 246, 0.7);
+        }
+        
+        [data-theme="dark"] {
+            --bg-body: #202124;
+            --bg-paper: #303134;
+            --text-main: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted: #5f6368;
+            --border-color: #3c4043;
+            --primary: #14b8a6;
+            --primary-hover: #0d9488;
+            --header-bg: rgba(32, 33, 36, 0.85);
+            --bg-dots: #5f6368;
+            --overlay-bg: rgba(32, 33, 36, 0.8);
         }
         
         /* Custom Webkit Scrollbar */
@@ -34,17 +62,20 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
         body { 
             font-family: 'Inter', Arial, Helvetica, sans-serif; 
             background-color: var(--bg-body); 
-            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-image: radial-gradient(var(--bg-dots) 1px, transparent 1px);
             background-size: 20px 20px;
             color: var(--text-main); 
             margin: 0; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Utility class to stop body scrolling */
@@ -55,11 +86,11 @@
         
         /* Viewer Specific Header - Glassmorphism */
         .viewer-header {
-            background-color: rgba(255, 255, 255, 0.85);
+            background-color: var(--header-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            border-bottom: 1px solid var(--border-color);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -77,7 +108,7 @@
             align-items: center;
             gap: 8px;
         }
-        .actions { display: flex; gap: 0.75rem; }
+        .actions { display: flex; gap: 0.75rem; align-items: center; }
 
         /* Buttons */
         .btn { 
@@ -100,15 +131,17 @@
         }
         
         .btn-secondary { 
-            background-color: white; 
+            background-color: var(--bg-paper); 
             border-color: var(--border-color); 
             color: var(--text-main); 
         }
         .btn-secondary:hover { 
-            background-color: #f9fafb; 
-            border-color: #d1d5db;
+            background-color: var(--bg-body); 
+            border-color: var(--text-muted);
         }
         .btn svg { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; }
+        .btn.icon-only svg { margin-right: 0; }
+        .btn.icon-only { padding: 0.5rem; border-radius: 999px; }
 
         .main-content {
             margin: 40px auto !important;
@@ -334,6 +367,7 @@
                 --bg-body: #ffffff !important;
                 --bg-paper: #ffffff !important;
                 --text-main: #111827 !important;
+                --bg-dots: transparent !important;
             }
 
             /* 2. Strip all spacing, height constraints, and force white background */
@@ -345,13 +379,11 @@
                 min-height: 100% !important;
                 max-width: none !important;
                 background-color: #ffffff !important;
-                /* --- NEW: Remove the dotted background pattern specifically for printing --- */
                 background-image: none !important; 
                 color: #111827 !important;
                 box-shadow: none !important;
                 border: none !important;
                 overflow: visible !important;
-                /* --- NEW: Force browsers to print background colors (like table header gray) --- */
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important;
             }
@@ -402,16 +434,14 @@
             #qr-code img, #qr-code canvas { max-width: none; width: 180px !important; }
         }
 
-
-
         /* --- Loading & Error Screen Styles --- */
         .loading-overlay {
             position: fixed; inset: 0; z-index: 50;
-            background: rgba(243, 244, 246, 0.7);
+            background: var(--overlay-bg);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.3s ease;
         }
         .loading-overlay.fade-out {
             opacity: 0;
@@ -425,13 +455,13 @@
         
         /* Error Card specifically */
         .error-card {
-            background: #ffffff;
+            background: var(--bg-paper);
             border-radius: 16px;
             padding: 40px 30px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             max-width: 420px;
             width: 90%;
-            border: 1px solid rgba(229, 231, 235, 0.5);
+            border: 1px solid var(--border-color);
             animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
@@ -441,11 +471,11 @@
         }
 
         .error-icon { width: 64px; height: 64px; color: #ef4444; margin-bottom: 20px; }
-        .error-title { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 12px 0; }
-        .error-desc { font-size: 15px; color: #4b5563; margin: 0 0 24px 0; line-height: 1.6; }
-        .disclaimer-text { font-size: 11px; color: #9ca3af; margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 16px; line-height: 1.5; }
+        .error-title { font-size: 22px; font-weight: 700; color: var(--text-main); margin: 0 0 12px 0; }
+        .error-desc { font-size: 15px; color: var(--text-secondary); margin: 0 0 24px 0; line-height: 1.6; }
+        .disclaimer-text { font-size: 11px; color: var(--text-muted); margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 16px; line-height: 1.5; }
 
-        /* --- Website Alert Banner - Restored to original Yellow --- */
+        /* --- Website Alert Banner --- */
         .site-disclaimer-banner {
             background-color: #fffbeb;
             color: #854d0e;
@@ -459,6 +489,14 @@
             color: #713f12;
             font-weight: 600;
             text-decoration: underline;
+        }
+        [data-theme="dark"] .site-disclaimer-banner {
+            background-color: #fde68a;
+            color: #854d0e;
+            border-bottom-color: #713f12;
+        }
+        [data-theme="dark"] .site-disclaimer-banner a {
+            color: #713f12;
         }
 
         .hidden { display: none !important; }
@@ -501,13 +539,16 @@
             SwiftInvoice Viewer
         </div>
         <div class="actions">
+            <button id="theme-toggle-btn" class="btn btn-secondary icon-only" title="Toggle Theme">
+                <!-- SVG added by JS -->
+            </button>
             <button id="print-btn" class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.198-.54-1.214-1.201L6.054 18m11.606 0c.54 0 1.077-.077 1.602-.224 1.12-.312 1.956-1.348 1.956-2.54V9.67c0-.693-.559-1.252-1.252-1.252H4.945c-.693 0-1.252.559-1.252 1.252v5.536c0 1.192.836 2.228 1.956 2.54.525.148 1.062.225 1.602.225M17.66 18h-11.606" />
                 </svg>
-                Print / Save as PDF
+                Print / Save
             </button>
-            </div>
+        </div>
     </header>
 
     <div id="website-disclaimer" class="site-disclaimer-banner hide-on-print hidden">
@@ -591,6 +632,38 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Handling ---
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const html = document.documentElement;
+            const THEME_KEY = 'swiftInvoiceTheme';
+
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`;
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>`;
+
+            function updateThemeIcon() {
+                if (html.getAttribute('data-theme') === 'dark') {
+                    themeBtn.innerHTML = sunIcon;
+                } else {
+                    themeBtn.innerHTML = moonIcon;
+                }
+            }
+
+            if (themeBtn) {
+                updateThemeIcon();
+                themeBtn.addEventListener('click', () => {
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    if (newTheme === 'dark') {
+                        html.setAttribute('data-theme', 'dark');
+                    } else {
+                        html.removeAttribute('data-theme');
+                    }
+                    localStorage.setItem(THEME_KEY, newTheme);
+                    updateThemeIcon();
+                });
+            }
+
+            // --- Viewer Logic ---
             const loadingScreen = document.getElementById('loading-screen');
             const loadingContent = document.getElementById('loading-content');
             const errorContent = document.getElementById('error-content');
