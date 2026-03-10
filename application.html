@@ -619,12 +619,12 @@
         }
         
         .main-content-container { 
-            /* On desktop, we constrain the width, but allow it to exceed on mobile for scrolling */
             max-width: 100%;
+            min-width: fit-content; /* Forces the wrapper to include the right padding */
             margin-left: auto; 
             margin-right: auto; 
             padding: 1.5rem 1rem; 
-            display: block; /* Changed from flex to block to prevent left-side clipping */
+            display: block;
         }
         
         @media (min-width: 640px) { .main-content-container { padding: 2.5rem 1.5rem; } }
@@ -638,15 +638,37 @@
             } 
         }
 
-        .invoice-toolbar { display: flex; gap: 0.75rem; flex-wrap: nowrap; overflow-x: auto; }
+        .invoice-toolbar { 
+            display: flex; 
+            gap: 0.75rem; 
+            flex-wrap: nowrap; 
+            overflow-x: auto; 
+            padding-bottom: 8px; /* Gives the scrollbar room to breathe */
+            margin-bottom: -8px; /* Offsets the padding to keep it vertically centered */
+        }
         .invoice-toolbar::-webkit-scrollbar { height: 6px; }
         .invoice-toolbar::-webkit-scrollbar-track { background: var(--bg-body); border-radius: 3px; }
         .invoice-toolbar::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
         .invoice-toolbar::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
-        .invoice-toolbar .btn { width: auto; flex-shrink: 0; padding-left: 0.75rem; padding-right: 0.75rem; white-space: nowrap; }
+
+        /* Make buttons slightly smaller on mobile */
+        .invoice-toolbar .btn { 
+            width: auto; 
+            flex-shrink: 0; 
+            padding: 0.375rem 0.6rem; /* Smaller padding */
+            font-size: 0.8rem; /* Slightly smaller text */
+            white-space: nowrap; 
+        }
         .invoice-toolbar .btn-icon { margin-right: 0.5rem; }
         .invoice-toolbar .btn-label { display: inline; }
-        @media (min-width: 640px) { .invoice-toolbar .btn { padding-left: 1rem; padding-right: 1rem; } }
+
+        /* Restore normal button sizes on desktop */
+        @media (min-width: 640px) { 
+            .invoice-toolbar .btn { 
+                padding: 0.5rem 1rem; 
+                font-size: 0.875rem; 
+            } 
+        }
         
         @media (max-width: 640px) { .app-container { width: fit-content; } }
         
