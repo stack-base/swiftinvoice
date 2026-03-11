@@ -533,7 +533,7 @@
         .dropdown-container { position: relative; margin-top: 0.25rem; }
         .dropdown-trigger { position: relative; width: 100%; cursor: default; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-input); padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 2.5rem; text-align: left; font-size: 1rem; line-height: 1.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); color: var(--text-main); }
         .dropdown-trigger:hover { border-color: var(--text-muted); }
-        .dropdown-trigger:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #99f6e4; box-shadow: 0 0 0 2px #99f6e4; }
+        .dropdown-trigger:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #99f6e4; box-shadow: 0 0 0 1px #99f6e4; }
         @media (min-width: 640px) { .dropdown-trigger { font-size: 0.875rem; line-height: 1.25rem; } }
         .dropdown-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .dropdown-icon-container { pointer-events: none; position: absolute; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding-right: 0.5rem; }
@@ -557,7 +557,7 @@
         .btn-full { width: 100%; }
         .btn-primary { color: #ffffff; background-color: var(--primary); }
         .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
-        .btn-primary:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
+        .btn-primary:focus { outline: none; }
         .btn-secondary { color: var(--text-main); background-color: var(--bg-input); border-color: var(--border-color); }
         .btn-secondary:hover:not(:disabled) { background-color: var(--bg-hover); }
         .invoice-toolbar .btn-secondary:hover:not(:disabled) { background-color: var(--bg-body); }
@@ -569,7 +569,7 @@
         .animate-spin { animation: spin 1s linear infinite; }
         .btn-icon-only { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 0.375rem; border: 1px solid transparent; color: var(--text-secondary); background-color: transparent;}
         .btn-icon-only:hover { background-color: var(--bg-hover); color: var(--text-main); }
-        .btn-icon-only:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
+        .btn-icon-only:focus { outline: none; }
         .btn-icon-only svg { width: 1.5rem; height: 1.5rem; }
         
         /* --- MAIN CONTENT & SCROLL FIXES --- */
