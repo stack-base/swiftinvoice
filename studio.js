@@ -21,6 +21,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const themeToggleBtn = document.getElementById('header-theme-btn');
     
+    // --- NEW: Liquid Glass Tab Indicator Logic ---
+    function updateTabIndicators() {
+        document.querySelectorAll('.tab-group').forEach(group => {
+            let indicator = group.querySelector('.tab-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.classList.add('tab-indicator');
+                group.appendChild(indicator);
+            }
+            const activeBtn = group.querySelector('.tab-btn.active');
+            if (activeBtn) {
+                indicator.style.width = `${activeBtn.offsetWidth}px`;
+                indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+            }
+        });
+    }
+    window.addEventListener('resize', updateTabIndicators);
+    // ---------------------------------------------
+
     function applyTheme(theme) {
         if(theme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -251,7 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 ui.viewLanding.classList.add('hidden');
                 ui.viewApp.classList.remove('hidden');
-                setTimeout(() => ui.viewApp.classList.add('active'), 50);
+                setTimeout(() => {
+                    ui.viewApp.classList.add('active');
+                    updateTabIndicators(); // Initialize indicators once app view is active
+                }, 50);
             }, 400);
         } else {
             ui.viewApp.classList.remove('active');
@@ -1003,11 +1025,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btnLine.classList.add('active');
             btnBar.classList.remove('active');
             updateSingleChart(chartKey, 'line', label, color);
+            updateTabIndicators(); // NEW: Sync sliding indicator
         });
         btnBar.addEventListener('click', () => {
             btnBar.classList.add('active');
             btnLine.classList.remove('active');
             updateSingleChart(chartKey, 'bar', label, color);
+            updateTabIndicators(); // NEW: Sync sliding indicator
         });
     }
 
@@ -1734,10 +1758,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ui.pdfBtn.disabled = true;
             }
         }
+        
+        // NEW: Sync sliding indicator when tabs switch
+        setTimeout(updateTabIndicators, 10);
     };
     ui.tabPreview.onclick = () => switchTab('preview');
     ui.tabAnalytics.onclick = () => switchTab('analytics');
     ui.tabRaw.onclick = () => switchTab('raw');
 
     checkLocalData(); 
+    
+    // NEW: Initialize the indicators shortly after initial load
+    setTimeout(updateTabIndicators, 50);
 });
