@@ -178,20 +178,15 @@
         }
         
         .party-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 32px; }
-        h1.title { font-size: 32px; margin: 0 0 16px 0; font-weight: 700; letter-spacing: -0.02em; color: #111827; text-transform: uppercase; }
-        .meta-table { font-size: 12px; border-collapse: collapse; }
-        .meta-table td { padding: 4px 0; vertical-align: top; }
-        .meta-table td.label { width: 120px; font-weight: 600; color: #4b5563; }
         .party { width: 48%; }
-        .party h2 { font-size: 14px; margin: 0 0 8px 0; font-weight: 600; color: #111827; }
-        .address { font-size: 12px; white-space: pre-wrap; line-height: 1.6; min-height: 72px; padding: 4px; border: none; color: #4b5563; }
         .table-wrap { margin-top: 0; width: 100%; overflow-x: auto; }
 
         /* ==========================================================================
-        SWIFTINVOICE UNIVERSAL INVOICE STYLES
-        Ensures 1:1 identical layout across Editor, Viewer, and Data Studio
+        SWIFTINVOICE UNIFIED UNIVERSAL INVOICE STYLES
+        Merged styles for Editor, Viewer, and Data Studio environments
         ========================================================================== */
 
+        /* --- BASE LAYOUT --- */
         #invoice, .paper {
             width: 210mm !important;
             min-width: 210mm !important;
@@ -202,256 +197,131 @@
             color: #111827 !important;
             font-family: 'Inter', Arial, sans-serif !important;
             box-sizing: border-box !important;
-            margin: 0 auto !important; /* Centers the paper in viewer/studio */
+            margin: 0 auto !important;
             border: none !important;
             border-radius: 0 !important;
+            display: block; /* Ensures consistent block layout across environments */
         }
 
+        /* --- TYPOGRAPHY & HEADINGS --- */
         #invoice h1.title, .paper h1.title {
-            font-size: 32px !important;
-            margin: 0 0 16px 0 !important;
-            font-weight: 700 !important;
-            letter-spacing: -0.02em !important;
-            color: #111827 !important;
-            text-transform: uppercase !important;
-            line-height: 1.2 !important;
+            font-size: 32px !important; margin: 0 0 16px 0 !important;
+            font-weight: 700 !important; text-transform: uppercase !important; color: #111827 !important;
+            line-height: 1.2 !important; letter-spacing: -0.02em !important;
         }
 
-        #invoice .meta-table, .paper .meta-table {
-            font-size: 12px !important;
-            border-collapse: collapse !important;
-            margin-bottom: 24px !important;
+        #invoice h2, .paper h2, #invoice .party h2, .paper .party h2 { 
+            font-size: 14px !important; margin: 0 0 8px 0 !important; font-weight: 600 !important; color: #111827 !important; 
         }
 
-        #invoice .meta-table td, .paper .meta-table td {
-            padding: 4px 0 !important;
-            vertical-align: top !important;
+        /* --- META & ADDRESS --- */
+        #invoice .meta-table, .paper .meta-table { font-size: 12px !important; border-collapse: collapse !important; margin-bottom: 24px !important; }
+        #invoice .meta-table td, .paper .meta-table td { padding: 4px 0 !important; vertical-align: top !important; }
+        #invoice .meta-table td.label, .paper .meta-table td.label { width: 120px !important; font-weight: 600 !important; color: #4b5563 !important; }
+
+        #invoice .address, .paper .address { 
+            font-size: 12px !important; white-space: pre-wrap !important; line-height: 1.6 !important; 
+            color: #4b5563 !important; min-height: 72px !important; padding: 0 !important; 
         }
 
-        #invoice .meta-table td.label, .paper .meta-table td.label {
-            width: 120px !important;
-            font-weight: 600 !important;
-            color: #4b5563 !important;
-        }
+        /* --- STUDIO & EXTENDED LAYOUT CLASSES --- */
+        .invoice-header-row { display: flex; justify-content: space-between; margin-bottom: 24px; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; }
+        .header-right { display: flex; flex-direction: column; align-items: flex-end; }
+        .party-row { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 32px; }
+        .party { width: 48%; }
+        .invoice-logo { max-height: 80px; max-width: 150px; object-fit: contain; border-radius: 0; }
 
-        #invoice .party h2, .paper .party h2 {
-            font-size: 14px !important;
-            margin: 0 0 8px 0 !important;
-            font-weight: 600 !important;
-            color: #111827 !important;
-        }
-
-        #invoice .address, .paper .address {
-            font-size: 12px !important;
-            white-space: pre-wrap !important;
-            line-height: 1.6 !important;
-            color: #4b5563 !important;
-            min-height: 72px !important;
-        }
+        /* --- QR CODE (SCREEN VIEW) --- */
+        #qr-code { margin-top: 10px; padding: 4px; background: white; border: 1px solid #e5e7eb; border-radius: 4px; display: inline-block; }
 
         /* --- EXACT TABLE LAYOUT --- */
-        #items {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            font-size: 12px !important;
-            table-layout: fixed !important; /* Forces strict column widths */
-        }
+        #items { width: 100% !important; border-collapse: collapse !important; font-size: 12px !important; table-layout: fixed !important; box-sizing: border-box !important; }
+        #items thead th { box-sizing: border-box !important; background: #f9fafb !important; font-weight: 600 !important; font-size: 10px !important; color: #4b5563 !important; text-transform: uppercase !important; letter-spacing: 0.02em !important; padding: 12px 8px !important; border: none !important; text-align: left !important; vertical-align: middle !important; }
+        #items td { box-sizing: border-box !important; padding: 12px 8px !important; border: none !important; border-bottom: 1px solid #f3f4f6 !important; vertical-align: top !important; word-wrap: break-word !important; color: #111827 !important; font-family: 'Inter', Arial, sans-serif !important; }
 
-        #items thead th {
-            background: #f9fafb !important;
-            font-weight: 600 !important;
-            font-size: 10px !important;
-            color: #4b5563 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.02em !important;
-            padding: 12px 8px !important;
-            border: none !important;
-            text-align: left !important;
-            vertical-align: middle !important;
-        }
-
-        #items td {
-            padding: 12px 8px !important;
-            border: none !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            vertical-align: top !important;
-            word-wrap: break-word !important;
-            color: #111827 !important;
-            font-family: 'Inter', Arial, sans-serif !important;
-        }
-
-        /* STRICT COLUMN WIDTHS (Matches application.html intended layout) */
-        #items th:nth-child(1), #items td:nth-child(1) { width: 40px !important; text-align: center !important; } /* Line */
-        #items th:nth-child(2), #items td:nth-child(2) { width: 100px !important; text-align: left !important; } /* Code */
-        #items th:nth-child(3), #items td:nth-child(3) { width: auto !important; text-align: left !important; }   /* Description */
-        #items th:nth-child(4), #items td:nth-child(4) { width: 40px !important; text-align: center !important; } /* Qty */
-        #items th:nth-child(5), #items td:nth-child(5) { width: 90px !important; text-align: right !important; }  /* Excl */
-        #items th:nth-child(6), #items td:nth-child(6) { width: 60px !important; text-align: right !important; }  /* Rate */
-        #items th:nth-child(7), #items td:nth-child(7) { width: 80px !important; text-align: right !important; }  /* VAT Amt */
-        #items th:nth-child(8), #items td:nth-child(8) { width: 90px !important; text-align: right !important; }  /* Incl */
-        /* 9th Action column in Editor mode - ignored in viewer/studio */
+        /* STRICT COLUMN WIDTHS */
+        #items th:nth-child(1), #items td:nth-child(1) { width: 40px !important; text-align: center !important; } 
+        #items th:nth-child(2), #items td:nth-child(2) { width: 100px !important; text-align: left !important; } 
+        #items th:nth-child(3), #items td:nth-child(3) { width: auto !important; text-align: left !important; }   
+        #items th:nth-child(4), #items td:nth-child(4) { width: 40px !important; text-align: center !important; } 
+        #items th:nth-child(5), #items td:nth-child(5) { width: 90px !important; text-align: right !important; }  
+        #items th:nth-child(6), #items td:nth-child(6) { width: 60px !important; text-align: right !important; }  
+        #items th:nth-child(7), #items td:nth-child(7) { width: 80px !important; text-align: right !important; }  
+        #items th:nth-child(8), #items td:nth-child(8) { width: 90px !important; text-align: right !important; }
         #items th:nth-child(9), #items td:nth-child(9) { width: 40px !important; text-align: center !important; } 
 
-        /* Totals Exact Match */
-        .totals {
-            display: flex !important;
-            justify-content: flex-end !important;
-            margin-top: 32px !important;
-        }
-
-        .totals .box, .totals-box {
-            width: 380px !important;
-            font-size: 12px !important;
-        }
-
-        #inv-currency, .totals .currency {
-            text-align: right !important;
-            padding-right: 10px !important;
-            margin-bottom: 6px !important;
-            color: #4b5563 !important;
-            font-size: 12px !important;
-            font-weight: 400 !important;
-        }
-
-        .totals table, .totals-table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            font-size: 12px !important;
-        }
-
-        .totals table td, .totals-table td {
-            padding: 8px !important;
-        }
-
-        .totals table td.label, .totals-table td:first-child {
-            text-align: left !important;
-            width: 100px !important;
-            font-weight: 500 !important;
-            color: #4b5563 !important;
-        }
-
-        .totals table td.value, .totals-table td:last-child {
-            text-align: right !important;
-            font-weight: 700 !important;
-            width: 140px !important;
-            color: #111827 !important;
-        }
-
-        .totals table tr:last-child, .totals-table tr:last-child {
-            background-color: #f9fafb !important;
-            border-top: 2px solid #e5e7eb !important;
-            border-bottom: 2px solid #e5e7eb !important;
-        }
-
-        .totals table tr:last-child td, .totals-table tr:last-child td {
-            font-size: 14px !important;
-            padding-top: 12px !important;
-            padding-bottom: 12px !important;
-        }
-        
-        #items th { 
-            padding: 12px 8px; /* Reduced padding for tightness */
-            vertical-align: top; 
-            font-family: 'Inter', Arial, sans-serif; 
-            font-weight: 600;
-            border: none; 
-            text-align: left; 
-            vertical-align: middle; 
-            word-wrap: break-word; /* Ensure text wraps */
-        }
-        #items td { 
-            padding: 12px 8px; /* Reduced padding for tightness */
-            vertical-align: top; 
-            font-family: 'Inter', Arial, sans-serif; 
-            border: none; 
-            text-align: left; 
-            vertical-align: top; 
-            word-wrap: break-word; /* Ensure text wraps */
-        }
+        /* --- TOTALS --- */
+        .totals { display: flex !important; justify-content: flex-end !important; margin-top: 32px !important; }
+        .totals .box, .totals-box { width: 380px !important; font-size: 12px !important; }
+        #inv-currency, .totals .currency { text-align: right !important; margin-bottom: 6px !important; color: #4b5563 !important; font-size: 12px !important; font-weight: 400 !important; padding-right: 10px !important; }
+        .totals table, .totals-table { width: 100% !important; border-collapse: collapse !important; font-size: 12px !important; }
+        .totals table td, .totals-table td { padding: 8px !important; }
+        .totals table td.label, .totals-table td:first-child { text-align: left !important; width: 100px !important; font-weight: 500 !important; color: #4b5563 !important; }
+        .totals table td.value, .totals-table td:last-child { text-align: right !important; font-weight: 700 !important; width: 140px !important; color: #111827 !important; }
+        .totals table tr:last-child, .totals-table tr:last-child { background-color: #f9fafb !important; border-top: 2px solid #e5e7eb !important; border-bottom: 2px solid #e5e7eb !important; }
+        .totals table tr:last-child td, .totals-table tr:last-child td { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
 
         /* ==========================================================================
-        UNIVERSAL A4 PRINT STYLES (CORRECTED & DARK-MODE SAFE)
+        UNIVERSAL A4 PRINT STYLES (UNIFIED)
         ========================================================================== */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0; /* Let the element's padding act as the page margin */
-            }
+            @page { size: A4 portrait; margin: 0; }
             
-            /* 1. Neutralize dark mode variables to prevent black bleed */
+            /* 1. Neutralize dark mode across all environments */
             :root, [data-theme="dark"] {
                 --bg-body: #ffffff !important;
                 --bg-paper: #ffffff !important;
+                --bg-dots: transparent !important;
                 --text-main: #111827 !important;
+                --text-secondary: #4b5563 !important;
             }
 
-            /* 2. Strip all spacing, height constraints, and force white background */
-            html, body, .app-layout, .main-content, .main-content-container, .app-container {
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                height: auto !important; 
-                min-height: 100% !important;
-                max-width: none !important;
-                background-color: #ffffff !important;
-                /* --- NEW: Remove the dotted background pattern specifically for printing --- */
-                background-image: none !important; 
-                color: #111827 !important;
-                box-shadow: none !important;
-                border: none !important;
-                overflow: visible !important;
-                /* --- NEW: Force browsers to print background colors (like table header gray) --- */
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important;
+            /* 2. Flatten ALL outer wrappers (Studio, Viewer, Editor) */
+            html, body, 
+            .app-layout, .main-content, .main-content-container, .app-container,
+            #view-app, .right-pane-wrapper, .three-pane-body, .pane-content-area {
+                display: block !important; position: static !important;
+                margin: 0 !important; padding: 0 !important; 
+                width: 100% !important; max-width: none !important;
+                height: auto !important; min-height: 100% !important;
+                background-color: #ffffff !important; background-image: none !important; 
+                color: #111827 !important; box-shadow: none !important;
+                border: none !important; overflow: visible !important; transform: none !important;
+                -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
             }
 
-            /* 3. Hide UI wrappers, tax categories, and dropdowns */
-            .hide-on-print, .viewer-header, .main-header, .sidebar, 
-            .settings-column-wrapper, .mobile-control-bar,
-            .tax-category-wrapper, .table-dropdown-trigger, 
-            .table-dropdown-panel {
+            /* 3. Hide ALL specific UI elements across apps */
+            .hide-on-print, .hidden,
+            .viewer-header, .main-header, .sidebar, .sidebar-overlay,
+            .settings-column-wrapper, .mobile-control-bar, #mobile-invoice-controls,
+            .tax-category-wrapper, .table-dropdown-trigger, .table-dropdown-panel,
+            .right-pane-header, .tab-group, #pane-invoice-list, #content-raw {
                 display: none !important;
             }
             
-            /* 4. Apply exact A4 dimensions ONLY to the actual invoice sheet */
+            /* 4. Ensure body stays white */
+            body { background-color: #ffffff !important; }
+
+            /* 5. Apply exact A4 dimensions to paper */
             #invoice, .paper {
-                width: 210mm !important;
-                max-width: 210mm !important;
-                min-height: 297mm !important;
-                margin: 0 auto !important;
-                padding: 10mm !important; 
-                box-sizing: border-box !important;
-                page-break-after: auto;
-                background-color: #ffffff !important;
+                width: 210mm !important; max-width: 210mm !important; min-height: 297mm !important;
+                margin: 0 auto !important; padding: 10mm !important; box-sizing: border-box !important;
+                page-break-after: auto; background-color: #ffffff !important;
             }
 
-            /* --- NEW: 4.1 Smart Page Breaking for Tables & Totals --- */
-            /* Prevents a single row of items from being sliced horizontally across two pages */
-            #items tr {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevents the table header from repeating awkwardly or being detached */
-            #items thead {
-                display: table-header-group !important;
-            }
-            /* Keeps the totals box entirely intact on one page */
-            .totals {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Avoids leaving single lines of text (orphans/widows) at the top or bottom of pages */
-            p, h1, h2, h3, .address {
-                orphans: 3;
-                widows: 3;
-            }
+            /* 6. Smart Page Breaking */
+            #items tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            #items thead { display: table-header-group !important; }
+            .totals { page-break-inside: avoid !important; break-inside: avoid !important; }
+            p, h1, h2, h3, .address { orphans: 3; widows: 3; }
 
-            /* 5. QR Code specific print rules */
-            #qr-code { border: none; }
-            #qr-code img, #qr-code canvas { max-width: none; width: 180px !important; }
+            /* 7. QR Code Print specifics */
+            #qr-code { border: none !important; }
+            #qr-code img, #qr-code canvas { max-width: none !important; width: 180px !important; }
         }
 
-        .desc { white-space: pre-wrap; line-height: 1.6; font-size: 12px; color: #111827; width: 100%; }
+        .desc { white-space: pre-wrap; font-size: 12px !important; color: #111827; width: 100%; }
+        #items td.incl { font-weight: 600 !important; }
         .tax-category-wrapper { position: relative; margin-top: 8px; max-width: 200px; }
         .table-dropdown-trigger { width: 100%; padding: 0.5rem 0.75rem; font-size: 12px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--bg-input); font-family: 'Inter', Arial, sans-serif; text-align: left; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239ca3af' stroke-width='1.5'%3e%3cpath d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px 16px; color: var(--text-main); }
         .table-dropdown-trigger:hover { background-color: var(--bg-hover); }
@@ -471,7 +341,7 @@
             border-color: var(--border-color) !important;
         }
         .item-serial::placeholder, .item-color::placeholder {
-            color: var(--text-muted);
+            color: var(--text-main);
         }
         .item-serial:focus, .item-color:focus {
             outline: 2px solid transparent;
@@ -480,16 +350,7 @@
             box-shadow: 0 0 0 2px var(--text-accent);
         }
         
-        .rate-display { text-align: right !important; color: #4b5563; font-size: 12px; padding-right: 8px; }
-        .totals { display: flex; justify-content: flex-end; margin-top: 32px; }
-        .totals .box { width: 380px; font-size: 12px; }
-        .totals .currency { text-align: right; padding-right: 10px; margin-bottom: 6px; color: #4b5563; font-size: 12px; }
-        .totals table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .totals td { padding: 8px; }
-        .totals td.label { text-align: left; width: 100px; font-weight: 500; color: #4b5563; }
-        .totals td.value { text-align: right; font-weight: 700; width: 140px; color: #111827; }
-        .totals table tr:last-child { background-color: #f9fafb; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
-        .totals table tr:last-child td { font-size: 14px; padding-top: 12px; padding-bottom: 12px; }
+        .rate-display { text-align: right !important; font-size: 12px; }
         .delete-btn { background: transparent; border: none; cursor: pointer; padding: 2px; border-radius: 4px; }
         .delete-btn svg { color: #dc2626; width: 1rem; height: 1rem; }
         .delete-btn:hover svg { stroke: #b91c1c; }
@@ -679,7 +540,7 @@
         
         .sidebar-branding { font-family: 'Ubuntu', sans-serif; text-align: center; font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; flex-shrink: 0; padding: 1.5rem; border-top: 1px solid var(--border-color); }
         .invoice-footer { font-family: 'Ubuntu', sans-serif; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #9ca3af; font-weight: 400; }
-        .invoice-footer-brand { font-family: 'Roboto', sans-serif; font-weight: 500; }
+        .invoice-footer-brand { font-family: 'Roboto', sans-serif; font-weight: 500; color: #9ca3af;}
         .search-wrapper { position: relative; margin-top: 1rem; margin-bottom: 0.5rem; }
         .search-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem; border-radius: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-input); font-size: 0.875rem; line-height: 1.25rem; color: var(--text-main); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); }
         .search-input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #2dd4bf; box-shadow: 0 0 0 2px #2dd4bf; }
@@ -778,7 +639,7 @@
         
         .invoice-view-mode .item-serial, 
         .invoice-view-mode .item-style {
-            font-size: 10px;
+            font-size: 12px;
             color: #6b7280 !important;
             margin-top: 1px !important;
             display: block;
@@ -1240,14 +1101,14 @@ City, State 67890</div>
                                 <table id="items" aria-label="items table">
                                     <thead>
                                         <tr>
-                                            <th>Line Nr</th>
-                                            <th>Product Code</th>
-                                            <th>Description</th>
-                                            <th>Qty</th>
-                                            <th>Price excl<br/>VAT</th>
-                                            <th>VAT<br/>rate</th>
-                                            <th>VAT<br/>amount</th>
-                                            <th>Price incl<br/>VAT</th>
+                                            <th>LINE NR</th>
+                                            <th>PRODUCT CODE</th>
+                                            <th>DESCRIPTION</th>
+                                            <th>QTY</th>
+                                            <th>PRICE EXCL VAT</th>
+                                            <th>VAT RATE</th>
+                                            <th>VAT AMOUNT</th>
+                                            <th>Price incl VAT</th>
                                             <th class="hide-on-print hide-on-view">Action</th>
                                         </tr>
                                     </thead>
@@ -1267,12 +1128,12 @@ City, State 67890</div>
                                                 <td class="hide-on-print hide-on-view" style="width: 40px;"></td> 
                                             </tr>
                                             <tr id="vat-row"> 
-                                                <td class="label">VAT</td>
+                                                <td class="label">VAT Total</td>
                                                 <td contenteditable="false" id="vat-total" class="value">3.33</td>
                                                 <td class="hide-on-print hide-on-view"></td>
                                             </tr>
                                             <tr>
-                                                <td class="label">Total</td>
+                                                <td class="label">Grand Total</td>
                                                 <td contenteditable="false" id="grand" class="value">69.95</td>
                                                 <td class="hide-on-print hide-on-view"></td>
                                             </tr>
@@ -1288,7 +1149,7 @@ City, State 67890</div>
                             </div>
                         </div>
                         <div class="invoice-footer">
-                            <span class="invoice-footer-brand">SwiftInvoice</span> | StackBase
+                            SwiftInvoice | <span class="invoice-footer-brand">StackBase</span>
                         </div>
                     </div>
                 </div>

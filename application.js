@@ -711,6 +711,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const inputs = invoiceContainer.querySelectorAll('input');
             inputs.forEach(input => {
                 input.setAttribute('value', input.value);
+                
+                // Manage SN and Style prefixes
+                if (input.classList.contains('item-serial') || input.classList.contains('item-style')) {
+                    const field = input.closest('.meta-field');
+                    if (field) {
+                        if (input.value.trim() === '') {
+                            field.style.display = 'none'; // Hide entirely if empty
+                        } else {
+                            field.style.display = 'flex';
+                            const label = field.querySelector('.meta-label');
+                            if (label) label.style.display = 'inline-block'; // Show prefix
+                        }
+                    }
+                }
             });
             updateQRCode();
         } else {
@@ -718,6 +732,19 @@ document.addEventListener('DOMContentLoaded', () => {
             invoiceContainer.classList.remove('invoice-view-mode');
             editModeButtons.style.display = 'flex';
             viewModeButtons.style.display = 'none';
+            
+            // Restore visibility of SN/Style fields for editing
+            const inputs = invoiceContainer.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.classList.contains('item-serial') || input.classList.contains('item-style')) {
+                    const field = input.closest('.meta-field');
+                    if (field) {
+                        field.style.display = 'flex';
+                        const label = field.querySelector('.meta-label');
+                        if (label) label.style.display = 'none'; // Hide prefix in edit mode
+                    }
+                }
+            });
         }
     }
     
@@ -1245,13 +1272,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const incl = itemData ? itemData.incl : '0.00';
         
         tr.innerHTML = `
-            <td contenteditable="true" class="line" data-label="Line Nr">${line}</td>
-            <td contenteditable="true" class="code" data-label="Product Code">${code}</td>
+            <td contenteditable="true" class="line" data-label="#">${line}</td>
+            <td contenteditable="true" class="code" data-label="Code">${code}</td>
             <td data-label="Description">
                 <div contenteditable="true" class="desc">${desc}</div>
                 <div class="meta-inputs" style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">
-                    <input type="text" class="item-serial" placeholder="Serial No / IMEI" value="${serial}" style="width:100%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
-                    <input type="text" class="item-style" placeholder="Style" value="${style}" style="width:100%; font-size:11px; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
+                    <div class="meta-field" style="display:flex; align-items:center;">
+                        <span class="meta-label" style="display:none; margin-right:4px;">SN:</span>
+                        <input type="text" class="item-serial" placeholder="Serial No / IMEI" value="${serial}" style="width:100%; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
+                    </div>
+                    <div class="meta-field" style="display:flex; align-items:center;">
+                        <span class="meta-label" style="display:none; margin-right:4px;">Style:</span>
+                        <input type="text" class="item-style" placeholder="Style" value="${style}" style="width:100%; padding:4px; border:1px solid #e5e7eb; border-radius:4px; color:#4b5563; font-family:inherit;">
+                    </div>
                 </div>
                 <div class="tax-category-wrapper" data-label="Tax Category" data-category-print="${taxData.selectedName}">
                     <button type="button" class="table-dropdown-trigger">${taxData.selectedName}</button>
@@ -1259,10 +1292,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </td>
             <td contenteditable="true" class="qty" data-label="Qty">${qty}</td>
-            <td contenteditable="true" class="excl" data-label="Price excl VAT">${excl}</td>
-            <td contenteditable="${isCustomRate ? 'true' : 'false'}" class="rate-display" data-label="VAT rate">${rateStr}</td>
-            <td contenteditable="${isCustomRate ? 'false' : 'true'}" class="vat" data-label="VAT amount">${vat}</td>
-            <td contenteditable="true" class="incl" data-label="Price incl VAT">${incl}</td>
+            <td contenteditable="true" class="excl" data-label="Price">${excl}</td>
+            <td contenteditable="${isCustomRate ? 'true' : 'false'}" class="rate-display" data-label="VAT%">${rateStr}</td>
+            <td contenteditable="${isCustomRate ? 'false' : 'true'}" class="vat" data-label="VAT">${vat}</td>
+            <td contenteditable="true" class="incl" data-label="Total">${incl}</td>
             <td class="hide-on-print hide-on-view" data-label="Action">
                 <button class="delete-btn" title="Delete row">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">

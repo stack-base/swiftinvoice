@@ -1525,21 +1525,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const vat = item.vat ? formatMoney(parseCurrency(item.vat), currencyCode) : '0.00';
             const incl = item.incl ? formatMoney(parseCurrency(item.incl), currencyCode) : '0.00';
             
-            const desc = (item.desc || '').replace(/\n/g, '<br>');
+            const desc = item.desc || '';
             const serial = item.serial || '';
             const style = item.style || item.color || ''; 
             
             let metaHtml = '';
-            if(serial) metaHtml += `<div>SN: ${serial}</div>`;
-            if(style) metaHtml += `<div>Style: ${style}</div>`;
-            
+            if(serial || style) {
+                metaHtml += `<div class="meta-inputs" style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">`;
+                
+                if(serial) {
+                    metaHtml += `
+                        <div class="meta-field" style="display:flex; align-items:center;">
+                            <span class="meta-label" style="display:inline-block; margin-right:4px;">SN:</span>
+                            <span class="item-serial" style="margin-top: 1px; display: block;">${serial}</span>
+                        </div>`;
+                }
+                if(style) {
+                    metaHtml += `
+                        <div class="meta-field" style="display:flex; align-items:center;">
+                            <span class="meta-label" style="display:inline-block; margin-right:4px;">Style:</span>
+                            <span class="item-style" style="margin-top: 1px; display: block;">${style}</span>
+                        </div>`;
+                }
+                metaHtml += `</div>`;
+            }
+
             return `
                 <tr>
                     <td data-label="#">${item.line || '-'}</td>
                     <td data-label="Code">${item.code || ''}</td>
                     <td data-label="Description">
-                        <div>${desc}</div>
-                        <div class="item-meta">${metaHtml}</div>
+                        <div class="desc" style="white-space: pre-wrap; font-size: 12px; color: #111827; width: 100%;">${desc}</div>
+                        ${metaHtml}
                     </td>
                     <td data-label="Qty">${item.qty || 1}</td>
                     <td data-label="Price">${excl}</td>
@@ -1600,7 +1617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
-            <div class="party-row">
+            <div class="party-row" style="margin-bottom: 37px;">
                 <div class="party">
                     <h2>Seller</h2>
                     <div id="inv-seller" class="address">${sellerAddress}</div>
