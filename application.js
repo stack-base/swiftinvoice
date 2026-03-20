@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const editInvoiceBtn = document.getElementById('edit-invoice-btn');
     const editModeButtons = document.getElementById('edit-mode-buttons');
     const viewModeButtons = document.getElementById('view-mode-buttons');
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    let currentInvoiceUrl = '';
     const invoiceContainer = document.getElementById('invoice');
 
     const invoiceList = document.getElementById('invoice-list');
@@ -1479,6 +1481,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const compressed = LZString.compressToEncodedURIComponent(jsonString);
             const fullUrl = VIEWER_URL_BASE + compressed;
 
+            currentInvoiceUrl = fullUrl;
+
             qrCodeContainer.innerHTML = '';
             new QRCode(qrCodeContainer, {
                 text: fullUrl,
@@ -1569,6 +1573,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         window.print();
     });
+
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', async () => {
+            if (!currentInvoiceUrl) return;
+            try {
+                await navigator.clipboard.writeText(currentInvoiceUrl);
+                
+                // Temporary visual feedback
+                const originalText = copyLinkBtn.querySelector('.btn-label').textContent;
+                copyLinkBtn.querySelector('.btn-label').textContent = 'Copied!';
+                setTimeout(() => {
+                    copyLinkBtn.querySelector('.btn-label').textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy link. Check console for details.');
+                console.error('Clipboard write failed:', err);
+            }
+        });
+    }
     
     setupFinishBtn.addEventListener('click', () => {
         const name = setupUserName.value.trim();
