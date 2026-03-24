@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P2P LocalShare</title>
+    <title>P2P LocalShare Pro</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --primary: #007bff; --bg: #f4f7f6; --text: #333; --card: #fff; }
         body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
         h1 { margin-top: 0; color: var(--primary); }
-        .box { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; }
-        .id-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; color: var(--primary); }
+        .box { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;}
+        .id-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; color: var(--primary); margin-bottom: 15px; word-break: break-all;}
         input[type="text"], input[type="file"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
         button { background: var(--primary); color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
         button:hover { background: #0056b3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+        #qrcode { margin-top: 10px; padding: 10px; background: white; border-radius: 8px; }
+        progress { width: 100%; height: 20px; margin-top: 15px; border-radius: 5px; }
         #status { font-size: 0.9rem; margin-top: 15px; font-weight: bold; color: #666; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>LocalShare P2P</h1>
+    <h1>LocalShare Pro</h1>
     
-    <div class="box">
-        <p>Your Device ID:</p>
+    <div id="identity-section" class="box">
+        <p style="margin: 0 0 10px 0;">Your Device ID:</p>
         <div class="id-text" id="my-id">Generating...</div>
+        <div id="qrcode"></div>
+        <p style="font-size: 0.8rem; color: #666;">Scan to connect directly</p>
     </div>
 
     <div id="connect-section">
@@ -38,23 +42,50 @@
     <div id="share-section" class="hidden">
         <input type="file" id="file-input">
         <button id="send-btn" onclick="sendFile()">Send File</button>
+        <progress id="progress-bar" value="0" max="100" class="hidden"></progress>
     </div>
 
     <div id="status">Waiting for connection...</div>
 </div>
 
 <script>
-    // Initialize PeerJS. It connects to a free public signaling server automatically.
     const peer = new Peer();
-    let conn; // Variable to hold the connection
+    let conn; 
+
+    // File receiving variables
+    let receivingFile = [];
+    let receivingFileSize = 0;
+    let receivingFileName = '';
+    let receivingFileType = '';
+    let receivedSize = 0;
 
     const statusEl = document.getElementById('status');
     const connectSection = document.getElementById('connect-section');
     const shareSection = document.getElementById('share-section');
+    const identitySection = document.getElementById('identity-section');
+    const progressBar = document.getElementById('progress-bar');
 
-    // 1. Generate and display our ID
+    // 1. Setup ID and QR Code
     peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
+        
+        // Create a URL that includes the peer ID
+        const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
+        
+        // Generate QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: shareUrl,
+            width: 128,
+            height: 128
+        });
+
+        // Check if we were opened via a QR code scan
+        const urlParams = new URLSearchParams(window.location.search);
+        const connectId = urlParams.get('connect');
+        if (connectId) {
+            document.getElementById('target-id').value = connectId;
+            connectToPeer(); // Auto-connect!
+        }
     });
 
     // 2. Listen for INCOMING connections
@@ -63,7 +94,7 @@
         setupConnection();
     });
 
-    // 3. Initiate an OUTGOING connection
+    // 3. Initiate OUTGOING connection
     function connectToPeer() {
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return alert("Please enter an ID");
@@ -73,32 +104,50 @@
         setupConnection();
     }
 
-    // 4. Handle the connection events (used by both sender and receiver)
+    // 4. Handle connection and file RECEIVING logic
     function setupConnection() {
         conn.on('open', () => {
             statusEl.innerText = "Connected! Ready to share.";
             statusEl.style.color = "green";
             connectSection.classList.add('hidden');
+            identitySection.classList.add('hidden'); // Hide QR code once connected
             shareSection.classList.remove('hidden');
         });
 
-        // Listen for incoming data (files)
         conn.on('data', (data) => {
-            if (data.type === 'file') {
-                statusEl.innerText = "Receiving file...";
+            if (data.type === 'header') {
+                // Incoming file metadata
+                receivingFile = [];
+                receivedSize = 0;
+                receivingFileSize = data.filesize;
+                receivingFileName = data.filename;
+                receivingFileType = data.filetype;
                 
-                // Convert the received ArrayBuffer/Blob back into a downloadable file
-                const blob = new Blob([data.file], { type: data.filetype });
+                progressBar.classList.remove('hidden');
+                progressBar.value = 0;
+                statusEl.innerText = `Receiving: ${data.filename}...`;
+
+            } else if (data.type === 'chunk') {
+                // Incoming file data chunk
+                receivingFile.push(data.data);
+                receivedSize += data.data.byteLength;
+                
+                // Update progress bar
+                progressBar.value = (receivedSize / receivingFileSize) * 100;
+
+            } else if (data.type === 'done') {
+                // File transfer complete
+                const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob);
                 
-                // Create a temporary link to trigger the download
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = data.filename;
+                a.download = receivingFileName;
                 a.click();
                 
-                URL.revokeObjectURL(url); // Clean up memory
-                statusEl.innerText = `Received: ${data.filename}`;
+                URL.revokeObjectURL(url);
+                statusEl.innerText = "File received successfully!";
+                setTimeout(() => progressBar.classList.add('hidden'), 2000);
             }
         });
 
@@ -109,24 +158,58 @@
         });
     }
 
-    // 5. Send the file
+    // 5. File SENDING logic (with Chunking)
     function sendFile() {
         const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
 
         if (!file) return alert("Please select a file first.");
         if (conn && conn.open) {
+            progressBar.classList.remove('hidden');
+            progressBar.value = 0;
             statusEl.innerText = `Sending ${file.name}...`;
             
-            // Send the file over the P2P data channel
+            // Send metadata first
             conn.send({
-                type: 'file',
-                file: file,
+                type: 'header',
                 filename: file.name,
-                filetype: file.type
+                filetype: file.type,
+                filesize: file.size
             });
+
+            // Read and send the file in 64KB chunks
+            let offset = 0;
+            const chunkSize = 64 * 1024; 
+
+            function readSlice() {
+                const slice = file.slice(offset, offset + chunkSize);
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    conn.send({ type: 'chunk', data: e.target.result });
+                    offset += slice.size;
+                    
+                    // Update sender's progress bar
+                    progressBar.value = (offset / file.size) * 100;
+                    
+                    if (offset < file.size) {
+                        // Prevent overloading the data channel buffer
+                        if (conn.dataChannel.bufferedAmount > 1024 * 1024) {
+                            setTimeout(readSlice, 50); 
+                        } else {
+                            readSlice();
+                        }
+                    } else {
+                        // Tell receiver we are done
+                        conn.send({ type: 'done' });
+                        statusEl.innerText = "File sent successfully!";
+                        setTimeout(() => progressBar.classList.add('hidden'), 2000);
+                    }
+                };
+                reader.readAsArrayBuffer(slice);
+            }
             
-            statusEl.innerText = "File sent!";
+            readSlice(); // Start chunking
         } else {
             alert("No active connection.");
         }
