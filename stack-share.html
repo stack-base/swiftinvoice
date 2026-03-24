@@ -49,7 +49,17 @@
 </div>
 
 <script>
-    const peer = new Peer();
+    // 1. Upgrade: Explicitly define STUN servers for better mobile connectivity
+    const peer = new Peer({
+        config: {
+            'iceServers': [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        },
+        debug: 1 // Logs info to the browser console if you need to troubleshoot
+    });
+    
     let conn; 
 
     // File receiving variables
@@ -65,58 +75,65 @@
     const identitySection = document.getElementById('identity-section');
     const progressBar = document.getElementById('progress-bar');
 
-    // 1. Setup ID and QR Code
+    // 2. Setup ID and QR Code
     peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
         
-        // Create a URL that includes the peer ID
         const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
         
-        // Generate QR Code
         new QRCode(document.getElementById("qrcode"), {
             text: shareUrl,
             width: 128,
             height: 128
         });
 
-        // Check if we were opened via a QR code scan
         const urlParams = new URLSearchParams(window.location.search);
         const connectId = urlParams.get('connect');
         if (connectId) {
             document.getElementById('target-id').value = connectId;
-            connectToPeer(); // Auto-connect!
+            // Add a tiny delay to ensure the browser is fully ready before connecting
+            setTimeout(connectToPeer, 500); 
         }
     });
 
-    // 2. Listen for INCOMING connections
+    // 3. Catch Global Peer Errors (Crucial for debugging!)
+    peer.on('error', (err) => {
+        console.error("PeerJS Error:", err);
+        statusEl.innerText = `Error: ${err.type}`;
+        statusEl.style.color = "red";
+    });
+
+    // 4. Listen for INCOMING connections
     peer.on('connection', (connection) => {
         conn = connection;
         setupConnection();
     });
 
-    // 3. Initiate OUTGOING connection
+    // 5. Initiate OUTGOING connection
     function connectToPeer() {
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return alert("Please enter an ID");
         
         statusEl.innerText = "Connecting...";
-        conn = peer.connect(targetId);
+        statusEl.style.color = "#666";
+        
+        // Upgrade: Force reliable data transfer
+        conn = peer.connect(targetId, { reliable: true });
         setupConnection();
     }
 
-    // 4. Handle connection and file RECEIVING logic
+    // 6. Handle connection and file RECEIVING logic
     function setupConnection() {
         conn.on('open', () => {
             statusEl.innerText = "Connected! Ready to share.";
             statusEl.style.color = "green";
             connectSection.classList.add('hidden');
-            identitySection.classList.add('hidden'); // Hide QR code once connected
+            identitySection.classList.add('hidden'); 
             shareSection.classList.remove('hidden');
         });
 
         conn.on('data', (data) => {
             if (data.type === 'header') {
-                // Incoming file metadata
                 receivingFile = [];
                 receivedSize = 0;
                 receivingFileSize = data.filesize;
@@ -128,15 +145,11 @@
                 statusEl.innerText = `Receiving: ${data.filename}...`;
 
             } else if (data.type === 'chunk') {
-                // Incoming file data chunk
                 receivingFile.push(data.data);
                 receivedSize += data.data.byteLength;
-                
-                // Update progress bar
                 progressBar.value = (receivedSize / receivingFileSize) * 100;
 
             } else if (data.type === 'done') {
-                // File transfer complete
                 const blob = new Blob(receivingFile, { type: receivingFileType });
                 const url = URL.createObjectURL(blob);
                 
@@ -156,9 +169,16 @@
             statusEl.style.color = "red";
             shareSection.classList.add('hidden');
         });
+
+        // Catch connection-specific errors
+        conn.on('error', (err) => {
+            statusEl.innerText = "Connection failed!";
+            statusEl.style.color = "red";
+            console.error("Connection Error:", err);
+        });
     }
 
-    // 5. File SENDING logic (with Chunking)
+    // 7. File SENDING logic
     function sendFile() {
         const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
@@ -169,7 +189,6 @@
             progressBar.value = 0;
             statusEl.innerText = `Sending ${file.name}...`;
             
-            // Send metadata first
             conn.send({
                 type: 'header',
                 filename: file.name,
@@ -177,7 +196,6 @@
                 filesize: file.size
             });
 
-            // Read and send the file in 64KB chunks
             let offset = 0;
             const chunkSize = 64 * 1024; 
 
@@ -188,19 +206,15 @@
                 reader.onload = (e) => {
                     conn.send({ type: 'chunk', data: e.target.result });
                     offset += slice.size;
-                    
-                    // Update sender's progress bar
                     progressBar.value = (offset / file.size) * 100;
                     
                     if (offset < file.size) {
-                        // Prevent overloading the data channel buffer
                         if (conn.dataChannel.bufferedAmount > 1024 * 1024) {
                             setTimeout(readSlice, 50); 
                         } else {
                             readSlice();
                         }
                     } else {
-                        // Tell receiver we are done
                         conn.send({ type: 'done' });
                         statusEl.innerText = "File sent successfully!";
                         setTimeout(() => progressBar.classList.add('hidden'), 2000);
@@ -208,8 +222,7 @@
                 };
                 reader.readAsArrayBuffer(slice);
             }
-            
-            readSlice(); // Start chunking
+            readSlice(); 
         } else {
             alert("No active connection.");
         }
