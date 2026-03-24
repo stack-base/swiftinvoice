@@ -3,38 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerDrop | StackBase</title>
+    <title>PeerDrop | Fast P2P Sharing</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --primary: #007bff; --bg: #f4f7f6; --text: #333; --card: #fff; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { margin-top: 0; color: var(--primary); }
-        .box { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;}
-        .id-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; color: var(--primary); margin-bottom: 15px; word-break: break-all;}
-        input[type="text"], input[type="file"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        /* Base Light Theme */
+        :root { 
+            --primary: #007bff; 
+            --bg: #f4f7f6; 
+            --text: #333; 
+            --card: #fff; 
+            --input-bg: #fff;
+            --border: #ccc;
+        }
+
+        /* Dark Theme Overrides */
+        body.dark-mode {
+            --bg: #121212;
+            --text: #e0e0e0;
+            --card: #1e1e1e;
+            --input-bg: #2d2d2d;
+            --border: #444;
+        }
+
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; transition: background-color 0.3s; }
+        .container { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; transition: background-color 0.3s; }
+        
+        /* Header Flexbox for Dark Mode Button */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; color: var(--primary); }
+        
+        .box { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; transition: background-color 0.3s;}
+        
+        /* ID & Copy Button Flexbox */
+        .id-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap;}
+        .id-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; color: var(--primary); word-break: break-all;}
+        
+        input[type="text"], input[type="file"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); color: var(--text); }
+        
         button { background: var(--primary); color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
         button:hover { background: #0056b3; }
+        
+        /* Utility Buttons */
+        .btn-small { width: auto; padding: 6px 12px; margin: 0; font-size: 0.85rem; background: #6c757d; }
+        .btn-small:hover { background: #5a6268; }
+        .btn-icon { width: auto; padding: 8px; margin: 0; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
+        .btn-icon:hover { background: var(--bg); }
+
+        /* QR Code needs a white background to remain scannable in dark mode */
         #qrcode { margin-top: 10px; padding: 10px; background: white; border-radius: 8px; }
+        
         progress { width: 100%; height: 20px; margin-top: 15px; border-radius: 5px; }
-        #status { font-size: 0.9rem; margin-top: 15px; font-weight: bold; color: #666; }
+        #status { font-size: 0.9rem; margin-top: 15px; font-weight: bold; color: #888; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>LocalShare Pro</h1>
+    <div class="header">
+        <h1>PeerDrop</h1>
+        <button class="btn-icon" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌓</button>
+    </div>
     
     <div id="identity-section" class="box">
         <p style="margin: 0 0 10px 0;">Your Device ID:</p>
-        <div class="id-text" id="my-id">Generating...</div>
+        <div class="id-container">
+            <div class="id-text" id="my-id">Generating...</div>
+            <button id="copy-btn" class="btn-small hidden" onclick="copyId()">Copy</button>
+        </div>
         <div id="qrcode"></div>
-        <p style="font-size: 0.8rem; color: #666;">Scan to connect directly</p>
+        <p style="font-size: 0.8rem; color: #888;">Scan to connect directly</p>
     </div>
 
     <div id="connect-section">
@@ -52,7 +94,38 @@
 </div>
 
 <script>
-    // 1. Upgrade: Explicitly define STUN servers for better mobile connectivity
+    // --- UI Logic (Dark Mode & Copy) ---
+    
+    // Check local storage for dark mode preference on load
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+    }
+
+    function copyId() {
+        const idText = document.getElementById('my-id').innerText;
+        navigator.clipboard.writeText(idText).then(() => {
+            const copyBtn = document.getElementById('copy-btn');
+            copyBtn.innerText = 'Copied!';
+            copyBtn.style.background = '#28a745'; // Green success color
+            setTimeout(() => {
+                copyBtn.innerText = 'Copy';
+                copyBtn.style.background = '#6c757d'; // Revert to gray
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert("Could not copy ID. Please copy manually.");
+        });
+    }
+
+
+    // --- Core WebRTC Logic ---
+
     const peer = new Peer({
         config: {
             'iceServers': [
@@ -60,21 +133,18 @@
                 { urls: 'stun:stun1.l.google.com:19302' }
             ]
         },
-        debug: 1 // Logs info to the browser console if you need to troubleshoot
+        debug: 1 
     });
 
-    // Register Service Worker for PWA installability
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registered!', reg))
+                .then(reg => console.log('Service Worker registered!'))
                 .catch(err => console.error('Service Worker registration failed:', err));
         });
     }
     
     let conn; 
-
-    // File receiving variables
     let receivingFile = [];
     let receivingFileSize = 0;
     let receivingFileName = '';
@@ -86,10 +156,11 @@
     const shareSection = document.getElementById('share-section');
     const identitySection = document.getElementById('identity-section');
     const progressBar = document.getElementById('progress-bar');
+    const copyBtn = document.getElementById('copy-btn');
 
-    // 2. Setup ID and QR Code
     peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
+        copyBtn.classList.remove('hidden'); // Show copy button once ID is generated
         
         const shareUrl = window.location.href.split('?')[0] + '?connect=' + id;
         
@@ -103,42 +174,36 @@
         const connectId = urlParams.get('connect');
         if (connectId) {
             document.getElementById('target-id').value = connectId;
-            // Add a tiny delay to ensure the browser is fully ready before connecting
             setTimeout(connectToPeer, 500); 
         }
     });
 
-    // 3. Catch Global Peer Errors (Crucial for debugging!)
     peer.on('error', (err) => {
         console.error("PeerJS Error:", err);
         statusEl.innerText = `Error: ${err.type}`;
         statusEl.style.color = "red";
     });
 
-    // 4. Listen for INCOMING connections
     peer.on('connection', (connection) => {
         conn = connection;
         setupConnection();
     });
 
-    // 5. Initiate OUTGOING connection
     function connectToPeer() {
         const targetId = document.getElementById('target-id').value.trim();
         if (!targetId) return alert("Please enter an ID");
         
         statusEl.innerText = "Connecting...";
-        statusEl.style.color = "#666";
+        statusEl.style.color = "#888";
         
-        // Upgrade: Force reliable data transfer
         conn = peer.connect(targetId, { reliable: true });
         setupConnection();
     }
 
-    // 6. Handle connection and file RECEIVING logic
     function setupConnection() {
         conn.on('open', () => {
             statusEl.innerText = "Connected! Ready to share.";
-            statusEl.style.color = "green";
+            statusEl.style.color = "#28a745";
             connectSection.classList.add('hidden');
             identitySection.classList.add('hidden'); 
             shareSection.classList.remove('hidden');
@@ -182,7 +247,6 @@
             shareSection.classList.add('hidden');
         });
 
-        // Catch connection-specific errors
         conn.on('error', (err) => {
             statusEl.innerText = "Connection failed!";
             statusEl.style.color = "red";
@@ -190,7 +254,6 @@
         });
     }
 
-    // 7. File SENDING logic
     function sendFile() {
         const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
@@ -230,6 +293,7 @@
                         conn.send({ type: 'done' });
                         statusEl.innerText = "File sent successfully!";
                         setTimeout(() => progressBar.classList.add('hidden'), 2000);
+                        fileInput.value = ''; // Clear the input after sending
                     }
                 };
                 reader.readAsArrayBuffer(slice);
